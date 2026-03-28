@@ -1,8 +1,8 @@
 pluginManagement {
     repositories {
-        google()
-        gradlePluginPortal()
-        mavenCentral()
+        maven { url = uri("https://maven.aliyun.com/repository/google") }
+        maven { url = uri("https://maven.aliyun.com/repository/gradle-plugin") }
+        maven { url = uri("https://maven.aliyun.com/repository/central") }
         maven {
             url = uri("https://mirrors.tencent.com/nexus/repository/maven-tencent/")
         }
@@ -11,7 +11,8 @@ pluginManagement {
 
 dependencyResolutionManagement {
     repositories {
-        google()
+        maven { url = uri("https://maven.aliyun.com/repository/google") }
+        maven { url = uri("https://maven.aliyun.com/repository/central") }
         mavenCentral()
         mavenLocal()
         maven {

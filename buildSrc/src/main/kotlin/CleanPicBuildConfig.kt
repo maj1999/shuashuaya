@@ -9,8 +9,9 @@ object Versions {
     const val KOTLIN = "2.1.21"
     const val AGP = "7.4.2"
     const val COMPOSE_MULTIPLATFORM = "1.7.3"
-    const val KSP = "2.1.21-2.0.1"
-    const val KUIKLY_GRADLE_PLUGIN = "2.14.1-2.0.21"
+    const val KSP = "2.1.21-1.0.29"
+    const val KUIKLY = "2.4.0-2.0.21"
+    const val KUIKLY_GRADLE_PLUGIN = "2.4.0-2.0.21"
 
     // Android SDK
     const val ANDROID_COMPILE_SDK = 34

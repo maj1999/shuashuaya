@@ -6,9 +6,9 @@ plugins {
     kotlin("native.cocoapods")
     kotlin("plugin.compose")
     id("com.android.library")
-    id("com.google.devtools.ksp")
+    // id("com.google.devtools.ksp")  // 暂不使用 KSP（Compose DSL 无需 @Page 注解）
     id("org.jetbrains.compose")
-    id("com.tencent.kuikly-open.kuikly")
+    // id("com.tencent.kuikly-open.kuikly")  // 暂不使用 Kuikly Gradle 插件（避免 KSP 版本冲突）
 }
 
 group = AppConfig.GROUP
@@ -28,12 +28,14 @@ kotlin {
     iosSimulatorArm64()
 
     // HarmonyOS NEXT target (ohos arm64)
-    ohosArm64 {
-        binaries.sharedLib("shared") {
-            freeCompilerArgs += "-Xadd-light-debug=enable"
-            linkerOpts += "--build-id=sha1"
-        }
-    }
+    // 注意：ohosArm64 需要 KuiklyUI Gradle 插件提供支持
+    // 当 KuiklyUI 插件正确加载后取消注释
+    // ohosArm64 {
+    //     binaries.sharedLib("shared") {
+    //         freeCompilerArgs += "-Xadd-light-debug=enable"
+    //         linkerOpts += "--build-id=sha1"
+    //     }
+    // }
 
     sourceSets {
         all {
@@ -44,10 +46,10 @@ kotlin {
     // commonMain — 跨平台共享代码
     val commonMain by sourceSets.getting {
         dependencies {
-            // KuiklyUI 核心依赖（后续任务中补充具体版本号）
-            // implementation(Deps.KUIKLY_CORE)
-            // implementation(Deps.KUIKLY_COMPOSE)
-            // implementation(Deps.KUIKLY_CORE_ANNOTATIONS)
+            // KuiklyUI 核心依赖
+            implementation("com.tencent.kuikly-open:core:${Versions.KUIKLY}")
+            implementation("com.tencent.kuikly-open:compose:${Versions.KUIKLY}")
+            implementation("com.tencent.kuikly-open:core-annotations:${Versions.KUIKLY}")
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
         }
     }

@@ -1,0 +1,267 @@
+package com.cleanpic.ui.result
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import com.cleanpic.model.MediaType
+import com.cleanpic.model.ViewerItem
+import com.cleanpic.theme.ThemeTokens
+import com.cleanpic.ui.viewer.formatBytes
+import com.cleanpic.viewmodel.ViewerViewModel
+import kotlinx.coroutines.launch
+
+@Composable
+fun ResultScreen(
+    navController: NavHostController,
+    theme: ThemeTokens,
+    viewerViewModel: ViewerViewModel
+) {
+    val scope = rememberCoroutineScope()
+    val items by viewerViewModel.items.collectAsState()
+    var confirmResult by remember { mutableStateOf<String?>(null) }
+    var isDeleting by remember { mutableStateOf(false) }
+
+    val pendingDeletes = items.filter {
+        it.state == com.cleanpic.model.OperationState.PENDING_DELETE
+    }
+    val keptCount = items.count {
+        it.state == com.cleanpic.model.OperationState.KEPT
+    }
+    val releasedBytes = pendingDeletes.sumOf { it.media.size }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(theme.colorBackground))
+            .verticalScroll(rememberScrollState())
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Spacer(modifier = Modifier.height(32.dp))
+        Text(text = "\ud83c\udf89", fontSize = 64.sp)
+        Spacer(modifier = Modifier.height(12.dp))
+        Text(
+            text = "\u672c\u8f6e\u6e05\u7406\u5b8c\u6210\uff01",
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(theme.colorText)
+        )
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // 统计卡片
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            StatCard(
+                label = "\u5220\u9664",
+                value = "${pendingDeletes.size}",
+                color = Color(theme.colorDanger),
+                theme = theme,
+                modifier = Modifier.weight(1f)
+            )
+            StatCard(
+                label = "\u4fdd\u7559",
+                value = "$keptCount",
+                color = Color(theme.colorSuccess),
+                theme = theme,
+                modifier = Modifier.weight(1f)
+            )
+            StatCard(
+                label = "\u91ca\u653e",
+                value = formatBytes(releasedBytes),
+                color = Color(0xFF9C27B0),
+                theme = theme,
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        // 待删除预览列表
+        if (pendingDeletes.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(24.dp))
+            Text(
+                text = "\u5f85\u5220\u9664\u9879\u76ee",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium,
+                color = Color(theme.colorText),
+                modifier = Modifier.align(Alignment.Start)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth().height(100.dp)
+            ) {
+                items(pendingDeletes, key = { it.media.id }) { item ->
+                    DeletePreviewItem(item, theme) {
+                        viewerViewModel.cancelDelete(item.media.id)
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // 确认删除按钮
+        if (pendingDeletes.isNotEmpty()) {
+            Button(
+                onClick = {
+                    isDeleting = true
+                    scope.launch {
+                        viewerViewModel.confirmDelete().fold(
+                            onSuccess = { count ->
+                                confirmResult = "\u5df2\u6210\u529f\u5220\u9664 $count \u4e2a\u6587\u4ef6"
+                            },
+                            onFailure = { e ->
+                                confirmResult = when {
+                                    e.message?.contains("cancel", true) == true ->
+                                        "\u5df2\u53d6\u6d88\u5220\u9664"
+                                    else -> "\u5220\u9664\u5931\u8d25\uff1a${e.message}"
+                                }
+                            }
+                        )
+                        isDeleting = false
+                    }
+                },
+                enabled = !isDeleting,
+                modifier = Modifier.fillMaxWidth().height(48.dp),
+                shape = RoundedCornerShape(theme.borderRadius.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(theme.colorDanger)
+                )
+            ) {
+                if (isDeleting) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        color = Color.White,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text(
+                        text = "\u786e\u8ba4\u5220\u9664",
+                        color = Color.White,
+                        fontSize = 16.sp
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
+        // 结果提示
+        confirmResult?.let { msg ->
+            Text(
+                text = msg,
+                fontSize = 14.sp,
+                color = Color(theme.colorTextSecondary),
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+        }
+
+        // 再来一轮
+        OutlinedButton(
+            onClick = {
+                val type = items.firstOrNull()?.media?.type ?: MediaType.PHOTO
+                scope.launch {
+                    viewerViewModel.loadMedia(type)
+                    navController.navigate("viewer/${type.name}") {
+                        popUpTo("result") { inclusive = true }
+                    }
+                }
+            },
+            modifier = Modifier.fillMaxWidth().height(48.dp),
+            shape = RoundedCornerShape(theme.borderRadius.dp)
+        ) {
+            Text(text = "\ud83d\udd04 \u518d\u6765\u4e00\u8f6e", fontSize = 16.sp)
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // 返回首页
+        TextButton(onClick = {
+            viewerViewModel.clearSession()
+            navController.navigate("home") {
+                popUpTo("home") { inclusive = true }
+            }
+        }) {
+            Text(
+                text = "\ud83c\udfe0 \u8fd4\u56de\u9996\u9875",
+                fontSize = 16.sp,
+                color = Color(theme.colorPrimary)
+            )
+        }
+    }
+}
+
+@Composable
+private fun StatCard(
+    label: String,
+    value: String,
+    color: Color,
+    theme: ThemeTokens,
+    modifier: Modifier
+) {
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(theme.borderRadius.dp))
+            .background(color.copy(alpha = 0.1f))
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = value, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = color)
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(text = label, fontSize = 12.sp, color = Color(theme.colorTextSecondary))
+    }
+}
+
+@Composable
+private fun DeletePreviewItem(
+    item: ViewerItem,
+    theme: ThemeTokens,
+    onCancel: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .width(80.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(Color(theme.colorSurface)),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(
+            modifier = Modifier.size(60.dp).background(Color(theme.colorSurface)),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = if (item.media.type == MediaType.PHOTO) "\ud83d\uddbc\ufe0f" else "\ud83c\udfac",
+                fontSize = 24.sp
+            )
+        }
+        Text(
+            text = item.media.name,
+            fontSize = 10.sp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.padding(horizontal = 4.dp)
+        )
+        TextButton(
+            onClick = onCancel,
+            contentPadding = PaddingValues(0.dp),
+            modifier = Modifier.height(24.dp)
+        ) {
+            Text(text = "\u2715 \u53d6\u6d88", fontSize = 10.sp, color = Color(theme.colorDanger))
+        }
+    }
+}

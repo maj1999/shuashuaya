@@ -8,7 +8,7 @@ interface AppSettings {
 
 private val VALID_COUNTS = setOf(5, 10, 15, 20)
 
-class InMemoryAppSettings : AppSettings {
+open class InMemoryAppSettings : AppSettings {
     override var theme: String = "dreamy-gradient"
     override var interactionMode: String = "carousel"
 

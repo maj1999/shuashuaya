@@ -65,6 +65,9 @@ kotlin {
     // Android 平台
     val androidMain by sourceSets.getting {
         dependsOn(commonMain)
+        dependencies {
+            implementation("androidx.core:core-ktx:1.12.0")
+        }
     }
 
     // Apple 平台（iOS 共享）

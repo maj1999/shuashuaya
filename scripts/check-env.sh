@@ -14,10 +14,10 @@ WARN=0
 check() {
     local label="$1"
     local cmd="$2"
-    local detail
+    local detail=""
 
     if detail=$(eval "$cmd" 2>/dev/null); then
-        echo "[OK] $label — $detail"
+        echo "[OK] $label - $detail"
         ((PASS++))
     else
         echo "[NO] $label"
@@ -28,13 +28,13 @@ check() {
 check_warn() {
     local label="$1"
     local cmd="$2"
-    local detail
+    local detail=""
 
     if detail=$(eval "$cmd" 2>/dev/null); then
-        echo "[OK] $label — $detail"
+        echo "[OK] $label - $detail"
         ((PASS++))
     else
-        echo "[--] $label（非阻塞）"
+        echo "[--] $label (non-blocking)"
         ((WARN++))
     fi
 }

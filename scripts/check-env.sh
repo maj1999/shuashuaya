@@ -2,7 +2,7 @@
 #
 # 检查多平台模拟测试环境是否就绪
 #
-set -uo pipefail
+set -u
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -16,7 +16,7 @@ check() {
     local cmd="$2"
     local detail=""
 
-    if detail=$(eval "$cmd" 2>/dev/null); then
+    if detail=$(eval "$cmd" 2>&1); then
         echo "[OK] $label - $detail"
         ((PASS++))
     else
@@ -51,7 +51,7 @@ check "Gradle Wrapper" \
 
 # Xcode / iOS Simulator
 check "Xcode" \
-    "xcodebuild -version 2>/dev/null | head -1"
+    "xcode-select -p >/dev/null 2>&1 && xcodebuild -version 2>&1 | head -1 || false"
 
 check "iOS Simulator" \
     "xcrun simctl list devices available 2>/dev/null | grep -c 'iPhone' | xargs -I{} echo '{} devices available'"

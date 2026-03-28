@@ -32,3 +32,9 @@ Thumbs.db
 
 # Android
 androidApp/libs/
+
+# Test assets (generated locally, not tracked)
+test-assets/**/*.jpg
+test-assets/**/*.png
+test-assets/**/*.mp4
+!test-assets/**/.gitkeep

@@ -17,10 +17,10 @@ import com.tencent.kuikly.compose.ui.text.font.FontWeight
 import com.tencent.kuikly.compose.ui.text.style.TextOverflow
 import com.tencent.kuikly.compose.ui.unit.dp
 import com.tencent.kuikly.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import com.cleanpic.model.MediaType
 import com.cleanpic.model.ViewerItem
 import com.cleanpic.theme.ThemeTokens
+import com.cleanpic.ui.navigation.AppRouter
 import com.cleanpic.viewmodel.ViewerViewModel
 import kotlinx.coroutines.launch
 
@@ -30,7 +30,7 @@ private const val VERTICAL_THRESHOLD_DP = 120
 fun FullscreenMode(
     theme: ThemeTokens,
     viewerViewModel: ViewerViewModel,
-    navController: NavHostController
+    router: AppRouter
 ) {
     val items by viewerViewModel.items.collectAsState()
     val currentIndex by viewerViewModel.currentIndex.collectAsState()
@@ -55,7 +55,7 @@ fun FullscreenMode(
             theme = theme,
             current = currentIndex + 1,
             total = items.size,
-            onExit = { navController.popBackStack() },
+            onExit = { router.popBackStack() },
             modifier = Modifier.align(Alignment.TopCenter)
         )
 
@@ -116,7 +116,7 @@ private fun TopBar(
             .fillMaxWidth()
             .background(Color.Black.copy(alpha = 0.4f))
             .padding(horizontal = 12.dp, vertical = 8.dp)
-            .statusBarsPadding(),
+            .padding(top = 44.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         TextButton(onClick = onExit) {
@@ -190,7 +190,7 @@ private fun BottomInfo(
             .fillMaxWidth()
             .background(Color.Black.copy(alpha = 0.5f))
             .padding(horizontal = 16.dp, vertical = 12.dp)
-            .navigationBarsPadding()
+            .padding(bottom = 34.dp)
     ) {
         Text(
             text = item.media.name,
@@ -217,7 +217,7 @@ private fun BottomInfo(
                 val seconds = (item.media.duration / 1000) % 60
                 val minutes = (item.media.duration / 1000 / 60) % 60
                 Text(
-                    text = "%d:%02d".format(minutes, seconds),
+                    text = "$minutes:${seconds.toString().padStart(2, '0')}",
                     fontSize = 12.sp,
                     color = Color.White.copy(alpha = 0.8f)
                 )

@@ -10,17 +10,18 @@ import com.tencent.kuikly.compose.ui.Modifier
 import com.tencent.kuikly.compose.ui.graphics.Color
 import com.tencent.kuikly.compose.ui.unit.dp
 import com.tencent.kuikly.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import com.cleanpic.di.ServiceLocator
 import com.cleanpic.model.InteractionMode
 import com.cleanpic.model.MediaType
 import com.cleanpic.theme.ThemeTokens
 import com.cleanpic.ui.common.EmptyStateScreen
+import com.cleanpic.ui.navigation.AppRouter
+import com.cleanpic.ui.navigation.Route
 import com.cleanpic.viewmodel.ViewerViewModel
 
 @Composable
 fun ViewerScreen(
-    navController: NavHostController,
+    router: AppRouter,
     theme: ThemeTokens,
     viewerViewModel: ViewerViewModel,
     type: MediaType
@@ -32,16 +33,18 @@ fun ViewerScreen(
 
     LaunchedEffect(viewerViewModel.isComplete, currentIndex) {
         if (items.isNotEmpty() && currentIndex >= items.size) {
-            navController.navigate("result") {
-                popUpTo("viewer/{type}") { inclusive = true }
-            }
+            router.navigate(
+                Route.Result,
+                clearBackStackUpTo = Route.Viewer(type),
+                inclusive = true
+            )
         }
     }
 
     when {
         isLoading -> LoadingView(theme)
         isEmpty -> EmptyStateScreen(theme, type) {
-            navController.popBackStack()
+            router.popBackStack()
         }
         else -> {
             val mode = InteractionMode.fromId(
@@ -66,7 +69,7 @@ fun ViewerScreen(
                             theme, viewerViewModel
                         )
                         InteractionMode.FULLSCREEN -> FullscreenMode(
-                            theme, viewerViewModel, navController
+                            theme, viewerViewModel, router
                         )
                     }
                 }

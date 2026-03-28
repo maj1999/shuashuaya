@@ -184,7 +184,7 @@ private fun ActionButtons(theme: ThemeTokens, viewerViewModel: ViewerViewModel) 
 internal fun DurationBadge(durationMs: Long, modifier: Modifier = Modifier) {
     val seconds = (durationMs / 1000) % 60
     val minutes = (durationMs / 1000 / 60) % 60
-    val text = "%d:%02d".format(minutes, seconds)
+    val text = "$minutes:${seconds.toString().padStart(2, '0')}"
     Text(
         text = text,
         fontSize = 12.sp,
@@ -228,7 +228,7 @@ internal fun FileInfoOverlay(item: ViewerItem, modifier: Modifier = Modifier) {
 
 internal fun formatBytes(bytes: Long): String = when {
     bytes < 1024L -> "$bytes B"
-    bytes < 1024L * 1024 -> "%.1f KB".format(bytes / 1024.0)
-    bytes < 1024L * 1024 * 1024 -> "%.1f MB".format(bytes / (1024.0 * 1024))
-    else -> "%.2f GB".format(bytes / (1024.0 * 1024 * 1024))
+    bytes < 1024L * 1024 -> "${(bytes * 10 / 1024).toDouble() / 10.0} KB"
+    bytes < 1024L * 1024 * 1024 -> "${(bytes * 10 / (1024L * 1024)).toDouble() / 10.0} MB"
+    else -> "${(bytes * 100 / (1024L * 1024 * 1024)).toDouble() / 100.0} GB"
 }

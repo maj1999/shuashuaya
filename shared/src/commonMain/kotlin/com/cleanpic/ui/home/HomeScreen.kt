@@ -12,18 +12,20 @@ import com.tencent.kuikly.compose.ui.graphics.Color
 import com.tencent.kuikly.compose.ui.text.font.FontWeight
 import com.tencent.kuikly.compose.ui.unit.dp
 import com.tencent.kuikly.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import com.cleanpic.model.MediaType
 import com.cleanpic.permission.PermissionStatus
 import com.cleanpic.theme.ThemeTokens
 import com.cleanpic.ui.common.PermissionBanner
+import com.cleanpic.ui.common.SimpleDialog
+import com.cleanpic.ui.navigation.AppRouter
+import com.cleanpic.ui.navigation.Route
 import com.cleanpic.viewmodel.HomeViewModel
 import com.cleanpic.viewmodel.ViewerViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
-    navController: NavHostController,
+    router: AppRouter,
     theme: ThemeTokens,
     viewerViewModel: ViewerViewModel
 ) {
@@ -38,7 +40,7 @@ fun HomeScreen(
             PermissionStatus.GRANTED, PermissionStatus.LIMITED -> {
                 scope.launch {
                     viewerViewModel.loadMedia(type)
-                    navController.navigate("viewer/${type.name}")
+                    router.navigate(Route.Viewer(type))
                 }
             }
             PermissionStatus.DENIED -> showDeniedDialog = true
@@ -93,7 +95,7 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        IconButton(onClick = { navController.navigate("settings") }) {
+        TextButton(onClick = { router.navigate(Route.Settings) }) {
             Text(text = "\u2699\ufe0f", fontSize = 28.sp)
         }
     }
@@ -137,30 +139,24 @@ private fun ActionButton(
 
 @Composable
 private fun PermissionDeniedDialog(onRequest: () -> Unit, onDismiss: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("\u9700\u8981\u76f8\u518c\u6743\u9650") },
-        text = { Text("\u8bf7\u6388\u6743\u8bbf\u95ee\u76f8\u518c\uff0c\u4ee5\u4fbf\u968f\u673a\u6e05\u7406\u7167\u7247\u548c\u89c6\u9891") },
-        confirmButton = {
-            TextButton(onClick = onRequest) { Text("\u6388\u6743") }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text("\u53d6\u6d88") }
-        }
+    SimpleDialog(
+        title = "\u9700\u8981\u76f8\u518c\u6743\u9650",
+        message = "\u8bf7\u6388\u6743\u8bbf\u95ee\u76f8\u518c\uff0c\u4ee5\u4fbf\u968f\u673a\u6e05\u7406\u7167\u7247\u548c\u89c6\u9891",
+        confirmText = "\u6388\u6743",
+        dismissText = "\u53d6\u6d88",
+        onConfirm = onRequest,
+        onDismiss = onDismiss
     )
 }
 
 @Composable
 private fun PermissionPermanentDialog(onGoSettings: () -> Unit, onDismiss: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("\u6743\u9650\u5df2\u88ab\u62d2\u7edd") },
-        text = { Text("\u8bf7\u524d\u5f80\u7cfb\u7edf\u8bbe\u7f6e\u624b\u52a8\u5f00\u542f\u76f8\u518c\u8bbf\u95ee\u6743\u9650") },
-        confirmButton = {
-            TextButton(onClick = onGoSettings) { Text("\u53bb\u8bbe\u7f6e") }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text("\u53d6\u6d88") }
-        }
+    SimpleDialog(
+        title = "\u6743\u9650\u5df2\u88ab\u62d2\u7edd",
+        message = "\u8bf7\u524d\u5f80\u7cfb\u7edf\u8bbe\u7f6e\u624b\u52a8\u5f00\u542f\u76f8\u518c\u8bbf\u95ee\u6743\u9650",
+        confirmText = "\u53bb\u8bbe\u7f6e",
+        dismissText = "\u53d6\u6d88",
+        onConfirm = onGoSettings,
+        onDismiss = onDismiss
     )
 }

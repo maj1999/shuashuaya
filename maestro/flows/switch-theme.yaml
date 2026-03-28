@@ -1,0 +1,19 @@
+# maestro/flows/switch-theme.yaml
+#
+# E2E: 首页 → 设置 → 切换主题 → 返回验证
+#
+appId: com.cleanpic.android
+---
+- launchApp
+- waitForAnimationToEnd
+- tapOn: "设置"
+- waitForAnimationToEnd
+- tapOn: "主题"
+- waitForAnimationToEnd
+- takeScreenshot: theme-settings
+- tapOn: "优雅暗色"
+- waitForAnimationToEnd
+- takeScreenshot: theme-dark-applied
+- tapOn: "返回"
+- waitForAnimationToEnd
+- takeScreenshot: theme-home-after-switch

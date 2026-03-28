@@ -1,0 +1,16 @@
+# maestro/flows/browse-photos.yaml
+#
+# E2E: 首页 → 选择照片 → 浏览照片 → 返回
+#
+# 注意: UI 选择器待 Maestro + KuiklyUI 兼容性验证后调整
+#
+appId: com.cleanpic.android
+---
+- launchApp
+- assertVisible: "CleanPic"
+- waitForAnimationToEnd
+- tapOn: "照片"
+- waitForAnimationToEnd
+- assertVisible: "保留"
+- assertVisible: "删除"
+- takeScreenshot: browse-photos-loaded

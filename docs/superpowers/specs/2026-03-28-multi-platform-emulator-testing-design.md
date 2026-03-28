@@ -11,6 +11,8 @@ CleanPic 是基于 KuiklyUI 的 Kotlin Multiplatform 项目，目标平台为 An
 
 **核心决策：** 采用本地 + 云端混合方案——三端 IDE 全部本地安装，HarmonyOS 额外接入华为 AGC 云测试弥补模拟器的硬件功能缺陷。
 
+**前置条件：** HarmonyOS 的 `ohosArm64` Gradle target 当前被注释（依赖 KuiklyUI Gradle 插件对 ohos 的支持就绪）。在该 target 解除注释之前，`test-harmony.sh` 和 `test-harmony-cloud.sh` 暂不可用，HarmonyOS 相关脚本将在 target 启用后生效。Android 和 iOS 的环境搭建不受此影响。
+
 ## 二、工具链架构
 
 ```
@@ -53,8 +55,8 @@ CleanPic 是基于 KuiklyUI 的 Kotlin Multiplatform 项目，目标平台为 An
 
 | 层级 | 运行方式 | Android | iOS | HarmonyOS |
 |------|---------|---------|-----|-----------|
-| L1 单元 | `scripts/test.sh` | commonTest (JVM) | commonTest (JVM) | commonTest (JVM) |
-| L2 组件 | `scripts/test.sh` | commonTest (JVM) | commonTest (JVM) | commonTest (JVM) |
+| L1 单元 | `scripts/test.sh` | 跨平台 commonTest | 跨平台 commonTest | 跨平台 commonTest |
+| L2 组件 | `scripts/test.sh` | 跨平台 commonTest | 跨平台 commonTest | 跨平台 commonTest |
 | L3 集成 | 各平台脚本 | Emulator | Simulator | 模拟器(UI) + AGC 云真机(媒体/权限) |
 | L4 E2E | 各平台脚本 | Maestro + Emulator | Maestro + Simulator | ArkTS + 模拟器/AGC 云真机 |
 
@@ -191,6 +193,10 @@ Step 5: AGC 云测试        — 注册华为开发者账号，实名认证，�
 | 热门设备可能排队 | 非高峰时段执行，或选择冷门但同配置的设备 |
 | IDE 插件连接需在中国大陆 | 通过浏览器访问 AGC 控制台 |
 
+### Maestro + KuiklyUI 兼容性（待验证）
+
+Maestro 的 UI 元素定位依赖 Accessibility 节点树。KuiklyUI 非标准 Jetpack Compose / SwiftUI，其渲染层可能不会自动暴露标准的 accessibility 标签。需要在环境搭建完成后尽早验证 Maestro 能否正确识别 KuiklyUI 渲染的 UI 元素。若不兼容，L4 E2E 自动化方案需切换为截图对比或其他方案。
+
 ## 七、测试媒体资源
 
 三端共用统一的测试媒体，由各平台启动脚本自动注入：
@@ -204,6 +210,14 @@ test-assets/
 └── videos/
     ├── test_01.mp4  (5MB, 10s, 1080p)
     └── test_02.mp4  (15MB, 30s, 4K)
+```
+
+test-assets/ 中包含大体积二进制文件（视频最大 15MB），应使用 Git LFS 管理以避免仓库膨胀。需在项目中配置 `.gitattributes`：
+
+```
+test-assets/**/*.mp4 filter=lfs diff=lfs merge=lfs -text
+test-assets/**/*.jpg filter=lfs diff=lfs merge=lfs -text
+test-assets/**/*.png filter=lfs diff=lfs merge=lfs -text
 ```
 
 ## 八、关键设计决策

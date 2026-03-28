@@ -48,6 +48,7 @@ kotlin {
             // implementation(Deps.KUIKLY_CORE)
             // implementation(Deps.KUIKLY_COMPOSE)
             // implementation(Deps.KUIKLY_CORE_ANNOTATIONS)
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
         }
     }
 

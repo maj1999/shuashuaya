@@ -23,6 +23,7 @@ import com.cleanpic.model.MediaType
 import com.cleanpic.model.ViewerItem
 import com.cleanpic.theme.ThemeTokens
 import com.cleanpic.ui.media.MediaImage
+import com.cleanpic.ui.media.VideoPlayerView
 import com.cleanpic.viewmodel.ViewerViewModel
 import kotlinx.coroutines.launch
 
@@ -40,8 +41,14 @@ fun SwipeCardMode(theme: ThemeTokens, viewerViewModel: ViewerViewModel) {
     val density = LocalDensity.current
     val thresholdPx = with(density) { SWIPE_THRESHOLD_DP.dp.toPx() }
 
-    // 每次 index 变化时重置偏移
-    LaunchedEffect(currentIndex) { offsetX.snapTo(0f) }
+    var isPlaying by remember { mutableStateOf(false) }
+    var isMuted by remember { mutableStateOf(true) }
+
+    // 每次 index 变化时重置偏移和播放状态
+    LaunchedEffect(currentIndex) {
+        offsetX.snapTo(0f)
+        isPlaying = false
+    }
 
     fun onSwipeComplete(toLeft: Boolean) {
         scope.launch {
@@ -109,6 +116,10 @@ fun SwipeCardMode(theme: ThemeTokens, viewerViewModel: ViewerViewModel) {
             CardContent(
                 item = items[currentIndex],
                 theme = theme,
+                isPlaying = isPlaying,
+                isMuted = isMuted,
+                onPlayClick = { isPlaying = true },
+                onToggleMute = { isMuted = !isMuted },
                 modifier = Modifier
                     .fillMaxHeight(0.8f)
                     .fillMaxWidth(0.85f)
@@ -141,27 +152,53 @@ fun SwipeCardMode(theme: ThemeTokens, viewerViewModel: ViewerViewModel) {
 }
 
 @Composable
-private fun CardContent(item: ViewerItem, theme: ThemeTokens, modifier: Modifier) {
+private fun CardContent(
+    item: ViewerItem,
+    theme: ThemeTokens,
+    modifier: Modifier,
+    isPlaying: Boolean = false,
+    isMuted: Boolean = true,
+    onPlayClick: (() -> Unit)? = null,
+    onToggleMute: (() -> Unit)? = null
+) {
+    val isVideo = item.media.type == MediaType.VIDEO
+
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(theme.borderRadius.dp))
             .background(Color(theme.colorSurface))
     ) {
-        // 媒体缩略图
-        MediaImage(
-            item = item.media,
-            modifier = Modifier.fillMaxSize()
-        )
-        // 视频时长角标
-        if (item.media.type == MediaType.VIDEO && item.media.duration != null) {
+        if (isVideo && isPlaying) {
+            VideoPlayerView(
+                item = item.media,
+                isMuted = isMuted,
+                modifier = Modifier.fillMaxSize()
+            )
+        } else {
+            MediaImage(
+                item = item.media,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+        // 视频时长角标（未播放时显示）
+        if (isVideo && !isPlaying && item.media.duration != null) {
             DurationBadge(
                 durationMs = item.media.duration,
                 modifier = Modifier.align(Alignment.TopEnd).padding(8.dp)
             )
         }
+        // 播放图标（视频未播放时显示）
+        if (isVideo && !isPlaying && onPlayClick != null) {
+            PlayButtonOverlay(
+                onClick = onPlayClick,
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
         // 文件信息
         FileInfoOverlay(
             item = item,
+            isMuted = if (isVideo && isPlaying) isMuted else null,
+            onToggleMute = onToggleMute,
             modifier = Modifier.align(Alignment.BottomCenter)
         )
     }

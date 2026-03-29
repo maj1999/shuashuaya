@@ -80,12 +80,14 @@ expect fun VideoPlayerView(
 
 | 模式 | 图片 | 视频 |
 |------|------|------|
-| CarouselMode | MediaImage | MediaImage（缩略图）+ 时长角标 |
-| SwipeCardMode | MediaImage | MediaImage（缩略图）+ 时长角标 |
-| FullscreenMode | MediaImage | VideoPlayerView（自动静音播放） |
+| CarouselMode | MediaImage | MediaImage（缩略图）+ 播放图标 → 点击后 VideoPlayerView + 静音按钮 |
+| SwipeCardMode | MediaImage | MediaImage（缩略图）+ 播放图标 → 点击后 VideoPlayerView + 静音按钮 |
+| FullscreenMode | MediaImage | VideoPlayerView（自动静音播放）+ 静音按钮 |
 | ResultScreen | MediaImage | MediaImage（缩略图） |
 
-FullscreenMode 中视频使用 `VideoPlayerView` 自动静音播放，用户可通过底部 mute 按钮切换。
+所有浏览模式中视频均支持播放和静音控制：
+- **轮播/卡片模式**：默认显示缩略图 + 播放图标覆层，点击后内联播放（默认静音），卡片右下角显示静音切换按钮
+- **全屏模式**：自动静音播放，底部显示静音切换按钮
 
 ### 4. 文件变更
 

@@ -1,0 +1,98 @@
+# maestro/flows/exit-button.yaml
+#
+# E19: 中途退出浏览验证（三种模式）
+# 轮播模式退出 → 卡片模式退出 → 全屏模式退出
+#
+appId: com.cleanpic.android
+---
+- launchApp
+- waitForAnimationToEnd
+
+# ===== E19a: 轮播模式退出 =====
+
+# 确保轮播模式
+- tapOn: "⚙️"
+- waitForAnimationToEnd
+- tapOn: "轮播"
+- waitForAnimationToEnd
+- tapOn: "←"
+- waitForAnimationToEnd
+
+# 进入照片浏览
+- tapOn: ".*随机清理照片"
+- waitForAnimationToEnd
+- tapOn:
+    text: "授权"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Allow"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: ".*随机清理照片"
+    optional: true
+- waitForAnimationToEnd
+
+# 操作 1 张后点退出
+- tapOn: "✓"
+- waitForAnimationToEnd
+- assertVisible: "← 退出"
+- tapOn: "← 退出"
+- waitForAnimationToEnd
+
+# 验证回到首页
+- assertVisible: ".*随机清理照片"
+- takeScreenshot: exit-carousel-back-home
+
+# ===== E19b: 卡片模式退出 =====
+
+# 切换到卡片模式
+- tapOn: "⚙️"
+- waitForAnimationToEnd
+- tapOn: "卡片"
+- waitForAnimationToEnd
+- tapOn: "←"
+- waitForAnimationToEnd
+
+# 进入照片浏览
+- tapOn: ".*随机清理照片"
+- waitForAnimationToEnd
+
+# 验证退出按钮可见
+- assertVisible: "← 退出"
+- tapOn: "← 退出"
+- waitForAnimationToEnd
+
+# 验证回到首页
+- assertVisible: ".*随机清理照片"
+- takeScreenshot: exit-swipecard-back-home
+
+# ===== E19c: 全屏模式退出 =====
+
+# 切换到全屏模式
+- tapOn: "⚙️"
+- waitForAnimationToEnd
+- tapOn: "全屏"
+- waitForAnimationToEnd
+- tapOn: "←"
+- waitForAnimationToEnd
+
+# 进入照片浏览
+- tapOn: ".*随机清理照片"
+- waitForAnimationToEnd
+
+# 验证退出按钮可见（全屏模式已有）
+- assertVisible: "← 退出"
+- tapOn: "← 退出"
+- waitForAnimationToEnd
+
+# 验证回到首页
+- assertVisible: ".*随机清理照片"
+- takeScreenshot: exit-fullscreen-back-home
+
+# 恢复轮播模式
+- tapOn: "⚙️"
+- waitForAnimationToEnd
+- tapOn: "轮播"
+- waitForAnimationToEnd

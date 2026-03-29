@@ -1,0 +1,60 @@
+# maestro/flows/carousel-video-playback.yaml
+#
+# E08a: 轮播模式视频播放+静音验证
+# 轮播模式 → 视频浏览 → 点击播放 → 验证静音按钮
+#
+appId: com.cleanpic.android
+---
+- launchApp
+- waitForAnimationToEnd
+
+# 确保轮播模式
+- tapOn: "⚙️"
+- waitForAnimationToEnd
+- tapOn: "轮播"
+- waitForAnimationToEnd
+- tapOn: "←"
+- waitForAnimationToEnd
+
+# 进入视频浏览
+- tapOn: ".*随机清理视频"
+- waitForAnimationToEnd
+- tapOn:
+    text: "授权"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Allow"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: ".*随机清理视频"
+    optional: true
+- waitForAnimationToEnd
+
+# 截图：视频缩略图 + 播放图标应可见
+- takeScreenshot: carousel-video-thumbnail
+
+# 点击播放图标（屏幕中央区域）
+- tapOn: "▶"
+- waitForAnimationToEnd
+
+# 等待视频加载播放
+- swipe:
+    start: "50%, 50%"
+    end: "50%, 50%"
+    duration: 1500
+
+# 验证静音按钮可见
+- assertVisible: "🔇"
+- takeScreenshot: carousel-video-playing
+
+# 点击静音按钮切换声音
+- tapOn: "🔇"
+- waitForAnimationToEnd
+- assertVisible: "🔊"
+- takeScreenshot: carousel-video-unmuted
+
+# 退出
+- tapOn: "← 退出"
+- waitForAnimationToEnd

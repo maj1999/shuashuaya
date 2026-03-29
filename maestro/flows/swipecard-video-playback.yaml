@@ -1,0 +1,64 @@
+# maestro/flows/swipecard-video-playback.yaml
+#
+# E08b: 卡片模式视频播放+静音验证
+# 卡片模式 → 视频浏览 → 点击播放 → 验证静音按钮
+#
+appId: com.cleanpic.android
+---
+- launchApp
+- waitForAnimationToEnd
+
+# 切换到卡片模式
+- tapOn: "⚙️"
+- waitForAnimationToEnd
+- tapOn: "卡片"
+- waitForAnimationToEnd
+- tapOn: "←"
+- waitForAnimationToEnd
+
+# 进入视频浏览
+- tapOn: ".*随机清理视频"
+- waitForAnimationToEnd
+- tapOn:
+    text: "授权"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Allow"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: ".*随机清理视频"
+    optional: true
+- waitForAnimationToEnd
+
+# 截图：视频缩略图 + 播放图标应可见
+- takeScreenshot: swipecard-video-thumbnail
+
+# 点击播放图标（屏幕中央区域）
+- tapOn: "▶"
+- waitForAnimationToEnd
+
+# 等待视频加载播放
+- swipe:
+    start: "50%, 50%"
+    end: "50%, 50%"
+    duration: 1500
+
+# 验证静音按钮可见
+- assertVisible: "🔇"
+- takeScreenshot: swipecard-video-playing
+
+# 点击静音按钮切换声音
+- tapOn: "🔇"
+- waitForAnimationToEnd
+- assertVisible: "🔊"
+- takeScreenshot: swipecard-video-unmuted
+
+# 退出并恢复轮播模式
+- tapOn: "← 退出"
+- waitForAnimationToEnd
+- tapOn: "⚙️"
+- waitForAnimationToEnd
+- tapOn: "轮播"
+- waitForAnimationToEnd

@@ -55,11 +55,14 @@ fun ViewerScreen(
                     .fillMaxSize()
                     .background(Color(theme.colorBackground))
             ) {
-                ProgressHeader(
-                    theme = theme,
-                    current = currentIndex + 1,
-                    total = items.size
-                )
+                if (mode != InteractionMode.FULLSCREEN) {
+                    ProgressHeader(
+                        theme = theme,
+                        current = currentIndex + 1,
+                        total = items.size,
+                        onExit = { router.popBackStack() }
+                    )
+                }
                 Box(modifier = Modifier.weight(1f)) {
                     when (mode) {
                         InteractionMode.CAROUSEL -> CarouselMode(
@@ -91,7 +94,12 @@ private fun LoadingView(theme: ThemeTokens) {
 }
 
 @Composable
-private fun ProgressHeader(theme: ThemeTokens, current: Int, total: Int) {
+private fun ProgressHeader(
+    theme: ThemeTokens,
+    current: Int,
+    total: Int,
+    onExit: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -99,8 +107,16 @@ private fun ProgressHeader(theme: ThemeTokens, current: Int, total: Int) {
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
+            TextButton(onClick = onExit) {
+                Text(
+                    text = "← 退出",
+                    fontSize = 14.sp,
+                    color = Color(theme.colorTextSecondary)
+                )
+            }
             Text(
                 text = "$current / $total",
                 fontSize = 14.sp,

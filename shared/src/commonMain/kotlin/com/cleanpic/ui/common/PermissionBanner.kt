@@ -25,10 +25,10 @@ fun PermissionBanner(theme: ThemeTokens, onClick: () -> Unit) {
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = "\u26a0\ufe0f", fontSize = 16.sp)
+        Text(text = "⚠️", fontSize = 16.sp)
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = "\u5f53\u524d\u4ec5\u80fd\u8bbf\u95ee\u90e8\u5206\u7167\u7247\uff0c\u70b9\u51fb\u6388\u6743\u5168\u90e8",
+            text = "当前仅能访问部分照片，点击授权全部",
             fontSize = 13.sp,
             color = Color(0xFF795548)
         )

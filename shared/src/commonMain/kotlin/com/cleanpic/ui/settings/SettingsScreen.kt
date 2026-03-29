@@ -43,10 +43,10 @@ fun SettingsScreen(router: AppRouter, theme: ThemeTokens) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             TextButton(onClick = { router.popBackStack() }) {
-                Text(text = "\u2190", fontSize = 20.sp, color = Color(theme.colorText))
+                Text(text = "←", fontSize = 20.sp, color = Color(theme.colorText))
             }
             Text(
-                text = "\u8bbe\u7f6e",
+                text = "设置",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(theme.colorText)
@@ -60,7 +60,7 @@ fun SettingsScreen(router: AppRouter, theme: ThemeTokens) {
         ) {
             // Theme selection
             item {
-                SectionTitle("\u4e3b\u9898")
+                SectionTitle("主题")
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier.fillMaxWidth().height(90.dp)
@@ -82,7 +82,7 @@ fun SettingsScreen(router: AppRouter, theme: ThemeTokens) {
 
             // Interaction mode
             item {
-                SectionTitle("\u4ea4\u4e92\u6a21\u5f0f")
+                SectionTitle("交互模式")
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -105,7 +105,7 @@ fun SettingsScreen(router: AppRouter, theme: ThemeTokens) {
 
             // Round count
             item {
-                SectionTitle("\u6bcf\u8f6e\u6570\u91cf")
+                SectionTitle("每轮数量")
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -128,15 +128,15 @@ fun SettingsScreen(router: AppRouter, theme: ThemeTokens) {
 
             // About
             item {
-                SectionTitle("\u5173\u4e8e")
+                SectionTitle("关于")
                 Text(
-                    text = "\u5237\u5237\u9e2d v1.0.0",
+                    text = "刷刷鸭 v1.0.0",
                     fontSize = 14.sp,
                     color = Color(theme.colorText)
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "\u7eaf\u672c\u5730\u5904\u7406\uff0c\u4e0d\u6536\u96c6\u4efb\u4f55\u6570\u636e",
+                    text = "纯本地处理，不收集任何数据",
                     fontSize = 13.sp,
                     color = Color(theme.colorTextSecondary)
                 )
@@ -189,7 +189,7 @@ private fun ThemeCard(
             modifier = Modifier.padding(vertical = 4.dp)
         )
         if (isSelected) {
-            Text(text = "\u2713", fontSize = 14.sp, color = Color(tokens.colorPrimary))
+            Text(text = "✓", fontSize = 14.sp, color = Color(tokens.colorPrimary))
         }
     }
 }
@@ -203,9 +203,9 @@ private fun ModeButton(
     onClick: () -> Unit
 ) {
     val icon = when (mode) {
-        InteractionMode.CAROUSEL -> "\uD83D\uDDBC\uFE0F"
-        InteractionMode.SWIPE_CARD -> "\uD83C\uDCCF"
-        InteractionMode.FULLSCREEN -> "\uD83D\uDCF1"
+        InteractionMode.CAROUSEL -> "🖼️"
+        InteractionMode.SWIPE_CARD -> "🃏"
+        InteractionMode.FULLSCREEN -> "📱"
     }
     val bg = if (isSelected) Color(theme.colorPrimary).copy(alpha = 0.15f)
     else Color(theme.colorSurface)

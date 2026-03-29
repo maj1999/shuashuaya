@@ -17,8 +17,8 @@ import com.cleanpic.theme.ThemeTokens
 
 @Composable
 fun EmptyStateScreen(theme: ThemeTokens, type: MediaType, onBack: () -> Unit) {
-    val emoji = if (type == MediaType.PHOTO) "\ud83d\udcf7" else "\ud83c\udfac"
-    val message = if (type == MediaType.PHOTO) "\u76f8\u518c\u7a7a\u7a7a\u5982\u4e5f" else "\u6ca1\u6709\u89c6\u9891"
+    val emoji = if (type == MediaType.PHOTO) "📷" else "🎬"
+    val message = if (type == MediaType.PHOTO) "相册空空如也" else "没有视频"
 
     Column(
         modifier = Modifier
@@ -42,7 +42,7 @@ fun EmptyStateScreen(theme: ThemeTokens, type: MediaType, onBack: () -> Unit) {
                 containerColor = Color(theme.colorPrimary)
             )
         ) {
-            Text(text = "\u8fd4\u56de\u9996\u9875", color = Color.White)
+            Text(text = "返回首页", color = Color.White)
         }
     }
 }

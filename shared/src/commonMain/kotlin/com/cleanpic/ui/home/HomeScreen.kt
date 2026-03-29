@@ -63,24 +63,24 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(24.dp))
         }
 
-        Text(text = "\u2728", fontSize = 56.sp)
+        Text(text = "✨", fontSize = 56.sp)
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "\u5237\u5237\u9e2d",
+            text = "刷刷鸭",
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
             color = Color(theme.colorText)
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
-            text = "\u968f\u673a\u4e00\u5237\uff0c\u76f8\u518c\u6e05\u723d",
+            text = "随机一刷，相册清爽",
             fontSize = 14.sp,
             color = Color(theme.colorTextSecondary)
         )
         Spacer(modifier = Modifier.height(48.dp))
 
         ActionButton(
-            text = "\ud83d\udcf7 \u968f\u673a\u6e05\u7406\u7167\u7247",
+            text = "📷 随机清理照片",
             color = Color(theme.colorPrimary),
             borderRadius = theme.borderRadius
         ) { launchViewer(MediaType.PHOTO) }
@@ -88,7 +88,7 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         ActionButton(
-            text = "\ud83c\udfac \u968f\u673a\u6e05\u7406\u89c6\u9891",
+            text = "🎬 随机清理视频",
             color = Color(theme.colorAccent),
             borderRadius = theme.borderRadius
         ) { launchViewer(MediaType.VIDEO) }
@@ -96,7 +96,7 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(48.dp))
 
         TextButton(onClick = { router.navigate(Route.Settings) }) {
-            Text(text = "\u2699\ufe0f", fontSize = 28.sp)
+            Text(text = "⚙️", fontSize = 28.sp)
         }
     }
 
@@ -140,10 +140,10 @@ private fun ActionButton(
 @Composable
 private fun PermissionDeniedDialog(onRequest: () -> Unit, onDismiss: () -> Unit) {
     SimpleDialog(
-        title = "\u9700\u8981\u76f8\u518c\u6743\u9650",
-        message = "\u8bf7\u6388\u6743\u8bbf\u95ee\u76f8\u518c\uff0c\u4ee5\u4fbf\u968f\u673a\u6e05\u7406\u7167\u7247\u548c\u89c6\u9891",
-        confirmText = "\u6388\u6743",
-        dismissText = "\u53d6\u6d88",
+        title = "需要相册权限",
+        message = "请授权访问相册，以便随机清理照片和视频",
+        confirmText = "授权",
+        dismissText = "取消",
         onConfirm = onRequest,
         onDismiss = onDismiss
     )
@@ -152,10 +152,10 @@ private fun PermissionDeniedDialog(onRequest: () -> Unit, onDismiss: () -> Unit)
 @Composable
 private fun PermissionPermanentDialog(onGoSettings: () -> Unit, onDismiss: () -> Unit) {
     SimpleDialog(
-        title = "\u6743\u9650\u5df2\u88ab\u62d2\u7edd",
-        message = "\u8bf7\u524d\u5f80\u7cfb\u7edf\u8bbe\u7f6e\u624b\u52a8\u5f00\u542f\u76f8\u518c\u8bbf\u95ee\u6743\u9650",
-        confirmText = "\u53bb\u8bbe\u7f6e",
-        dismissText = "\u53d6\u6d88",
+        title = "权限已被拒绝",
+        message = "请前往系统设置手动开启相册访问权限",
+        confirmText = "去设置",
+        dismissText = "取消",
         onConfirm = onGoSettings,
         onDismiss = onDismiss
     )

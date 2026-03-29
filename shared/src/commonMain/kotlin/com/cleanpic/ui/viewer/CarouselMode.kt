@@ -115,7 +115,7 @@ private fun MainCard(item: ViewerItem, theme: ThemeTokens, modifier: Modifier) {
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = if (item.media.type == MediaType.PHOTO) "\ud83d\uddbc\ufe0f" else "\ud83c\udfac",
+                text = if (item.media.type == MediaType.PHOTO) "🖼️" else "🎬",
                 fontSize = 48.sp
             )
         }
@@ -143,7 +143,7 @@ private fun PreviewCard(item: ViewerItem, theme: ThemeTokens, modifier: Modifier
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = if (item.media.type == MediaType.PHOTO) "\ud83d\uddbc\ufe0f" else "\ud83c\udfac",
+            text = if (item.media.type == MediaType.PHOTO) "🖼️" else "🎬",
             fontSize = 24.sp
         )
     }
@@ -164,7 +164,7 @@ private fun ActionButtons(theme: ThemeTokens, viewerViewModel: ViewerViewModel) 
             ),
             contentPadding = PaddingValues(0.dp)
         ) {
-            Text(text = "\ud83d\uddd1\ufe0f", fontSize = 24.sp)
+            Text(text = "🗑️", fontSize = 24.sp)
         }
         Button(
             onClick = { viewerViewModel.markKept() },
@@ -175,7 +175,7 @@ private fun ActionButtons(theme: ThemeTokens, viewerViewModel: ViewerViewModel) 
             ),
             contentPadding = PaddingValues(0.dp)
         ) {
-            Text(text = "\u2713", fontSize = 28.sp, fontWeight = FontWeight.Bold)
+            Text(text = "✓", fontSize = 28.sp, fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -218,7 +218,7 @@ internal fun FileInfoOverlay(item: ViewerItem, modifier: Modifier = Modifier) {
             )
             Spacer(modifier = Modifier.width(12.dp))
             Text(
-                text = "${item.media.width}\u00d7${item.media.height}",
+                text = "${item.media.width}×${item.media.height}",
                 fontSize = 11.sp,
                 color = Color.White.copy(alpha = 0.8f)
             )

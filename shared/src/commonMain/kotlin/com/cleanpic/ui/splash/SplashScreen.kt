@@ -32,19 +32,19 @@ fun SplashScreen(theme: ThemeTokens, onFinished: () -> Unit) {
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = "\u2728",
+                text = "✨",
                 fontSize = 64.sp
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "\u5237\u5237\u9e2d",
+                text = "刷刷鸭",
                 fontSize = 36.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "\u968f\u673a\u4e00\u5237\uff0c\u76f8\u518c\u6e05\u723d",
+                text = "随机一刷，相册清爽",
                 fontSize = 16.sp,
                 color = Color.White.copy(alpha = 0.8f)
             )

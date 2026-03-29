@@ -54,10 +54,10 @@ fun ResultScreen(
         // Header
         item {
             Spacer(modifier = Modifier.height(32.dp))
-            Text(text = "\uD83C\uDF89", fontSize = 64.sp)
+            Text(text = "🎉", fontSize = 64.sp)
             Spacer(modifier = Modifier.height(12.dp))
             Text(
-                text = "\u672c\u8f6e\u6e05\u7406\u5b8c\u6210\uff01",
+                text = "本轮清理完成！",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(theme.colorText)
@@ -72,21 +72,21 @@ fun ResultScreen(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 StatCard(
-                    label = "\u5220\u9664",
+                    label = "删除",
                     value = "${pendingDeletes.size}",
                     color = Color(theme.colorDanger),
                     theme = theme,
                     modifier = Modifier.weight(1f)
                 )
                 StatCard(
-                    label = "\u4fdd\u7559",
+                    label = "保留",
                     value = "$keptCount",
                     color = Color(theme.colorSuccess),
                     theme = theme,
                     modifier = Modifier.weight(1f)
                 )
                 StatCard(
-                    label = "\u91ca\u653e",
+                    label = "释放",
                     value = formatBytes(releasedBytes),
                     color = Color(0xFF9C27B0),
                     theme = theme,
@@ -100,7 +100,7 @@ fun ResultScreen(
             item {
                 Spacer(modifier = Modifier.height(24.dp))
                 Text(
-                    text = "\u5f85\u5220\u9664\u9879\u76ee",
+                    text = "待删除项目",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color(theme.colorText)
@@ -131,13 +131,13 @@ fun ResultScreen(
                         scope.launch {
                             viewerViewModel.confirmDelete().fold(
                                 onSuccess = { count ->
-                                    confirmResult = "\u5df2\u6210\u529f\u5220\u9664 $count \u4e2a\u6587\u4ef6"
+                                    confirmResult = "已成功删除 $count 个文件"
                                 },
                                 onFailure = { e ->
                                     confirmResult = when {
                                         e.message?.contains("cancel", true) == true ->
-                                            "\u5df2\u53d6\u6d88\u5220\u9664"
-                                        else -> "\u5220\u9664\u5931\u8d25\uff1a${e.message}"
+                                            "已取消删除"
+                                        else -> "删除失败：${e.message}"
                                     }
                                 }
                             )
@@ -159,7 +159,7 @@ fun ResultScreen(
                         )
                     } else {
                         Text(
-                            text = "\u786e\u8ba4\u5220\u9664",
+                            text = "确认删除",
                             color = Color.White,
                             fontSize = 16.sp
                         )
@@ -198,7 +198,7 @@ fun ResultScreen(
                 modifier = Modifier.fillMaxWidth().height(48.dp),
                 shape = RoundedCornerShape(theme.borderRadius.dp)
             ) {
-                Text(text = "\uD83D\uDD04 \u518d\u6765\u4e00\u8f6e", fontSize = 16.sp)
+                Text(text = "🔄 再来一轮", fontSize = 16.sp)
             }
             Spacer(modifier = Modifier.height(8.dp))
         }
@@ -214,7 +214,7 @@ fun ResultScreen(
                 )
             }) {
                 Text(
-                    text = "\uD83C\uDFE0 \u8fd4\u56de\u9996\u9875",
+                    text = "🏠 返回首页",
                     fontSize = 16.sp,
                     color = Color(theme.colorPrimary)
                 )
@@ -262,7 +262,7 @@ private fun DeletePreviewItem(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = if (item.media.type == MediaType.PHOTO) "\uD83D\uDDBC\uFE0F" else "\uD83C\uDFAC",
+                text = if (item.media.type == MediaType.PHOTO) "🖼️" else "🎬",
                 fontSize = 24.sp
             )
         }
@@ -278,7 +278,7 @@ private fun DeletePreviewItem(
             contentPadding = PaddingValues(0.dp),
             modifier = Modifier.height(24.dp)
         ) {
-            Text(text = "\u2715 \u53d6\u6d88", fontSize = 10.sp, color = Color(theme.colorDanger))
+            Text(text = "✕ 取消", fontSize = 10.sp, color = Color(theme.colorDanger))
         }
     }
 }

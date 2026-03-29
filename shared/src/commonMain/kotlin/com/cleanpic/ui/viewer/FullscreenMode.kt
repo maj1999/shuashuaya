@@ -87,12 +87,12 @@ private fun FullscreenContent(item: ViewerItem, isMuted: Boolean) {
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = if (item.media.type == MediaType.PHOTO) "\ud83d\uddbc\ufe0f" else "\ud83c\udfac",
+            text = if (item.media.type == MediaType.PHOTO) "🖼️" else "🎬",
             fontSize = 72.sp
         )
         if (item.media.type == MediaType.VIDEO) {
             Text(
-                text = if (isMuted) "\ud83d\udd07 \u5df2\u9759\u97f3" else "\ud83d\udd0a \u64ad\u653e\u4e2d",
+                text = if (isMuted) "🔇 已静音" else "🔊 播放中",
                 fontSize = 14.sp,
                 color = Color.White.copy(alpha = 0.7f),
                 modifier = Modifier
@@ -121,7 +121,7 @@ private fun TopBar(
     ) {
         TextButton(onClick = onExit) {
             Text(
-                text = "\u2190 \u9000\u51fa",
+                text = "← 退出",
                 color = Color.White,
                 fontSize = 15.sp
             )
@@ -158,7 +158,7 @@ private fun SideActions(
             ),
             contentPadding = PaddingValues(0.dp)
         ) {
-            Text(text = "\ud83d\uddd1\ufe0f", fontSize = 22.sp)
+            Text(text = "🗑️", fontSize = 22.sp)
         }
         Button(
             onClick = onKeep,
@@ -170,7 +170,7 @@ private fun SideActions(
             contentPadding = PaddingValues(0.dp)
         ) {
             Text(
-                text = "\u2713",
+                text = "✓",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -208,7 +208,7 @@ private fun BottomInfo(
             )
             Spacer(modifier = Modifier.width(12.dp))
             Text(
-                text = "${item.media.width}\u00d7${item.media.height}",
+                text = "${item.media.width}×${item.media.height}",
                 fontSize = 12.sp,
                 color = Color.White.copy(alpha = 0.8f)
             )
@@ -224,7 +224,7 @@ private fun BottomInfo(
                 Spacer(modifier = Modifier.weight(1f))
                 TextButton(onClick = onToggleMute) {
                     Text(
-                        text = if (isMuted) "\ud83d\udd07" else "\ud83d\udd0a",
+                        text = if (isMuted) "🔇" else "🔊",
                         fontSize = 20.sp
                     )
                 }

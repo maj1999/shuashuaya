@@ -56,7 +56,7 @@ fun SwipeCardMode(theme: ThemeTokens, viewerViewModel: ViewerViewModel) {
     ) {
         // 提示文案
         Text(
-            text = "\u2190 \u5de6\u6ed1\u5220\u9664 \u00b7 \u53f3\u6ed1\u4fdd\u7559 \u2192",
+            text = "← 左滑删除 · 右滑保留 →",
             fontSize = 13.sp,
             color = Color(theme.colorTextSecondary),
             modifier = Modifier.padding(top = 8.dp)
@@ -87,14 +87,14 @@ fun SwipeCardMode(theme: ThemeTokens, viewerViewModel: ViewerViewModel) {
             val progress = (offsetX.value / thresholdPx).coerceIn(-1f, 1f)
             if (progress < -0.2f) {
                 SwipeIndicator(
-                    text = "\u5220\u9664",
+                    text = "删除",
                     color = Color(theme.colorDanger),
                     modifier = Modifier.align(Alignment.CenterStart).padding(start = 8.dp)
                 )
             }
             if (progress > 0.2f) {
                 SwipeIndicator(
-                    text = "\u4fdd\u7559",
+                    text = "保留",
                     color = Color(theme.colorSuccess),
                     modifier = Modifier.align(Alignment.CenterEnd).padding(end = 8.dp)
                 )
@@ -152,7 +152,7 @@ private fun CardContent(item: ViewerItem, theme: ThemeTokens, modifier: Modifier
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = if (item.media.type == MediaType.PHOTO) "\ud83d\uddbc\ufe0f" else "\ud83c\udfac",
+                text = if (item.media.type == MediaType.PHOTO) "🖼️" else "🎬",
                 fontSize = 48.sp
             )
         }

@@ -25,7 +25,8 @@ Kotlin Multiplatform + Compose Multiplatform 的照片/视频随机清理 App。
 
 ## 项目级 Skill
 
-- `/tech-doc-system` — 写文档、审查文档、维护文档索引时使用。包含完整的文档体系规范、写作顺序、审查清单。任何文档相关工作都应先调用此 skill。
+- `/tech-doc-system` — 写文档、审查文档、维护文档索引时使用。包含完整的文档体系规范、写作顺序、审查清单。
+- `/dev-workflow` — 开始新功能、新需求、恢复开发时使用。6 步研发流程：US → 技术方案 → 测试方案 → TDD 实现 → E2E 验证 → 提交发布。
 
 ---
 

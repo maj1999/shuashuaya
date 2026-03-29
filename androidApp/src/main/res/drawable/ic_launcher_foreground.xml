@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    CleanPic 自适应图标前景层
+    设计语言：照片 + 闪光 = 相册清理
+    - 白色圆角照片框（代表相册）
+    - 框内简化山景（代表照片内容）
+    - 右上角四角星✨（代表清理后的清爽/焕新）
+    画布 108dp，安全区 72dp（内边距 18dp）
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- 照片框：白色圆角矩形，更大更居中 -->
+    <path
+        android:pathData="M28,34 L66,34 C69,34 71,36 71,39 L71,73 C71,76 69,78 66,78 L28,78 C25,78 23,76 23,73 L23,39 C23,36 25,34 28,34 Z"
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.95" />
+
+    <!-- 照片内容：简化山景（更大的三角） -->
+    <path
+        android:pathData="M23,67 L37,52 L46,61 L58,45 L71,62 L71,73 C71,76 69,78 66,78 L28,78 C25,78 23,76 23,73 Z"
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.45" />
+
+    <!-- 太阳：小圆点 -->
+    <path
+        android:pathData="M61,44 m-5,0 a5,5 0 1,1 10,0 a5,5 0 1,1 -10,0"
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.55" />
+
+    <!-- ✨ 主星：右上角大四角星 -->
+    <path
+        android:pathData="M74,30 L77,21 L80,30 L89,33 L80,36 L77,45 L74,36 L65,33 Z"
+        android:fillColor="#FFFFFF" />
+
+    <!-- ✨ 小星 1 -->
+    <path
+        android:pathData="M86,20 L87.5,16 L89,20 L93,21.5 L89,23 L87.5,27 L86,23 L82,21.5 Z"
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.7" />
+
+    <!-- ✨ 小星 2 -->
+    <path
+        android:pathData="M66,20 L67,17.5 L68,20 L70.5,21 L68,22 L67,24.5 L66,22 L63.5,21 Z"
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.5" />
+
+</vector>

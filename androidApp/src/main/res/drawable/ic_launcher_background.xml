@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- CleanPic 图标背景：紫色渐变（匹配梦幻渐变主题） -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- 渐变定义需用 gradient XML，此处用对角双色块模拟 -->
+    <!-- 左上深紫 -->
+    <path
+        android:pathData="M0,0 L108,0 L0,108 Z"
+        android:fillColor="#6A3DE8" />
+    <!-- 右下浅紫 -->
+    <path
+        android:pathData="M108,0 L108,108 L0,108 Z"
+        android:fillColor="#9B6FED" />
+
+</vector>

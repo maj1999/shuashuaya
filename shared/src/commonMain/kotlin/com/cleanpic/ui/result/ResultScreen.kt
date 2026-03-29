@@ -36,6 +36,7 @@ fun ResultScreen(
     val items by viewerViewModel.items.collectAsState()
     var confirmResult by remember { mutableStateOf<String?>(null) }
     var isDeleting by remember { mutableStateOf(false) }
+    var deleteConfirmed by remember { mutableStateOf(false) }
 
     val pendingDeletes = items.filter {
         it.state == com.cleanpic.model.OperationState.PENDING_DELETE
@@ -97,7 +98,7 @@ fun ResultScreen(
         }
 
         // Pending deletes preview
-        if (pendingDeletes.isNotEmpty()) {
+        if (pendingDeletes.isNotEmpty() && !deleteConfirmed) {
             item {
                 Spacer(modifier = Modifier.height(24.dp))
                 Text(
@@ -124,7 +125,7 @@ fun ResultScreen(
         item {
             Spacer(modifier = Modifier.height(32.dp))
         }
-        if (pendingDeletes.isNotEmpty()) {
+        if (pendingDeletes.isNotEmpty() && !deleteConfirmed) {
             item {
                 Button(
                     onClick = {
@@ -133,6 +134,7 @@ fun ResultScreen(
                             viewerViewModel.confirmDelete().fold(
                                 onSuccess = { count ->
                                     confirmResult = "已成功删除 $count 个文件"
+                                    deleteConfirmed = true
                                 },
                                 onFailure = { e ->
                                     confirmResult = when {

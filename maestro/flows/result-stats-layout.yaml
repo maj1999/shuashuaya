@@ -1,0 +1,67 @@
+# maestro/flows/result-stats-layout.yaml
+#
+# E16: 结果页统计卡片布局验证
+# 混合保留/删除 → 结果页 → 验证三个统计卡片值和单位完整显示
+#
+appId: com.cleanpic.android
+---
+- launchApp
+- waitForAnimationToEnd
+
+# 确保轮播模式
+- tapOn: "⚙️"
+- waitForAnimationToEnd
+- tapOn: "轮播"
+- waitForAnimationToEnd
+- tapOn: "←"
+- waitForAnimationToEnd
+
+# 进入照片浏览
+- tapOn: ".*随机清理照片"
+- waitForAnimationToEnd
+- tapOn:
+    text: "授权"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Allow"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: ".*随机清理照片"
+    optional: true
+- waitForAnimationToEnd
+
+# 混合操作：5 删除 + 5 保留（确保释放值有单位）
+- tapOn: "🗑️"
+- waitForAnimationToEnd
+- tapOn: "🗑️"
+- waitForAnimationToEnd
+- tapOn: "🗑️"
+- waitForAnimationToEnd
+- tapOn: "🗑️"
+- waitForAnimationToEnd
+- tapOn: "🗑️"
+- waitForAnimationToEnd
+- tapOn: "✓"
+- waitForAnimationToEnd
+- tapOn: "✓"
+- waitForAnimationToEnd
+- tapOn: "✓"
+- waitForAnimationToEnd
+- tapOn: "✓"
+- waitForAnimationToEnd
+- tapOn: "✓"
+- waitForAnimationToEnd
+
+# 验证结果页三个统计卡片
+- assertVisible: "删除"
+- assertVisible: "保留"
+- assertVisible: "释放"
+
+# 验证释放值包含单位（KB 或 MB）
+- assertVisible:
+    text: ".*(KB|MB|GB|B).*"
+
+# 截图验证卡片等高布局
+- takeScreenshot: result-stats-layout

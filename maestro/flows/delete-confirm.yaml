@@ -2,6 +2,7 @@
 #
 # E04: 全部删除 → 结果页确认删除（轮播模式）
 # 设置轮播模式 → viewer → 全部标记删除 → 结果页 → 确认删除
+# 验证：确认后待删除项目和确认按钮消失
 #
 appId: com.cleanpic.android
 ---
@@ -59,11 +60,19 @@ appId: com.cleanpic.android
 # 验证结果页显示删除统计
 - assertVisible: "删除"
 - assertVisible: "保留"
-- takeScreenshot: delete-confirm-result
+- assertVisible: "释放"
 
-# 点击确认删除按钮
-- tapOn:
-    text: ".*确认删除.*"
-    optional: true
+# 确认删除前：验证待删除区域和确认按钮可见
+- assertVisible: "待删除项目"
+- assertVisible: ".*确认删除.*"
+- takeScreenshot: delete-confirm-before
+
+# 点击确认删除
+- tapOn: ".*确认删除.*"
 - waitForAnimationToEnd
+
+# 确认删除后：验证待删除区域和确认按钮已消失
+- assertNotVisible: "待删除项目"
+- assertNotVisible: ".*确认删除.*"
+- assertVisible: ".*已成功删除.*"
 - takeScreenshot: delete-confirm-after

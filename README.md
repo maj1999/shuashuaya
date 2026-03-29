@@ -15,9 +15,23 @@
 
 ## 截图
 
-| 首页 | 浏览页 | 结果页 | 设置页 |
-|------|--------|--------|--------|
-| ![首页](docs/screenshots/home.png) | ![浏览](docs/screenshots/viewer.png) | ![结果](docs/screenshots/result.png) | ![设置](docs/screenshots/settings.png) |
+### 首页 / 设置 / 结果页
+
+| 首页 | 设置页 | 结果页 |
+|------|--------|--------|
+| ![首页](docs/screenshots/home.png) | ![设置](docs/screenshots/settings.png) | ![结果](docs/screenshots/result.png) |
+
+### 三种浏览模式
+
+| 轮播相册式 | 卡片左右滑 | 全屏沉浸式 |
+|-----------|-----------|-----------|
+| ![轮播](docs/screenshots/viewer-carousel.png) | ![卡片](docs/screenshots/viewer-swipecard.png) | ![全屏](docs/screenshots/viewer-fullscreen.png) |
+
+### 视频播放（轮播 / 卡片模式内联播放 + 静音控制）
+
+| 轮播模式播放视频 | 卡片模式播放视频 |
+|----------------|----------------|
+| ![轮播视频](docs/screenshots/video-carousel.png) | ![卡片视频](docs/screenshots/video-swipecard.png) |
 
 ## 技术栈
 
@@ -49,7 +63,7 @@ cleanpic/
 │       ├── appleMain/          # iOS 平台实现
 │       └── commonTest/         # 单元测试（28 用例）
 ├── androidApp/                 # Android 壳工程
-├── maestro/flows/              # E2E 测试流程（8 个）
+├── maestro/flows/              # E2E 测试流程（16 个）
 ├── scripts/                    # 构建/运行/测试脚本
 ├── test-assets/                # 测试媒体（本地生成）
 └── docs/                       # 产品/架构/测试文档
@@ -123,6 +137,14 @@ scripts/test-android.sh e2e
 | switch-theme | E14 | 切换到优雅暗黑主题 |
 | swipe-card-mode | E11 | 卡片左右滑手势操作 |
 | round-count | E17 | 设置每轮数量为 5 |
+| photo-thumbnail | E04 | 照片缩略图展示验证 |
+| video-thumbnail | E06 | 视频缩略图+时长展示验证 |
+| swipe-card-thumbnail | E10 | 卡片模式缩略图展示 |
+| fullscreen-video-playback | E09 | 全屏模式视频自动播放 |
+| result-stats-layout | E12 | 结果页统计布局验证 |
+| exit-button | E19 | 三种模式中途退出按钮 |
+| carousel-video-playback | E08a | 轮播模式视频播放+静音 |
+| swipecard-video-playback | E08b | 卡片模式视频播放+静音 |
 
 ## 开发路线图
 
@@ -136,12 +158,12 @@ scripts/test-android.sh e2e
 - [x] 批量延迟删除 + 反悔
 - [x] 再来一轮（自动去重）
 - [x] Android 权限请求流程
-- [x] 单元测试 28 用例 + E2E 8 流程
+- [x] 单元测试 28 用例 + E2E 16 流程
 
 ### V1.1（待开发）
 
-- [ ] 真实照片/视频缩略图加载（替换占位图标）
-- [ ] 视频播放器集成（ExoPlayer）
+- [x] ~~真实照片/视频缩略图加载~~（已在 V1.0 完成，Coil 3）
+- [x] ~~视频播放器集成~~（已在 V1.0 完成，ExoPlayer，三种模式均支持）
 - [ ] iOS 平台适配
 - [ ] 删除动画效果
 - [ ] 相册权限 LIMITED 模式下的增量授权引导

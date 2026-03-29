@@ -44,7 +44,12 @@
       "Bash(xcode-select -p)",
       "Bash(xcrun simctl:*)",
       "Bash(eval \"xcode-select -p >/dev/null 2>&1 && xcodebuild -version 2>&1 | head -1\")",
-      "Bash(echo \"exit: $?\")"
+      "Bash(echo \"exit: $?\")",
+      "WebFetch(domain:kuikly.tds.qq.com)",
+      "Bash(kdoctor)",
+      "Bash(export PATH=\"/opt/homebrew/opt/ruby/bin:$PATH\")",
+      "Bash(export LC_ALL=en_US.UTF-8)",
+      "Bash(find ~/Library/Application Support -path *AndroidStudio* -name *.jar)"
     ]
   }
 }

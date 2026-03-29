@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     kotlin("android")
+    kotlin("plugin.compose")
 }
 
 android {
@@ -25,6 +26,10 @@ android {
     packagingOptions {
         doNotStrip("**/*.so")
     }
+
+    buildFeatures {
+        compose = true
+    }
 }
 
 dependencies {
@@ -32,4 +37,5 @@ dependencies {
     implementation(Deps.ANDROIDX_APPCOMPAT)
     implementation(Deps.ANDROIDX_CORE_KTX)
     implementation(Deps.MATERIAL)
+    implementation("androidx.activity:activity-compose:1.8.2")
 }

@@ -1,5 +1,10 @@
 # 文档 Review 跟踪清单
 
+## AI 协作规范
+
+- [x] `CLAUDE.md` — Claude Code 项目级协作规范
+- [x] `AGENTS.md` — 跨 AI 工具通用协作规范
+
 ## 产品层
 
 - [x] `product/prd.md` — 产品需求概述

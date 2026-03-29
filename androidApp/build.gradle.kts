@@ -23,8 +23,10 @@ android {
         }
     }
 
-    packagingOptions {
-        doNotStrip("**/*.so")
+    packaging {
+        jniLibs {
+            keepDebugSymbols += "**/*.so"
+        }
     }
 
     buildFeatures {

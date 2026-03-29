@@ -72,4 +72,4 @@ case "${1:-all}" in
         ;;
 esac
 
-echo "=== Android 测试完成（日志: $LOG_FILE）==="
+echo "=== Android 测试完成（日志: ${LOG_FILE}）==="

@@ -46,10 +46,15 @@ kotlin {
     // commonMain — 跨平台共享代码
     val commonMain by sourceSets.getting {
         dependencies {
-            // KuiklyUI 核心依赖
+            // KuiklyUI 核心依赖（非 UI 部分）
             implementation("com.tencent.kuikly-open:core:${Versions.KUIKLY}")
-            implementation("com.tencent.kuikly-open:compose:${Versions.KUIKLY}")
             implementation("com.tencent.kuikly-open:core-annotations:${Versions.KUIKLY}")
+            // Compose Multiplatform UI
+            implementation(compose.foundation)
+            implementation(compose.material3)
+            implementation(compose.runtime)
+            implementation(compose.ui)
+            implementation(compose.animation)
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
         }
     }

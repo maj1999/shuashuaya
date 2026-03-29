@@ -6,14 +6,14 @@ appId: com.cleanpic.android
 ---
 - launchApp
 - waitForAnimationToEnd
-- tapOn: "设置"
+- tapOn: "⚙️"
 - waitForAnimationToEnd
-- tapOn: "主题"
-- waitForAnimationToEnd
+- assertVisible: "设置"
+- assertVisible: "主题"
 - takeScreenshot: theme-settings
-- tapOn: "优雅暗色"
+- tapOn: "优雅暗黑"
 - waitForAnimationToEnd
 - takeScreenshot: theme-dark-applied
-- tapOn: "返回"
+- tapOn: "←"
 - waitForAnimationToEnd
 - takeScreenshot: theme-home-after-switch

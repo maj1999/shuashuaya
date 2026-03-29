@@ -7,7 +7,7 @@
 
 object Versions {
     const val KOTLIN = "2.1.21"
-    const val AGP = "7.4.2"
+    const val AGP = "8.2.2"
     const val COMPOSE_MULTIPLATFORM = "1.7.3"
     const val KSP = "2.1.21-1.0.29"
     const val KUIKLY = "2.4.0-2.0.21"

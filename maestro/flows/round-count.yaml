@@ -1,0 +1,62 @@
+# maestro/flows/round-count.yaml
+#
+# E17: 每轮数量调节
+# 设置数量为 5 → viewer → 验证只有 5 张
+#
+appId: com.cleanpic.android
+---
+- launchApp
+- waitForAnimationToEnd
+
+# 设置轮播模式 + 数量改为 5
+- tapOn: "⚙️"
+- waitForAnimationToEnd
+- tapOn: "轮播"
+- waitForAnimationToEnd
+- tapOn: "5"
+- waitForAnimationToEnd
+- tapOn: "←"
+- waitForAnimationToEnd
+
+# 进入照片浏览
+- tapOn: ".*随机清理照片"
+- waitForAnimationToEnd
+- tapOn:
+    text: "授权"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Allow"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: ".*随机清理照片"
+    optional: true
+- waitForAnimationToEnd
+
+# 截图验证（应显示 N / 5）
+- takeScreenshot: round-count-5
+
+# 操作 5 张全部保留
+- tapOn: "✓"
+- waitForAnimationToEnd
+- tapOn: "✓"
+- waitForAnimationToEnd
+- tapOn: "✓"
+- waitForAnimationToEnd
+- tapOn: "✓"
+- waitForAnimationToEnd
+- tapOn: "✓"
+- waitForAnimationToEnd
+
+# 验证结果页
+- assertVisible: "保留"
+- takeScreenshot: round-count-result
+
+# 恢复默认数量 10
+- tapOn: ".*返回首页"
+- waitForAnimationToEnd
+- tapOn: "⚙️"
+- waitForAnimationToEnd
+- tapOn: "10"
+- waitForAnimationToEnd

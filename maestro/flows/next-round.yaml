@@ -1,0 +1,61 @@
+# maestro/flows/next-round.yaml
+#
+# E02: 再来一轮（验证可开启新一轮）
+#
+appId: com.cleanpic.android
+---
+- launchApp
+- waitForAnimationToEnd
+
+# 确保轮播模式
+- tapOn: "⚙️"
+- waitForAnimationToEnd
+- tapOn: "轮播"
+- waitForAnimationToEnd
+- tapOn: "←"
+- waitForAnimationToEnd
+
+# 第一轮：全部保留快速通过
+- tapOn: ".*随机清理照片"
+- waitForAnimationToEnd
+- tapOn:
+    text: "授权"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Allow"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: ".*随机清理照片"
+    optional: true
+- waitForAnimationToEnd
+
+- tapOn: "✓"
+- waitForAnimationToEnd
+- tapOn: "✓"
+- waitForAnimationToEnd
+- tapOn: "✓"
+- waitForAnimationToEnd
+- tapOn: "✓"
+- waitForAnimationToEnd
+- tapOn: "✓"
+- waitForAnimationToEnd
+- tapOn: "✓"
+- waitForAnimationToEnd
+- tapOn: "✓"
+- waitForAnimationToEnd
+- tapOn: "✓"
+- waitForAnimationToEnd
+- tapOn: "✓"
+- waitForAnimationToEnd
+- tapOn: "✓"
+- waitForAnimationToEnd
+
+# 到达结果页，点击再来一轮
+- assertVisible: ".*再来一轮"
+- tapOn: ".*再来一轮"
+- waitForAnimationToEnd
+
+# 验证进入新一轮 viewer
+- takeScreenshot: next-round-viewer

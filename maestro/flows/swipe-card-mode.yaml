@@ -1,0 +1,102 @@
+# maestro/flows/swipe-card-mode.yaml
+#
+# E11: 卡片左右滑模式
+# 切换到卡片模式 → viewer → 左滑删除/右滑保留 → 结果页
+#
+appId: com.cleanpic.android
+---
+- launchApp
+- waitForAnimationToEnd
+
+# 切换到卡片滑动模式
+- tapOn: "⚙️"
+- waitForAnimationToEnd
+- tapOn: "卡片"
+- waitForAnimationToEnd
+- tapOn: "←"
+- waitForAnimationToEnd
+
+# 进入照片浏览
+- tapOn: ".*随机清理照片"
+- waitForAnimationToEnd
+- tapOn:
+    text: "授权"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Allow"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: ".*随机清理照片"
+    optional: true
+- waitForAnimationToEnd
+
+# 验证卡片模式提示
+- assertVisible: ".*左滑删除.*"
+- takeScreenshot: swipe-card-viewer
+
+# 左滑 = 删除，右滑 = 保留（操作 10 张，需足够长的滑动距离触发 150dp 阈值）
+- swipe:
+    start: "80%, 50%"
+    end: "10%, 50%"
+    duration: 300
+- waitForAnimationToEnd
+- swipe:
+    start: "20%, 50%"
+    end: "90%, 50%"
+    duration: 300
+- waitForAnimationToEnd
+- swipe:
+    start: "20%, 50%"
+    end: "90%, 50%"
+    duration: 300
+- waitForAnimationToEnd
+- swipe:
+    start: "80%, 50%"
+    end: "10%, 50%"
+    duration: 300
+- waitForAnimationToEnd
+- swipe:
+    start: "20%, 50%"
+    end: "90%, 50%"
+    duration: 300
+- waitForAnimationToEnd
+- swipe:
+    start: "20%, 50%"
+    end: "90%, 50%"
+    duration: 300
+- waitForAnimationToEnd
+- swipe:
+    start: "20%, 50%"
+    end: "90%, 50%"
+    duration: 300
+- waitForAnimationToEnd
+- swipe:
+    start: "20%, 50%"
+    end: "90%, 50%"
+    duration: 300
+- waitForAnimationToEnd
+- swipe:
+    start: "20%, 50%"
+    end: "90%, 50%"
+    duration: 300
+- waitForAnimationToEnd
+- swipe:
+    start: "20%, 50%"
+    end: "90%, 50%"
+    duration: 300
+- waitForAnimationToEnd
+
+# 验证结果页
+- assertVisible: "删除"
+- assertVisible: "保留"
+- takeScreenshot: swipe-card-result
+
+# 恢复轮播模式
+- tapOn: ".*返回首页"
+- waitForAnimationToEnd
+- tapOn: "⚙️"
+- waitForAnimationToEnd
+- tapOn: "轮播"
+- waitForAnimationToEnd

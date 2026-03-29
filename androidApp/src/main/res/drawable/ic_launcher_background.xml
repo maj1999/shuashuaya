@@ -1,19 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- CleanPic 图标背景：紫色渐变（匹配梦幻渐变主题） -->
+<!--
+    CleanPic 图标背景：品牌紫渐变
+    使用 aapt:attr 实现真正的线性渐变（API 24+）
+-->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- 渐变定义需用 gradient XML，此处用对角双色块模拟 -->
-    <!-- 左上深紫 -->
+    <path android:pathData="M0,0 L108,0 L108,108 L0,108 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="0"
+                android:startY="0"
+                android:endX="108"
+                android:endY="108"
+                android:startColor="#5B2DD4"
+                android:endColor="#A87BF0" />
+        </aapt:attr>
+    </path>
+
+    <!-- 微妙的光晕（左上角亮区） -->
     <path
-        android:pathData="M0,0 L108,0 L0,108 Z"
-        android:fillColor="#6A3DE8" />
-    <!-- 右下浅紫 -->
-    <path
-        android:pathData="M108,0 L108,108 L0,108 Z"
-        android:fillColor="#9B6FED" />
+        android:pathData="M0,0 C40,0 54,14 54,54 C54,14 0,0 0,0 Z"
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.06" />
 
 </vector>

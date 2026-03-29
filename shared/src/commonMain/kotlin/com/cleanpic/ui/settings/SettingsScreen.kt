@@ -130,7 +130,7 @@ fun SettingsScreen(router: AppRouter, theme: ThemeTokens) {
             item {
                 SectionTitle("\u5173\u4e8e")
                 Text(
-                    text = "CleanPic v1.0.0",
+                    text = "\u5237\u5237\u9e2d v1.0.0",
                     fontSize = 14.sp,
                     color = Color(theme.colorText)
                 )

@@ -66,7 +66,7 @@ fun HomeScreen(
         Text(text = "\u2728", fontSize = 56.sp)
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "CleanPic",
+            text = "\u5237\u5237\u9e2d",
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
             color = Color(theme.colorText)

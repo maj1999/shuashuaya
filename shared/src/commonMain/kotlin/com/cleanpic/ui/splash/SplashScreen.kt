@@ -37,7 +37,7 @@ fun SplashScreen(theme: ThemeTokens, onFinished: () -> Unit) {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "CleanPic",
+                text = "\u5237\u5237\u9e2d",
                 fontSize = 36.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White

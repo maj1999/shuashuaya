@@ -1,51 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     CleanPic 自适应图标前景层
-    设计语言：照片 + 闪光 = 相册清理
-    - 白色圆角照片框（代表相册）
-    - 框内简化山景（代表照片内容）
-    - 右上角四角星✨（代表清理后的清爽/焕新）
-    画布 108dp，安全区 72dp（内边距 18dp）
+    设计：倾斜照片卡片 + 金色闪光星 ✨
+    传达：优雅的照片清理体验，而非冷冰冰的工具
+    画布 108dp，安全区中心 72dp
 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- 照片框：白色圆角矩形，更大更居中 -->
-    <path
-        android:pathData="M28,34 L66,34 C69,34 71,36 71,39 L71,73 C71,76 69,78 66,78 L28,78 C25,78 23,76 23,73 L23,39 C23,36 25,34 28,34 Z"
-        android:fillColor="#FFFFFF"
-        android:fillAlpha="0.95" />
+    <!-- ==================== 照片卡片（倾斜 -8°）==================== -->
+    <group
+        android:pivotX="46"
+        android:pivotY="58"
+        android:rotation="-8">
 
-    <!-- 照片内容：简化山景（更大的三角） -->
-    <path
-        android:pathData="M23,67 L37,52 L46,61 L58,45 L71,62 L71,73 C71,76 69,78 66,78 L28,78 C25,78 23,76 23,73 Z"
-        android:fillColor="#FFFFFF"
-        android:fillAlpha="0.45" />
+        <!-- 卡片投影（柔和阴影感） -->
+        <group
+            android:translateX="1.5"
+            android:translateY="2">
+            <path
+                android:pathData="M30,38 C30,35 32.5,33 35.5,33 L58.5,33 C61.5,33 64,35 64,38 L64,74 C64,77 61.5,79 58.5,79 L35.5,79 C32.5,79 30,77 30,74 Z"
+                android:fillColor="#3A1A9E"
+                android:fillAlpha="0.2" />
+        </group>
 
-    <!-- 太阳：小圆点 -->
-    <path
-        android:pathData="M61,44 m-5,0 a5,5 0 1,1 10,0 a5,5 0 1,1 -10,0"
-        android:fillColor="#FFFFFF"
-        android:fillAlpha="0.55" />
+        <!-- 主卡片（白色，大圆角） -->
+        <path
+            android:pathData="M30,38 C30,35 32.5,33 35.5,33 L58.5,33 C61.5,33 64,35 64,38 L64,74 C64,77 61.5,79 58.5,79 L35.5,79 C32.5,79 30,77 30,74 Z"
+            android:fillColor="#FFFFFF"
+            android:fillAlpha="0.95" />
 
-    <!-- ✨ 主星：右上角大四角星 -->
-    <path
-        android:pathData="M74,30 L77,21 L80,30 L89,33 L80,36 L77,45 L74,36 L65,33 Z"
-        android:fillColor="#FFFFFF" />
+        <!-- 卡片顶部高光（玻璃感） -->
+        <path
+            android:pathData="M30,38 C30,35 32.5,33 35.5,33 L58.5,33 C61.5,33 64,35 64,38 L64,42 L30,42 Z"
+            android:fillColor="#FFFFFF"
+            android:fillAlpha="0.3" />
 
-    <!-- ✨ 小星 1 -->
+        <!-- 照片内容：柔和山景（薰衣草色，呼应主题） -->
+        <path
+            android:pathData="M30,67 L40,56 L47,62 L56,50 L64,62 L64,74 C64,77 61.5,79 58.5,79 L35.5,79 C32.5,79 30,77 30,74 Z">
+            <aapt:attr name="android:fillColor">
+                <gradient
+                    android:type="linear"
+                    android:startX="30"
+                    android:startY="50"
+                    android:endX="64"
+                    android:endY="79"
+                    android:startColor="#D4C5F0"
+                    android:endColor="#E8DFF5" />
+            </aapt:attr>
+        </path>
+
+        <!-- 远山（更淡的层次） -->
+        <path
+            android:pathData="M30,71 L38,63 L44,67 L50,60 L58,66 L64,62 L64,74 C64,77 61.5,79 58.5,79 L35.5,79 C32.5,79 30,77 30,74 Z"
+            android:fillColor="#C9B8E8"
+            android:fillAlpha="0.5" />
+
+        <!-- 太阳（暖金色小圆） -->
+        <path
+            android:pathData="M56,43 m-3.5,0 a3.5,3.5 0 1,1 7,0 a3.5,3.5 0 1,1 -7,0"
+            android:fillColor="#FFE082" />
+
+        <!-- 太阳光晕 -->
+        <path
+            android:pathData="M56,43 m-5.5,0 a5.5,5.5 0 1,1 11,0 a5.5,5.5 0 1,1 -11,0"
+            android:fillColor="#FFE082"
+            android:fillAlpha="0.15" />
+
+    </group>
+
+    <!-- ==================== ✨ 闪光星群（金色，代表清爽焕新） ==================== -->
+
+    <!-- 主星：大四角星 -->
     <path
-        android:pathData="M86,20 L87.5,16 L89,20 L93,21.5 L89,23 L87.5,27 L86,23 L82,21.5 Z"
-        android:fillColor="#FFFFFF"
+        android:pathData="M74,32 L77.5,21 L81,32 L92,35.5 L81,39 L77.5,50 L74,39 L63,35.5 Z"
+        android:fillColor="#FFD54F" />
+
+    <!-- 主星中心高光 -->
+    <path
+        android:pathData="M76,34 L77.5,29 L79,34 L84,35.5 L79,37 L77.5,42 L76,37 L71,35.5 Z"
+        android:fillColor="#FFF8E1"
+        android:fillAlpha="0.6" />
+
+    <!-- 中星 -->
+    <path
+        android:pathData="M87,21 L88.5,16 L90,21 L95,22.5 L90,24 L88.5,29 L87,24 L82,22.5 Z"
+        android:fillColor="#FFE082"
+        android:fillAlpha="0.85" />
+
+    <!-- 小星 -->
+    <path
+        android:pathData="M64,23 L65,20 L66,23 L69,24 L66,25 L65,28 L64,25 L61,24 Z"
+        android:fillColor="#FFF8E1"
         android:fillAlpha="0.7" />
 
-    <!-- ✨ 小星 2 -->
+    <!-- 微小星 -->
     <path
-        android:pathData="M66,20 L67,17.5 L68,20 L70.5,21 L68,22 L67,24.5 L66,22 L63.5,21 Z"
-        android:fillColor="#FFFFFF"
+        android:pathData="M90,38 L90.8,36 L91.5,38 L93.5,38.7 L91.5,39.5 L90.8,41.5 L90,39.5 L88,38.7 Z"
+        android:fillColor="#FFE082"
         android:fillAlpha="0.5" />
+
+    <!-- 光点散粒 -->
+    <path
+        android:pathData="M70,44 m-1.2,0 a1.2,1.2 0 1,1 2.4,0 a1.2,1.2 0 1,1 -2.4,0"
+        android:fillColor="#FFE082"
+        android:fillAlpha="0.5" />
+
+    <path
+        android:pathData="M83,14 m-1,0 a1,1 0 1,1 2,0 a1,1 0 1,1 -2,0"
+        android:fillColor="#FFF8E1"
+        android:fillAlpha="0.4" />
+
+    <path
+        android:pathData="M60,16 m-0.8,0 a0.8,0.8 0 1,1 1.6,0 a0.8,0.8 0 1,1 -1.6,0"
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.35" />
 
 </vector>

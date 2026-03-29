@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -20,6 +21,8 @@ import androidx.compose.ui.unit.sp
 import com.cleanpic.model.MediaType
 import com.cleanpic.model.ViewerItem
 import com.cleanpic.theme.ThemeTokens
+import com.cleanpic.ui.media.MediaImage
+import com.cleanpic.ui.media.VideoPlayerView
 import com.cleanpic.ui.navigation.AppRouter
 import com.cleanpic.viewmodel.ViewerViewModel
 import kotlinx.coroutines.launch
@@ -81,23 +84,21 @@ fun FullscreenMode(
 
 @Composable
 private fun FullscreenContent(item: ViewerItem, isMuted: Boolean) {
-    // 占位全屏展示
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = if (item.media.type == MediaType.PHOTO) "🖼️" else "🎬",
-            fontSize = 72.sp
-        )
         if (item.media.type == MediaType.VIDEO) {
-            Text(
-                text = if (isMuted) "🔇 已静音" else "🔊 播放中",
-                fontSize = 14.sp,
-                color = Color.White.copy(alpha = 0.7f),
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(top = 80.dp)
+            VideoPlayerView(
+                item = item.media,
+                isMuted = isMuted,
+                modifier = Modifier.fillMaxSize()
+            )
+        } else {
+            MediaImage(
+                item = item.media,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Fit
             )
         }
     }

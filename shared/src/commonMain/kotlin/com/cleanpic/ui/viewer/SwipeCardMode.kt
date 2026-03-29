@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import com.cleanpic.model.MediaType
 import com.cleanpic.model.ViewerItem
 import com.cleanpic.theme.ThemeTokens
+import com.cleanpic.ui.media.MediaImage
 import com.cleanpic.viewmodel.ViewerViewModel
 import kotlinx.coroutines.launch
 
@@ -146,16 +147,11 @@ private fun CardContent(item: ViewerItem, theme: ThemeTokens, modifier: Modifier
             .clip(RoundedCornerShape(theme.borderRadius.dp))
             .background(Color(theme.colorSurface))
     ) {
-        // 占位内容
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = if (item.media.type == MediaType.PHOTO) "🖼️" else "🎬",
-                fontSize = 48.sp
-            )
-        }
+        // 媒体缩略图
+        MediaImage(
+            item = item.media,
+            modifier = Modifier.fillMaxSize()
+        )
         // 视频时长角标
         if (item.media.type == MediaType.VIDEO && item.media.duration != null) {
             DurationBadge(

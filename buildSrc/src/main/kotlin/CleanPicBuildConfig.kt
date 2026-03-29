@@ -20,6 +20,10 @@ object Versions {
 
     // iOS deployment target
     const val IOS_DEPLOYMENT_TARGET = "14.0"
+
+    // Media
+    const val COIL = "3.0.4"
+    const val MEDIA3 = "1.3.1"
 }
 
 object Deps {

@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import com.cleanpic.model.MediaType
 import com.cleanpic.model.ViewerItem
 import com.cleanpic.theme.ThemeTokens
+import com.cleanpic.ui.media.MediaImage
 import com.cleanpic.ui.navigation.AppRouter
 import com.cleanpic.ui.navigation.Route
 import com.cleanpic.ui.viewer.formatBytes
@@ -257,15 +258,10 @@ private fun DeletePreviewItem(
             .background(Color(theme.colorSurface)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Box(
-            modifier = Modifier.size(60.dp).background(Color(theme.colorSurface)),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = if (item.media.type == MediaType.PHOTO) "🖼️" else "🎬",
-                fontSize = 24.sp
-            )
-        }
+        MediaImage(
+            item = item.media,
+            modifier = Modifier.size(60.dp)
+        )
         Text(
             text = item.media.name,
             fontSize = 10.sp,

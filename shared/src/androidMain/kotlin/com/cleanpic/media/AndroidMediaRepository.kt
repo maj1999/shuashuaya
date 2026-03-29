@@ -58,7 +58,7 @@ class AndroidMediaRepository(private val context: Context) : MediaRepository {
 
     private fun queryMedia(uri: Uri, type: MediaType): List<MediaItem> {
         val items = mutableListOf<MediaItem>()
-        val projection = arrayOf(
+        val baseColumns = arrayOf(
             MediaStore.MediaColumns._ID,
             MediaStore.MediaColumns.DISPLAY_NAME,
             MediaStore.MediaColumns.SIZE,
@@ -66,6 +66,11 @@ class AndroidMediaRepository(private val context: Context) : MediaRepository {
             MediaStore.MediaColumns.WIDTH,
             MediaStore.MediaColumns.HEIGHT
         )
+        val projection = if (type == MediaType.VIDEO) {
+            baseColumns + MediaStore.Video.VideoColumns.DURATION
+        } else {
+            baseColumns
+        }
         val sortOrder = "${MediaStore.MediaColumns.DATE_MODIFIED} DESC"
 
         context.contentResolver.query(uri, projection, null, null, sortOrder)

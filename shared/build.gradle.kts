@@ -72,6 +72,12 @@ kotlin {
         dependsOn(commonMain)
         dependencies {
             implementation("androidx.core:core-ktx:1.12.0")
+            // Coil 3: 图片加载 + 视频帧解码
+            implementation("io.coil-kt.coil3:coil-compose:${Versions.COIL}")
+            implementation("io.coil-kt.coil3:coil-video:${Versions.COIL}")
+            // Media3 ExoPlayer: 视频播放
+            implementation("androidx.media3:media3-exoplayer:${Versions.MEDIA3}")
+            implementation("androidx.media3:media3-ui:${Versions.MEDIA3}")
         }
     }
 

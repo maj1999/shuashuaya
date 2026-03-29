@@ -1,0 +1,59 @@
+# maestro/flows/fullscreen-video-playback.yaml
+#
+# E14: 全屏模式视频播放验证
+# 切换到全屏模式 → 进入视频浏览 → 验证视频播放画面
+#
+appId: com.cleanpic.android
+---
+- launchApp
+- waitForAnimationToEnd
+
+# 切换到全屏模式
+- tapOn: "⚙️"
+- waitForAnimationToEnd
+- tapOn: "全屏"
+- waitForAnimationToEnd
+- tapOn: "←"
+- waitForAnimationToEnd
+
+# 进入视频浏览
+- tapOn: ".*随机清理视频"
+- waitForAnimationToEnd
+- tapOn:
+    text: "授权"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Allow"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: ".*随机清理视频"
+    optional: true
+- waitForAnimationToEnd
+
+# 等待视频加载和播放
+- assertVisible: "← 退出"
+
+# 截图：全屏视频播放中（应看到视频画面，非 emoji）
+- takeScreenshot: fullscreen-video-playing
+
+# 验证顶部栏可见
+- assertVisible: "← 退出"
+
+# 等待 2 秒让视频播放一段
+- swipe:
+    start: "50%, 50%"
+    end: "50%, 50%"
+    duration: 2000
+
+# 再次截图验证画面变化（视频在播放）
+- takeScreenshot: fullscreen-video-playing-2
+
+# 恢复轮播模式
+- tapOn: "← 退出"
+- waitForAnimationToEnd
+- tapOn: "⚙️"
+- waitForAnimationToEnd
+- tapOn: "轮播"
+- waitForAnimationToEnd

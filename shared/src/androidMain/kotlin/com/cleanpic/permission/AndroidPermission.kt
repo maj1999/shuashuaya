@@ -8,30 +8,42 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.core.content.ContextCompat
+import kotlin.coroutines.resume
+import kotlinx.coroutines.suspendCancellableCoroutine
 
 class AndroidPermission(private val context: Context) : PermissionManager {
 
+    private var pendingCallback: ((PermissionStatus) -> Unit)? = null
+
     override suspend fun requestPhotoPermission(): PermissionStatus {
-        // 实际的权限请求需要 Activity.requestPermissions()
-        // 这里仅检查当前状态；真正的请求流程在 Activity 层处理
-        return checkPermissionStatus()
+        if (checkPermissionStatus() == PermissionStatus.GRANTED) {
+            return PermissionStatus.GRANTED
+        }
+        return suspendCancellableCoroutine { cont ->
+            pendingCallback = { status -> cont.resume(status) }
+            val launcher = permissionLauncher
+            if (launcher != null) {
+                launcher(requiredPermissions())
+            } else {
+                cont.resume(PermissionStatus.DENIED)
+                pendingCallback = null
+            }
+        }
+    }
+
+    fun onPermissionResult(granted: Map<String, Boolean>) {
+        val allGranted = granted.values.all { it }
+        val status = if (allGranted) PermissionStatus.GRANTED
+            else PermissionStatus.DENIED
+        pendingCallback?.invoke(status)
+        pendingCallback = null
     }
 
     override fun checkPermissionStatus(): PermissionStatus {
-        val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            arrayOf(
-                Manifest.permission.READ_MEDIA_IMAGES,
-                Manifest.permission.READ_MEDIA_VIDEO
-            )
-        } else {
-            arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
-        }
-
-        val allGranted = permissions.all {
+        val allGranted = requiredPermissions().all {
             ContextCompat.checkSelfPermission(context, it) ==
                 PackageManager.PERMISSION_GRANTED
         }
-
         return if (allGranted) PermissionStatus.GRANTED else PermissionStatus.DENIED
     }
 
@@ -41,5 +53,19 @@ class AndroidPermission(private val context: Context) : PermissionManager {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         context.startActivity(intent)
+    }
+
+    private fun requiredPermissions(): Array<String> =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arrayOf(
+                Manifest.permission.READ_MEDIA_IMAGES,
+                Manifest.permission.READ_MEDIA_VIDEO
+            )
+        } else {
+            arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+        }
+
+    companion object {
+        var permissionLauncher: ((Array<String>) -> Unit)? = null
     }
 }

@@ -1,19 +1,33 @@
 # maestro/flows/delete-confirm.yaml
 #
-# E2E: 首页 → 点击照片按钮 → 处理权限弹窗 → 验证进入浏览或空状态
+# E2E: 首页 → 授权 → 进入浏览器 → 标记删除/保留 → 完成一轮 → 查看结果
 #
 appId: com.cleanpic.android
 ---
 - launchApp
 - waitForAnimationToEnd
+
+# 点击照片按钮
 - tapOn: ".*随机清理照片"
 - waitForAnimationToEnd
+
+# 处理 App 自定义权限弹窗
 - tapOn:
     text: "授权"
     optional: true
 - waitForAnimationToEnd
+
+# 处理系统权限弹窗 (Allow / 允许)
 - tapOn:
     text: "Allow"
     optional: true
 - waitForAnimationToEnd
-- takeScreenshot: delete-confirm-after-permission
+
+# 再次点击照片按钮（授权后回到首页需重新点击）
+- tapOn:
+    text: ".*随机清理照片"
+    optional: true
+- waitForAnimationToEnd
+
+# 截图验证进入浏览器或空状态
+- takeScreenshot: delete-confirm-viewer

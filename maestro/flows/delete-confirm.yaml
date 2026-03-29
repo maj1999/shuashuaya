@@ -1,33 +1,69 @@
 # maestro/flows/delete-confirm.yaml
 #
-# E2E: 首页 → 授权 → 进入浏览器 → 标记删除/保留 → 完成一轮 → 查看结果
+# E04: 全部删除 → 结果页确认删除（轮播模式）
+# 设置轮播模式 → viewer → 全部标记删除 → 结果页 → 确认删除
 #
 appId: com.cleanpic.android
 ---
 - launchApp
 - waitForAnimationToEnd
 
-# 点击照片按钮
+# 进入设置，确保轮播模式
+- tapOn: "⚙️"
+- waitForAnimationToEnd
+- tapOn: "轮播"
+- waitForAnimationToEnd
+- tapOn: "←"
+- waitForAnimationToEnd
+
+# 进入照片浏览
 - tapOn: ".*随机清理照片"
 - waitForAnimationToEnd
 
-# 处理 App 自定义权限弹窗
+# 处理权限
 - tapOn:
     text: "授权"
     optional: true
 - waitForAnimationToEnd
-
-# 处理系统权限弹窗 (Allow / 允许)
 - tapOn:
     text: "Allow"
     optional: true
 - waitForAnimationToEnd
-
-# 再次点击照片按钮（授权后回到首页需重新点击）
 - tapOn:
     text: ".*随机清理照片"
     optional: true
 - waitForAnimationToEnd
 
-# 截图验证进入浏览器或空状态
-- takeScreenshot: delete-confirm-viewer
+# 全部标记删除（连续点 10 次 🗑️）
+- tapOn: "🗑️"
+- waitForAnimationToEnd
+- tapOn: "🗑️"
+- waitForAnimationToEnd
+- tapOn: "🗑️"
+- waitForAnimationToEnd
+- tapOn: "🗑️"
+- waitForAnimationToEnd
+- tapOn: "🗑️"
+- waitForAnimationToEnd
+- tapOn: "🗑️"
+- waitForAnimationToEnd
+- tapOn: "🗑️"
+- waitForAnimationToEnd
+- tapOn: "🗑️"
+- waitForAnimationToEnd
+- tapOn: "🗑️"
+- waitForAnimationToEnd
+- tapOn: "🗑️"
+- waitForAnimationToEnd
+
+# 验证结果页显示删除统计
+- assertVisible: "删除"
+- assertVisible: "保留"
+- takeScreenshot: delete-confirm-result
+
+# 点击确认删除按钮
+- tapOn:
+    text: ".*确认删除.*"
+    optional: true
+- waitForAnimationToEnd
+- takeScreenshot: delete-confirm-after

@@ -1,12 +1,66 @@
 # maestro/flows/browse-photos.yaml
 #
-# E2E: 首页 → 选择照片 → 浏览照片
+# E01: 完整照片清理流程（轮播模式）
+# 设置轮播模式 → 首页 → viewer → 标记保留/删除 → 结果页验证
 #
 appId: com.cleanpic.android
 ---
 - launchApp
-- assertVisible: "CleanPic"
 - waitForAnimationToEnd
+
+# 进入设置，确保轮播模式
+- tapOn: "⚙️"
+- waitForAnimationToEnd
+- tapOn: "轮播"
+- waitForAnimationToEnd
+- tapOn: "←"
+- waitForAnimationToEnd
+
+# 进入照片浏览
 - tapOn: ".*随机清理照片"
 - waitForAnimationToEnd
-- takeScreenshot: browse-photos-loaded
+
+# 处理权限（首次运行）
+- tapOn:
+    text: "授权"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Allow"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: ".*随机清理照片"
+    optional: true
+- waitForAnimationToEnd
+
+# 验证进入 viewer（进度 N / M）
+- takeScreenshot: browse-photos-viewer
+
+# 操作 10 张：交替删除和保留
+- tapOn: "🗑️"
+- waitForAnimationToEnd
+- tapOn: "✓"
+- waitForAnimationToEnd
+- tapOn: "🗑️"
+- waitForAnimationToEnd
+- tapOn: "✓"
+- waitForAnimationToEnd
+- tapOn: "✓"
+- waitForAnimationToEnd
+- tapOn: "🗑️"
+- waitForAnimationToEnd
+- tapOn: "✓"
+- waitForAnimationToEnd
+- tapOn: "✓"
+- waitForAnimationToEnd
+- tapOn: "✓"
+- waitForAnimationToEnd
+- tapOn: "✓"
+- waitForAnimationToEnd
+
+# 验证到达结果页
+- assertVisible: "删除"
+- assertVisible: "保留"
+- assertVisible: "释放"
+- takeScreenshot: browse-photos-result

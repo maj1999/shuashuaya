@@ -17,34 +17,28 @@ mkdir -p "$ASSETS_DIR/photos" "$ASSETS_DIR/videos"
 
 echo "=== 生成测试照片 ==="
 
-ffmpeg -y -f lavfi -i "color=c=#4A90D9:s=1080x1920:d=1" \
-    -vf "drawtext=text='test_01 1080x1920':fontsize=60:fontcolor=white:x=(w-tw)/2:y=(h-th)/2" \
-    -frames:v 1 "$ASSETS_DIR/photos/test_01.jpg" 2>/dev/null
-echo "  test_01.jpg (1080x1920)"
+COLORS=("#4A90D9" "#D94A4A" "#4AD97A" "#D9A84A" "#8A4AD9"
+        "#D94A8A" "#4AD9D9" "#90D94A" "#D9D94A" "#4A4AD9"
+        "#D96A3A" "#3AD97A")
 
-ffmpeg -y -f lavfi -i "color=c=#D94A4A:s=2160x3840:d=1" \
-    -vf "drawtext=text='test_02 2160x3840':fontsize=120:fontcolor=white:x=(w-tw)/2:y=(h-th)/2" \
-    -frames:v 1 -q:v 2 "$ASSETS_DIR/photos/test_02.jpg" 2>/dev/null
-echo "  test_02.jpg (2160x3840)"
-
-ffmpeg -y -f lavfi -i "color=c=#4AD97A:s=720x1280:d=1" \
-    -vf "drawtext=text='test_03 720x1280':fontsize=40:fontcolor=white:x=(w-tw)/2:y=(h-th)/2" \
-    -frames:v 1 "$ASSETS_DIR/photos/test_03.png" 2>/dev/null
-echo "  test_03.png (720x1280)"
+for i in $(seq -w 1 12); do
+    color="${COLORS[$((10#$i - 1))]}"
+    ffmpeg -y -f lavfi -i "color=c=${color}:s=1080x1920:d=1" \
+        -update 1 -frames:v 1 "$ASSETS_DIR/photos/test_${i}.jpg" 2>/dev/null
+    echo "  test_${i}.jpg (1080x1920, ${color})"
+done
 
 echo "=== 生成测试视频 ==="
 
 ffmpeg -y -f lavfi -i "color=c=#D9A84A:s=1920x1080:d=10:r=30" \
-    -vf "drawtext=text='test_01 1080p %{pts\:hms}':fontsize=60:fontcolor=white:x=(w-tw)/2:y=(h-th)/2" \
     -c:v libx264 -preset fast -crf 23 \
     "$ASSETS_DIR/videos/test_01.mp4" 2>/dev/null
 echo "  test_01.mp4 (1080p, 10s)"
 
-ffmpeg -y -f lavfi -i "color=c=#8A4AD9:s=3840x2160:d=30:r=30" \
-    -vf "drawtext=text='test_02 4K %{pts\:hms}':fontsize=120:fontcolor=white:x=(w-tw)/2:y=(h-th)/2" \
-    -c:v libx264 -preset fast -crf 28 \
+ffmpeg -y -f lavfi -i "color=c=#8A4AD9:s=1280x720:d=5:r=30" \
+    -c:v libx264 -preset fast -crf 23 \
     "$ASSETS_DIR/videos/test_02.mp4" 2>/dev/null
-echo "  test_02.mp4 (4K, 30s)"
+echo "  test_02.mp4 (720p, 5s)"
 
 echo "=== 测试媒体生成完成 ==="
 ls -lh "$ASSETS_DIR/photos/" "$ASSETS_DIR/videos/"

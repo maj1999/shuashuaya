@@ -70,7 +70,8 @@ fun ResultScreen(
         // Stat cards
         item {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
+                    .height(androidx.compose.foundation.layout.IntrinsicSize.Max),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 StatCard(
@@ -236,12 +237,19 @@ private fun StatCard(
 ) {
     Column(
         modifier = modifier
+            .fillMaxHeight()
             .clip(RoundedCornerShape(theme.borderRadius.dp))
             .background(color.copy(alpha = 0.1f))
             .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        Text(text = value, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = color)
+        Text(
+            text = value,
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold,
+            color = color
+        )
         Spacer(modifier = Modifier.height(4.dp))
         Text(text = label, fontSize = 12.sp, color = Color(theme.colorTextSecondary))
     }

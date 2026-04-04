@@ -1,16 +1,23 @@
 package com.cleanpic.media
 
+import android.app.Activity
 import android.content.ContentUris
 import android.content.Context
+import android.content.IntentSender
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import com.cleanpic.model.MediaItem
 import com.cleanpic.model.MediaType
+import kotlin.coroutines.resume
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import java.util.concurrent.CancellationException
 
 class AndroidMediaRepository(private val context: Context) : MediaRepository {
+
+    private var pendingDeleteCallback: ((Boolean) -> Unit)? = null
 
     override suspend fun queryPhotos(): List<MediaItem> = withContext(Dispatchers.IO) {
         queryMedia(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, MediaType.PHOTO)
@@ -42,8 +49,7 @@ class AndroidMediaRepository(private val context: Context) : MediaRepository {
                     )
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    // API 30+: createDeleteRequest 返回 PendingIntent，需要在 Activity 层处理
-                    Result.success(ids.size)
+                    requestSystemDelete(uris, ids.size)
                 } else {
                     var deleted = 0
                     uris.forEach { uri ->
@@ -55,6 +61,56 @@ class AndroidMediaRepository(private val context: Context) : MediaRepository {
                 Result.failure(e)
             }
         }
+
+    override suspend fun deleteMediaItems(items: List<MediaItem>): Result<Int> =
+        withContext(Dispatchers.IO) {
+            try {
+                val uris = items.map { item ->
+                    val baseUri = when (item.type) {
+                        MediaType.PHOTO -> MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                        MediaType.VIDEO -> MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+                    }
+                    ContentUris.withAppendedId(baseUri, item.id.toLong())
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    requestSystemDelete(uris, items.size)
+                } else {
+                    var deleted = 0
+                    uris.forEach { uri ->
+                        deleted += context.contentResolver.delete(uri, null, null)
+                    }
+                    Result.success(deleted)
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+
+    fun onDeleteResult(granted: Boolean) {
+        pendingDeleteCallback?.invoke(granted)
+        pendingDeleteCallback = null
+    }
+
+    private suspend fun requestSystemDelete(uris: List<Uri>, count: Int): Result<Int> {
+        val pendingIntent = MediaStore.createDeleteRequest(context.contentResolver, uris)
+        val launcher = deleteLauncher
+            ?: return Result.failure(IllegalStateException("deleteLauncher not registered"))
+        return suspendCancellableCoroutine { cont ->
+            pendingDeleteCallback = { granted ->
+                if (granted) {
+                    cont.resume(Result.success(count))
+                } else {
+                    cont.resume(Result.failure(CancellationException("用户取消删除")))
+                }
+            }
+            cont.invokeOnCancellation { pendingDeleteCallback = null }
+            launcher(pendingIntent.intentSender)
+        }
+    }
+
+    companion object {
+        var deleteLauncher: ((IntentSender) -> Unit)? = null
+    }
 
     private fun queryMedia(uri: Uri, type: MediaType): List<MediaItem> {
         val items = mutableListOf<MediaItem>()

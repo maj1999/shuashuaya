@@ -88,6 +88,16 @@ appId: com.cleanpic.android
 - tapOn: ".*确认删除.*"
 - waitForAnimationToEnd
 
+# 系统删除确认弹窗（Android API 30+ createDeleteRequest）
+- tapOn:
+    text: "Allow"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Delete"
+    optional: true
+- waitForAnimationToEnd
+
 # 确认删除后：验证待删除区域和确认按钮已消失
 - assertNotVisible: "待删除项目"
 - assertNotVisible: ".*确认删除.*"

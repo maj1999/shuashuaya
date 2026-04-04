@@ -103,7 +103,31 @@ class ViewerViewModelTest {
         vm.markDelete()
         val result = vm.confirmDelete()
         assertTrue(result.isSuccess)
-        assertEquals(2, mockRepo.deletedIds.size)
+        assertEquals(2, mockRepo.deletedItems.size)
+    }
+
+    @Test
+    fun confirmDelete_passes_full_mediaItems() = runTest {
+        vm.loadMedia(MediaType.PHOTO)
+        vm.markDelete()  // item 0
+        vm.markKept()    // item 1
+        vm.markDelete()  // item 2
+        val result = vm.confirmDelete()
+        assertTrue(result.isSuccess)
+        assertEquals(2, mockRepo.deletedItems.size)
+        assertTrue(mockRepo.deletedItems.all { it.type == MediaType.PHOTO })
+        assertEquals(vm.pendingDeletes.map { it.media.id }.toSet(),
+            mockRepo.deletedItems.map { it.id }.toSet())
+    }
+
+    @Test
+    fun confirmDelete_video_passes_correct_type() = runTest {
+        vm.loadMedia(MediaType.VIDEO)
+        vm.markDelete()
+        val result = vm.confirmDelete()
+        assertTrue(result.isSuccess)
+        assertEquals(1, mockRepo.deletedItems.size)
+        assertEquals(MediaType.VIDEO, mockRepo.deletedItems[0].type)
     }
 
     @Test
@@ -112,7 +136,18 @@ class ViewerViewModelTest {
         repeat(10) { vm.markKept() }
         val result = vm.confirmDelete()
         assertTrue(result.isSuccess)
-        assertEquals(0, mockRepo.deletedIds.size)
+        assertEquals(0, mockRepo.deletedItems.size)
+    }
+
+    @Test
+    fun confirmDelete_repo_failure_returns_failure() = runTest {
+        vm.loadMedia(MediaType.PHOTO)
+        vm.markDelete()
+        vm.markDelete()
+        mockRepo.shouldFail = true
+        val result = vm.confirmDelete()
+        assertTrue(result.isFailure)
+        assertEquals("mock deletion failed", result.exceptionOrNull()?.message)
     }
 
     @Test

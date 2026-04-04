@@ -8,4 +8,6 @@ interface MediaRepository {
     suspend fun getThumbnail(id: String): ByteArray?
     suspend fun getFullImage(id: String): ByteArray?
     suspend fun deleteMedia(ids: List<String>): Result<Int>
+    suspend fun deleteMediaItems(items: List<MediaItem>): Result<Int> =
+        deleteMedia(items.map { it.id })
 }

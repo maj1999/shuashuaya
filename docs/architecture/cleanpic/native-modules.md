@@ -14,7 +14,7 @@
 | `queryVideos()` | 获取视频列表 | MediaStore.Video | PHAsset (video) | photoAccessHelper |
 | `getThumbnail(id)` | 获取缩略图 | ContentResolver | PHImageManager | getThumbnail |
 | `getFullImage(id)` | 获取原图 | ContentResolver | PHImageManager | requestImageData |
-| `deleteMedia(ids)` | 批量删除 | createDeleteRequest | PHAssetChangeRequest | deleteAssets |
+| `deleteMedia(items)` | 批量删除 | createDeleteRequest | PHAssetChangeRequest | deleteAssets |
 
 ### 性能约束
 
@@ -38,7 +38,7 @@
 | 基础权限 | API 33+: `READ_MEDIA_IMAGES` + `READ_MEDIA_VIDEO`；API 26-32: `READ_EXTERNAL_STORAGE` | `PHAuthorizationStatus.authorized` | `ohos.permission.READ_IMAGEVIDEO` |
 | 部分权限 | API 34+: `READ_MEDIA_VISUAL_USER_SELECTED` | iOS 14+: `.limited` | 暂无 |
 | 部分权限处理 | 首页提示条"仅能访问部分照片"，引导授予全部 | 同左 | N/A |
-| 删除权限 | `createDeleteRequest()` 自带系统确认 | `PHAssetChangeRequest` 自带确认 | `deleteAssets()` 自带确认 |
+| 删除权限 | API 30+: `createDeleteRequest()` → PendingIntent → Activity 启动系统确认弹窗；API < 30: `contentResolver.delete()` 直接删除 | `PHAssetChangeRequest` 自带确认 | `deleteAssets()` 自带确认 |
 | 永久拒绝 | 引导页 + "去设置"按钮 → `openAppSettings()` | 同左 | 同左 |
 
 ## VideoPlayerModule

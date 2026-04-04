@@ -62,9 +62,9 @@ class ViewerViewModel {
     }
 
     suspend fun confirmDelete(): Result<Int> {
-        val ids = pendingDeletes.map { it.media.id }
-        if (ids.isEmpty()) return Result.success(0)
-        return repo.deleteMedia(ids)
+        val items = pendingDeletes.map { it.media }
+        if (items.isEmpty()) return Result.success(0)
+        return repo.deleteMediaItems(items)
     }
 
     fun resetForNextRound() { _currentIndex.value = 0 }

@@ -10,9 +10,10 @@
 | 相册为空 | U04 | — | — | B01 |
 | 保留操作 | — | E10 | — | E03 |
 | 删除标记 | — | E10 | — | E04 |
-| 结果页确认删除 | — | — | — | E01 |
+| 结果页确认删除 | U-DEL-01 | — | — | E01,E04 |
 | 结果页反悔 | — | — | — | E05 |
 | 系统弹窗取消 | — | — | — | E06 |
+| 部分删除失败 | U-DEL-02 | — | — | — |
 | 再来一轮 | U02 | — | — | E02 |
 | 图片加载失败 | — | — | — | B04 |
 | 大相册性能 | — | — | — | B06 |
@@ -66,6 +67,24 @@
 |----|------|
 | 操作 | 标记删除 4 张→结果页确认→系统弹窗点"取消" |
 | 预期 | 所有照片保留；提示"已取消删除" |
+
+## 单元测试用例（删除相关）
+
+### U-DEL-01 confirmDelete 传递完整 MediaItem
+
+| 项 | 内容 |
+|----|------|
+| 前置 | MockMediaRepository 实现 deleteMedia(items) |
+| 操作 | 标记 2 张删除 → confirmDelete() |
+| 预期 | repo 收到 2 个 MediaItem，type 字段正确 |
+
+### U-DEL-02 confirmDelete 处理 repo 返回失败
+
+| 项 | 内容 |
+|----|------|
+| 前置 | MockMediaRepository.deleteMedia 返回 Result.failure |
+| 操作 | confirmDelete() |
+| 预期 | 返回 Result.failure，ViewModel 状态不变 |
 
 ## 边界场景用例
 

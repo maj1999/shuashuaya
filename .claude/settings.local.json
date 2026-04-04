@@ -49,7 +49,32 @@
       "Bash(kdoctor)",
       "Bash(export PATH=\"/opt/homebrew/opt/ruby/bin:$PATH\")",
       "Bash(export LC_ALL=en_US.UTF-8)",
-      "Bash(find ~/Library/Application Support -path *AndroidStudio* -name *.jar)"
+      "Bash(find ~/Library/Application Support -path *AndroidStudio* -name *.jar)",
+      "Bash(bash:*)",
+      "Bash(adb devices:*)",
+      "Bash(adb install:*)",
+      "Bash(adb shell:*)",
+      "Bash(xargs ls:*)",
+      "Bash(/Users/mark/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/scripts/start-server.sh:*)",
+      "Bash(/Users/mark/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/brainstorming/scripts/start-server.sh:*)",
+      "Bash(open:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)",
+      "Skill(dev-workflow)",
+      "Bash(gh auth:*)",
+      "Bash(git commit:*)",
+      "Bash(gh repo:*)",
+      "Bash(git push:*)",
+      "Bash(cat /Users/mark/.claude/plugins/cache/openai-codex/codex/1.0.2/prompts/*.md)",
+      "Bash(scripts/test.sh)",
+      "Bash(./gradlew :shared:testDebugUnitTest)",
+      "Bash(scripts/build-android.sh)",
+      "Bash(./gradlew jvmTest -p shared)",
+      "Bash(./gradlew test:*)",
+      "Bash(grep -E \"\\\\.kt$\")",
+      "Bash(./gradlew testDebugUnitTest -p shared)",
+      "Bash(./gradlew compileKotlin -p shared)",
+      "Bash(./gradlew compileDebugKotlinAndroid -p shared)"
     ]
   }
 }

@@ -75,22 +75,68 @@ cleanpic/
 
 - JDK 17
 - Android Studio（含 Android SDK 34）
-- ffmpeg（用于生成测试媒体）
+- ffmpeg（用于生成测试媒体，可选）
+- Maestro（用于 E2E 测试，可选）
 
-### 构建与运行
+可以运行以下命令一键检查环境是否就绪：
 
 ```bash
-# 检查开发环境
 scripts/check-env.sh
+```
 
-# 构建 Android APK
-scripts/build-android.sh
+### 第一步：启动模拟器
 
-# 启动模拟器并注入测试媒体
+在 Android Studio 中创建一个 AVD（推荐 Pixel 6 / API 34），然后：
+
+```bash
+# 启动模拟器（会自动等待启动完成，并注入测试媒体）
 scripts/emulators/android.sh start
 
-# 部署到模拟器
+# 如需冷启动（忽略快照）
+scripts/emulators/android.sh start --cold
+
+# 查看模拟器状态
+scripts/emulators/android.sh status
+```
+
+> 如果已有模拟器运行中或连接了实机，可跳过此步。用 `adb devices` 确认设备在线即可。
+
+### 第二步：构建 APK
+
+```bash
+scripts/build-android.sh
+```
+
+构建成功后，APK 输出路径：`androidApp/build/outputs/apk/debug/androidApp-debug.apk`
+
+### 第三步：安装并启动 App
+
+**方式一：使用脚本（推荐）**
+
+```bash
+# 安装 APK 到已连接的设备/模拟器
 scripts/test-android.sh deploy
+```
+
+**方式二：手动安装**
+
+```bash
+# 安装
+adb install -r androidApp/build/outputs/apk/debug/androidApp-debug.apk
+
+# 启动 App
+adb shell am start -n com.cleanpic.android/.MainActivity
+```
+
+App 启动后，授予相册权限即可开始使用。
+
+### 一键完整流程
+
+如果你想从构建到 E2E 测试一步到位：
+
+```bash
+# 构建 + 部署 + 运行 E2E 测试（需要模拟器已启动 + Maestro 已安装）
+scripts/test-android.sh
 ```
 
 ### 运行测试
@@ -99,10 +145,10 @@ scripts/test-android.sh deploy
 # 单元测试（28 用例）
 scripts/test.sh
 
-# 生成测试媒体（12 张照片 + 2 个视频）
+# 生成测试媒体（12 张照片 + 2 个视频，E2E 测试前需要）
 scripts/generate-test-assets.sh
 
-# E2E 测试（需要 Maestro + 模拟器）
+# E2E 测试（需要 Maestro + 模拟器 + 已部署 App）
 scripts/test-android.sh e2e
 ```
 

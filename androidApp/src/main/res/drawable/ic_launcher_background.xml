@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    CleanPic 图标背景：品牌紫渐变
+    CleanPic 图标背景：品牌暖色渐变
     使用 aapt:attr 实现真正的线性渐变（API 24+）
 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
@@ -18,15 +18,15 @@
                 android:startY="0"
                 android:endX="108"
                 android:endY="108"
-                android:startColor="#5B2DD4"
-                android:endColor="#A87BF0" />
+                android:startColor="#FFF8E1"
+                android:endColor="#FFECB3" />
         </aapt:attr>
     </path>
 
-    <!-- 微妙的光晕（左上角亮区） -->
+    <!-- 微妙的光晕（左上角暖色亮区） -->
     <path
         android:pathData="M0,0 C40,0 54,14 54,54 C54,14 0,0 0,0 Z"
         android:fillColor="#FFFFFF"
-        android:fillAlpha="0.06" />
+        android:fillAlpha="0.08" />
 
 </vector>

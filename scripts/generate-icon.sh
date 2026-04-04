@@ -28,7 +28,7 @@ for i in "${!DIRS[@]}"; do
 
     # 标准图标：紫色渐变
     ffmpeg -y -f lavfi \
-        -i "gradients=s=${size}x${size}:c0=#6A3DE8:c1=#B06FED:duration=1:speed=0.01" \
+        -i "gradients=s=${size}x${size}:c0=#FFF8E1:c1=#FFECB3:duration=1:speed=0.01" \
         -update 1 -frames:v 1 \
         "$RES_DIR/$dir/ic_launcher.png" 2>/dev/null
 
@@ -37,7 +37,7 @@ for i in "${!DIRS[@]}"; do
 
     # 自适应图标前景层（渐变 + 留白安全区）
     ffmpeg -y -f lavfi \
-        -i "gradients=s=${fg}x${fg}:c0=#6A3DE8:c1=#B06FED:duration=1:speed=0.01" \
+        -i "gradients=s=${fg}x${fg}:c0=#FFF8E1:c1=#FFECB3:duration=1:speed=0.01" \
         -update 1 -frames:v 1 \
         "$RES_DIR/$dir/ic_launcher_foreground.png" 2>/dev/null
 
@@ -47,7 +47,7 @@ done
 # 生成 Play Store 高分辨率图标（512x512）
 mkdir -p "$RES_DIR/../ic_launcher-playstore"
 ffmpeg -y -f lavfi \
-    -i "gradients=s=512x512:c0=#6A3DE8:c1=#B06FED:duration=1:speed=0.01" \
+    -i "gradients=s=512x512:c0=#FFF8E1:c1=#FFECB3:duration=1:speed=0.01" \
     -update 1 -frames:v 1 \
     "$RES_DIR/../ic_launcher-playstore.png" 2>/dev/null
 echo "  Play Store: 512x512"

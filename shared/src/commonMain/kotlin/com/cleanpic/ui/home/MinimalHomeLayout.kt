@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cleanpic.icons.IconPainter
 import com.cleanpic.ui.common.PermissionBanner
+import androidx.compose.ui.platform.testTag
 
 @Composable
 fun MinimalHomeLayout(state: HomeScreenState) {
@@ -50,7 +51,9 @@ fun MinimalHomeLayout(state: HomeScreenState) {
                 theme = theme,
                 size = 20.dp,
                 colorOverride = 0xFF999999,
-                modifier = Modifier.clickable { state.onOpenSettings() }
+                modifier = Modifier
+                    .testTag("settings_button")
+                    .clickable { state.onOpenSettings() }
             )
         }
 
@@ -107,6 +110,7 @@ fun MinimalHomeLayout(state: HomeScreenState) {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp)
+                .testTag(if (selectedTab == "photo") "start_photo" else "start_video")
                 .border(1.dp, Color(0xFF333333), RoundedCornerShape(2.dp))
                 .clickable {
                     if (selectedTab == "photo") state.onStartPhoto()

@@ -9,11 +9,13 @@ appId: com.cleanpic.android
 - waitForAnimationToEnd
 
 # 确保轮播模式
-- tapOn: "⚙️"
+- tapOn:
+    id: "settings_button"
 - waitForAnimationToEnd
 - tapOn: "轮播"
 - waitForAnimationToEnd
-- tapOn: "←"
+- tapOn:
+    id: "back_button"
 - waitForAnimationToEnd
 
 # 进入视频浏览

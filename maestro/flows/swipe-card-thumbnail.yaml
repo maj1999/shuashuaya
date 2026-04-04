@@ -9,11 +9,13 @@ appId: com.cleanpic.android
 - waitForAnimationToEnd
 
 # 切换到卡片滑动模式
-- tapOn: "⚙️"
+- tapOn:
+    id: "settings_button"
 - waitForAnimationToEnd
 - tapOn: "卡片"
 - waitForAnimationToEnd
-- tapOn: "←"
+- tapOn:
+    id: "back_button"
 - waitForAnimationToEnd
 
 # 进入照片浏览

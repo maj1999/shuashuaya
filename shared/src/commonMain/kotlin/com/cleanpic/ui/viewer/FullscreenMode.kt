@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cleanpic.icons.IconPainter
 import com.cleanpic.model.MediaType
+import androidx.compose.ui.platform.testTag
 import com.cleanpic.model.ViewerItem
 import com.cleanpic.theme.ThemeTokens
 import com.cleanpic.ui.media.MediaImage
@@ -121,7 +122,10 @@ private fun TopBar(
             .padding(top = 44.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        TextButton(onClick = onExit) {
+        TextButton(
+            onClick = onExit,
+            modifier = Modifier.testTag("exit_button")
+        ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconPainter("back", theme, size = 15.dp)
                 Spacer(modifier = Modifier.width(4.dp))
@@ -158,7 +162,7 @@ private fun SideActions(
         Button(
             onClick = onDelete,
             shape = CircleShape,
-            modifier = Modifier.size(56.dp),
+            modifier = Modifier.size(56.dp).testTag("delete_button"),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(theme.colorDanger)
             ),
@@ -169,7 +173,7 @@ private fun SideActions(
         Button(
             onClick = onKeep,
             shape = CircleShape,
-            modifier = Modifier.size(56.dp),
+            modifier = Modifier.size(56.dp).testTag("keep_button"),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(theme.colorSuccess)
             ),
@@ -225,7 +229,10 @@ private fun BottomInfo(
                     color = Color.White.copy(alpha = 0.8f)
                 )
                 Spacer(modifier = Modifier.weight(1f))
-                TextButton(onClick = onToggleMute) {
+                TextButton(
+                    onClick = onToggleMute,
+                    modifier = Modifier.testTag("mute_button")
+                ) {
                     IconPainter(if (isMuted) "mute" else "unmute", theme, size = 20.dp)
                 }
             }

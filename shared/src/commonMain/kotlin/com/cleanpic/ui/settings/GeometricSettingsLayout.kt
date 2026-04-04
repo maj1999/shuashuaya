@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import com.cleanpic.icons.IconPainter
 import com.cleanpic.model.InteractionMode
 import com.cleanpic.theme.ThemeTokens
+import androidx.compose.ui.platform.testTag
 
 @Composable
 fun GeometricSettingsLayout(state: SettingsScreenState) {
@@ -41,6 +42,7 @@ fun GeometricSettingsLayout(state: SettingsScreenState) {
             Box(
                 modifier = Modifier
                     .size(40.dp)
+                    .testTag("back_button")
                     .clip(RoundedCornerShape(12.dp))
                     .clickable { state.onBack() },
                 contentAlignment = Alignment.Center

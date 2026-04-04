@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.sp
 import com.cleanpic.di.ServiceLocator
 import com.cleanpic.icons.IconPainter
 import com.cleanpic.model.InteractionMode
+import androidx.compose.ui.platform.testTag
 import com.cleanpic.model.MediaType
 import com.cleanpic.theme.ThemeTokens
 import com.cleanpic.ui.common.EmptyStateScreen
@@ -111,7 +112,10 @@ private fun ProgressHeader(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            TextButton(onClick = onExit) {
+            TextButton(
+                onClick = onExit,
+                modifier = Modifier.testTag("exit_button")
+            ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconPainter("back", theme, size = 14.dp)
                     Spacer(modifier = Modifier.width(4.dp))

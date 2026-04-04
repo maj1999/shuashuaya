@@ -9,11 +9,13 @@ appId: com.cleanpic.android
 - waitForAnimationToEnd
 
 # 切换到全屏模式
-- tapOn: "⚙️"
+- tapOn:
+    id: "settings_button"
 - waitForAnimationToEnd
 - tapOn: "全屏"
 - waitForAnimationToEnd
-- tapOn: "←"
+- tapOn:
+    id: "back_button"
 - waitForAnimationToEnd
 
 # 进入视频浏览
@@ -33,13 +35,15 @@ appId: com.cleanpic.android
 - waitForAnimationToEnd
 
 # 等待视频加载和播放
-- assertVisible: "← 退出"
+- assertVisible:
+    id: "exit_button"
 
 # 截图：全屏视频播放中（应看到视频画面，非 emoji）
 - takeScreenshot: fullscreen-video-playing
 
 # 验证顶部栏可见
-- assertVisible: "← 退出"
+- assertVisible:
+    id: "exit_button"
 
 # 等待 2 秒让视频播放一段
 - swipe:
@@ -51,9 +55,11 @@ appId: com.cleanpic.android
 - takeScreenshot: fullscreen-video-playing-2
 
 # 恢复轮播模式
-- tapOn: "← 退出"
+- tapOn:
+    id: "exit_button"
 - waitForAnimationToEnd
-- tapOn: "⚙️"
+- tapOn:
+    id: "settings_button"
 - waitForAnimationToEnd
 - tapOn: "轮播"
 - waitForAnimationToEnd

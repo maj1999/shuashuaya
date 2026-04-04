@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cleanpic.icons.IconPainter
 import com.cleanpic.ui.common.PermissionBanner
+import androidx.compose.ui.platform.testTag
 
 private val EditorialBg = Color(0xFFFFFFF5)
 private val EditorialText = Color(0xFF1A1A1A)
@@ -100,7 +101,8 @@ fun EditorialHomeLayout(state: HomeScreenState) {
                 description = "浏览并整理\n你的照片库",
                 theme = theme,
                 modifier = Modifier.weight(1f),
-                onClick = state.onStartPhoto
+                onClick = state.onStartPhoto,
+                testTag = "start_photo"
             )
 
             // 竖分割线
@@ -118,7 +120,8 @@ fun EditorialHomeLayout(state: HomeScreenState) {
                 description = "浏览并整理\n你的视频库",
                 theme = theme,
                 modifier = Modifier.weight(1f),
-                onClick = state.onStartVideo
+                onClick = state.onStartVideo,
+                testTag = "start_video"
             )
         }
 
@@ -140,7 +143,9 @@ fun EditorialHomeLayout(state: HomeScreenState) {
             theme = theme,
             size = 20.dp,
             colorOverride = 0xFF999999,
-            modifier = Modifier.clickable { state.onOpenSettings() }
+            modifier = Modifier
+                .testTag("settings_button")
+                .clickable { state.onOpenSettings() }
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -154,7 +159,8 @@ private fun EditorialMediaColumn(
     description: String,
     theme: com.cleanpic.theme.ThemeTokens,
     modifier: Modifier,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    testTag: String = ""
 ) {
     Column(
         modifier = modifier.padding(horizontal = 16.dp, vertical = 12.dp),
@@ -208,7 +214,9 @@ private fun EditorialMediaColumn(
             fontWeight = FontWeight.SemiBold,
             color = EditorialText,
             letterSpacing = 1.sp,
-            modifier = Modifier.clickable(onClick = onClick)
+            modifier = Modifier
+                .then(if (testTag.isNotEmpty()) Modifier.testTag(testTag) else Modifier)
+                .clickable(onClick = onClick)
         )
     }
 }

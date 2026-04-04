@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cleanpic.icons.IconPainter
 import com.cleanpic.model.MediaType
+import androidx.compose.ui.platform.testTag
 import com.cleanpic.model.ViewerItem
 import com.cleanpic.theme.ThemeTokens
 import com.cleanpic.ui.media.MediaImage
@@ -194,7 +195,7 @@ private fun ActionButtons(theme: ThemeTokens, viewerViewModel: ViewerViewModel) 
         Button(
             onClick = { viewerViewModel.markDelete() },
             shape = CircleShape,
-            modifier = Modifier.size(64.dp),
+            modifier = Modifier.size(64.dp).testTag("delete_button"),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(theme.colorDanger)
             ),
@@ -205,7 +206,7 @@ private fun ActionButtons(theme: ThemeTokens, viewerViewModel: ViewerViewModel) 
         Button(
             onClick = { viewerViewModel.markKept() },
             shape = CircleShape,
-            modifier = Modifier.size(64.dp),
+            modifier = Modifier.size(64.dp).testTag("keep_button"),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(theme.colorSuccess)
             ),
@@ -236,6 +237,7 @@ internal fun PlayButtonOverlay(onClick: () -> Unit, theme: ThemeTokens, modifier
     Box(
         modifier = modifier
             .size(48.dp)
+            .testTag("play_button")
             .clip(CircleShape)
             .background(Color.Black.copy(alpha = 0.4f))
             .clickable(onClick = onClick),
@@ -280,7 +282,10 @@ internal fun FileInfoOverlay(
             )
             if (isMuted != null && onToggleMute != null) {
                 Spacer(modifier = Modifier.weight(1f))
-                TextButton(onClick = onToggleMute) {
+                TextButton(
+                    onClick = onToggleMute,
+                    modifier = Modifier.testTag("mute_button")
+                ) {
                     IconPainter(if (isMuted) "mute" else "unmute", theme, size = 18.dp)
                 }
             }

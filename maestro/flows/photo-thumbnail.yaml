@@ -9,11 +9,13 @@ appId: com.cleanpic.android
 - waitForAnimationToEnd
 
 # 确保轮播模式
-- tapOn: "⚙️"
+- tapOn:
+    id: "settings_button"
 - waitForAnimationToEnd
 - tapOn: "轮播"
 - waitForAnimationToEnd
-- tapOn: "←"
+- tapOn:
+    id: "back_button"
 - waitForAnimationToEnd
 
 # 进入照片浏览
@@ -40,14 +42,16 @@ appId: com.cleanpic.android
 - takeScreenshot: photo-thumbnail-1
 
 # 保留并切到下一张
-- tapOn: "✓"
+- tapOn:
+    id: "keep_button"
 - waitForAnimationToEnd
 
 # 截图：第 2 张照片缩略图
 - takeScreenshot: photo-thumbnail-2
 
 # 再切一张
-- tapOn: "✓"
+- tapOn:
+    id: "keep_button"
 - waitForAnimationToEnd
 
 # 截图：第 3 张照片缩略图

@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import com.cleanpic.icons.IconPainter
 import com.cleanpic.model.InteractionMode
 import com.cleanpic.theme.ThemeTokens
+import androidx.compose.ui.platform.testTag
 
 @Composable
 fun PlayfulSettingsLayout(state: SettingsScreenState) {
@@ -44,6 +45,7 @@ fun PlayfulSettingsLayout(state: SettingsScreenState) {
                 Box(
                     modifier = Modifier
                         .size(40.dp)
+                        .testTag("back_button")
                         .clip(RoundedCornerShape(12.dp))
                         .background(Color(0x1FFFFFFF))
                         .border(1.dp, Color(0x33FFFFFF), RoundedCornerShape(12.dp))

@@ -10,11 +10,13 @@ appId: com.cleanpic.android
 - waitForAnimationToEnd
 
 # 进入设置，确保轮播模式
-- tapOn: "⚙️"
+- tapOn:
+    id: "settings_button"
 - waitForAnimationToEnd
 - tapOn: "轮播"
 - waitForAnimationToEnd
-- tapOn: "←"
+- tapOn:
+    id: "back_button"
 - waitForAnimationToEnd
 
 # 进入照片浏览
@@ -35,26 +37,36 @@ appId: com.cleanpic.android
     optional: true
 - waitForAnimationToEnd
 
-# 全部标记删除（连续点 10 次 🗑️）
-- tapOn: "🗑️"
+# 全部标记删除（连续点 10 次删除按钮）
+- tapOn:
+    id: "delete_button"
 - waitForAnimationToEnd
-- tapOn: "🗑️"
+- tapOn:
+    id: "delete_button"
 - waitForAnimationToEnd
-- tapOn: "🗑️"
+- tapOn:
+    id: "delete_button"
 - waitForAnimationToEnd
-- tapOn: "🗑️"
+- tapOn:
+    id: "delete_button"
 - waitForAnimationToEnd
-- tapOn: "🗑️"
+- tapOn:
+    id: "delete_button"
 - waitForAnimationToEnd
-- tapOn: "🗑️"
+- tapOn:
+    id: "delete_button"
 - waitForAnimationToEnd
-- tapOn: "🗑️"
+- tapOn:
+    id: "delete_button"
 - waitForAnimationToEnd
-- tapOn: "🗑️"
+- tapOn:
+    id: "delete_button"
 - waitForAnimationToEnd
-- tapOn: "🗑️"
+- tapOn:
+    id: "delete_button"
 - waitForAnimationToEnd
-- tapOn: "🗑️"
+- tapOn:
+    id: "delete_button"
 - waitForAnimationToEnd
 
 # 验证结果页显示删除统计

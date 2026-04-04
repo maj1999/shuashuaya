@@ -9,11 +9,13 @@ appId: com.cleanpic.android
 - waitForAnimationToEnd
 
 # 确保轮播模式
-- tapOn: "⚙️"
+- tapOn:
+    id: "settings_button"
 - waitForAnimationToEnd
 - tapOn: "轮播"
 - waitForAnimationToEnd
-- tapOn: "←"
+- tapOn:
+    id: "back_button"
 - waitForAnimationToEnd
 
 # 进入照片浏览
@@ -33,25 +35,35 @@ appId: com.cleanpic.android
 - waitForAnimationToEnd
 
 # 混合操作：5 删除 + 5 保留（确保释放值有单位）
-- tapOn: "🗑️"
+- tapOn:
+    id: "delete_button"
 - waitForAnimationToEnd
-- tapOn: "🗑️"
+- tapOn:
+    id: "delete_button"
 - waitForAnimationToEnd
-- tapOn: "🗑️"
+- tapOn:
+    id: "delete_button"
 - waitForAnimationToEnd
-- tapOn: "🗑️"
+- tapOn:
+    id: "delete_button"
 - waitForAnimationToEnd
-- tapOn: "🗑️"
+- tapOn:
+    id: "delete_button"
 - waitForAnimationToEnd
-- tapOn: "✓"
+- tapOn:
+    id: "keep_button"
 - waitForAnimationToEnd
-- tapOn: "✓"
+- tapOn:
+    id: "keep_button"
 - waitForAnimationToEnd
-- tapOn: "✓"
+- tapOn:
+    id: "keep_button"
 - waitForAnimationToEnd
-- tapOn: "✓"
+- tapOn:
+    id: "keep_button"
 - waitForAnimationToEnd
-- tapOn: "✓"
+- tapOn:
+    id: "keep_button"
 - waitForAnimationToEnd
 
 # 验证结果页三个统计卡片

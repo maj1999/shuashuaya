@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cleanpic.model.InteractionMode
 import com.cleanpic.theme.ThemeTokens
+import androidx.compose.ui.platform.testTag
 
 private val EditorialBg = Color(0xFFFFFFF5)
 private val EditorialText = Color(0xFF1A1A1A)
@@ -49,7 +50,9 @@ fun EditorialSettingsLayout(state: SettingsScreenState) {
                 fontFamily = FontFamily.Serif,
                 color = EditorialSecondary,
                 letterSpacing = 1.sp,
-                modifier = Modifier.clickable { state.onBack() }
+                modifier = Modifier
+                    .testTag("back_button")
+                    .clickable { state.onBack() }
             )
             Text(
                 text = "设置",

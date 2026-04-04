@@ -8,11 +8,13 @@ appId: com.cleanpic.android
 - waitForAnimationToEnd
 
 # 确保轮播模式
-- tapOn: "⚙️"
+- tapOn:
+    id: "settings_button"
 - waitForAnimationToEnd
 - tapOn: "轮播"
 - waitForAnimationToEnd
-- tapOn: "←"
+- tapOn:
+    id: "back_button"
 - waitForAnimationToEnd
 
 # 第一轮：全部保留快速通过
@@ -31,25 +33,35 @@ appId: com.cleanpic.android
     optional: true
 - waitForAnimationToEnd
 
-- tapOn: "✓"
+- tapOn:
+    id: "keep_button"
 - waitForAnimationToEnd
-- tapOn: "✓"
+- tapOn:
+    id: "keep_button"
 - waitForAnimationToEnd
-- tapOn: "✓"
+- tapOn:
+    id: "keep_button"
 - waitForAnimationToEnd
-- tapOn: "✓"
+- tapOn:
+    id: "keep_button"
 - waitForAnimationToEnd
-- tapOn: "✓"
+- tapOn:
+    id: "keep_button"
 - waitForAnimationToEnd
-- tapOn: "✓"
+- tapOn:
+    id: "keep_button"
 - waitForAnimationToEnd
-- tapOn: "✓"
+- tapOn:
+    id: "keep_button"
 - waitForAnimationToEnd
-- tapOn: "✓"
+- tapOn:
+    id: "keep_button"
 - waitForAnimationToEnd
-- tapOn: "✓"
+- tapOn:
+    id: "keep_button"
 - waitForAnimationToEnd
-- tapOn: "✓"
+- tapOn:
+    id: "keep_button"
 - waitForAnimationToEnd
 
 # 到达结果页，点击再来一轮

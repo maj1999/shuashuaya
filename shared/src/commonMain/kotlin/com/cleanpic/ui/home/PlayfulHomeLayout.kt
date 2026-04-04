@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cleanpic.icons.IconPainter
 import com.cleanpic.ui.common.PermissionBanner
+import androidx.compose.ui.platform.testTag
 
 @Composable
 fun PlayfulHomeLayout(state: HomeScreenState) {
@@ -54,6 +55,7 @@ fun PlayfulHomeLayout(state: HomeScreenState) {
                 Box(
                     modifier = Modifier
                         .size(36.dp)
+                        .testTag("settings_button")
                         .clip(RoundedCornerShape(12.dp))
                         .background(Color(0x1FFFFFFF))
                         .border(1.dp, Color(0x33FFFFFF), RoundedCornerShape(12.dp))
@@ -101,14 +103,16 @@ fun PlayfulHomeLayout(state: HomeScreenState) {
                             iconName = "photo",
                             label = "照片",
                             onClick = state.onStartPhoto,
-                            theme = state.theme
+                            theme = state.theme,
+                            testTag = "start_photo"
                         )
                         // 视频方块
                         PlayfulMediaBlock(
                             iconName = "video",
                             label = "视频",
                             onClick = state.onStartVideo,
-                            theme = state.theme
+                            theme = state.theme,
+                            testTag = "start_video"
                         )
                     }
                 }
@@ -145,11 +149,13 @@ private fun PlayfulMediaBlock(
     iconName: String,
     label: String,
     onClick: () -> Unit,
-    theme: com.cleanpic.theme.ThemeTokens
+    theme: com.cleanpic.theme.ThemeTokens,
+    testTag: String = ""
 ) {
     Column(
         modifier = Modifier
             .size(72.dp)
+            .then(if (testTag.isNotEmpty()) Modifier.testTag(testTag) else Modifier)
             .clip(RoundedCornerShape(20.dp))
             .background(Color(0x2EFFFFFF))
             .border(1.dp, Color(0x40FFFFFF), RoundedCornerShape(20.dp))

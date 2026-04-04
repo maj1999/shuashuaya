@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cleanpic.icons.IconPainter
 import com.cleanpic.ui.common.PermissionBanner
+import androidx.compose.ui.platform.testTag
 
 @Composable
 fun GeometricHomeLayout(state: HomeScreenState) {
@@ -48,7 +49,9 @@ fun GeometricHomeLayout(state: HomeScreenState) {
                     theme = theme,
                     size = 24.dp,
                     colorOverride = 0x99FFFFFF,
-                    modifier = Modifier.clickable { state.onOpenSettings() }
+                    modifier = Modifier
+                        .testTag("settings_button")
+                        .clickable { state.onOpenSettings() }
                 )
             }
 
@@ -77,7 +80,7 @@ fun GeometricHomeLayout(state: HomeScreenState) {
                     gradientBrush = Brush.verticalGradient(
                         colors = listOf(Color(0xFFE94560), Color(0xFF0F3460))
                     ),
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).testTag("start_photo"),
                     onClick = state.onStartPhoto
                 )
                 // 视频卡
@@ -88,7 +91,7 @@ fun GeometricHomeLayout(state: HomeScreenState) {
                     gradientBrush = Brush.verticalGradient(
                         colors = listOf(Color(0xFF533483), Color(0xFF0F3460))
                     ),
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).testTag("start_video"),
                     onClick = state.onStartVideo
                 )
             }

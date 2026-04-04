@@ -6,20 +6,25 @@
 appId: com.cleanpic.android
 ---
 - launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 10000
 - waitForAnimationToEnd
 
 # 切换到卡片模式
 - tapOn:
     id: "settings_button"
 - waitForAnimationToEnd
-- tapOn: "卡片"
+- tapOn: "卡片左右"
 - waitForAnimationToEnd
 - tapOn:
     id: "back_button"
 - waitForAnimationToEnd
 
 # 进入视频浏览
-- tapOn: ".*随机清理视频"
+- tapOn:
+    id: "start_video"
 - waitForAnimationToEnd
 - tapOn:
     text: "授权"
@@ -30,7 +35,7 @@ appId: com.cleanpic.android
     optional: true
 - waitForAnimationToEnd
 - tapOn:
-    text: ".*随机清理视频"
+    id: "start_video"
     optional: true
 - waitForAnimationToEnd
 
@@ -68,5 +73,5 @@ appId: com.cleanpic.android
 - tapOn:
     id: "settings_button"
 - waitForAnimationToEnd
-- tapOn: "轮播"
+- tapOn: "轮播相册"
 - waitForAnimationToEnd

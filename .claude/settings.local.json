@@ -89,7 +89,17 @@
       "Bash(grep -v \"^$\")",
       "Bash(~/.maestro/bin/maestro test:*)",
       "Bash(git:*)",
-      "Bash(./gradlew :shared:compileDebugKotlinAndroid)"
+      "Bash(./gradlew :shared:compileDebugKotlinAndroid)",
+      "Bash(adb logcat:*)",
+      "Bash(adb pull:*)",
+      "Bash(sed -i '' 's/tapOn: \".*随机清理照片\"/tapOn:\\\\n    id: \"start_photo\"/g' maestro/flows/*.yaml)",
+      "Bash(sed -i '' 's/tapOn: \".*随机清理视频\"/tapOn:\\\\n    id: \"start_video\"/g' maestro/flows/*.yaml)",
+      "Bash(sed -i '' 's/text: \".*随机清理照片\"/id: \"start_photo\"/g' maestro/flows/*.yaml)",
+      "Bash(sed -i '' 's/text: \".*随机清理视频\"/id: \"start_video\"/g' maestro/flows/*.yaml)",
+      "Bash(sed -i '' 's/assertVisible: \".*随机清理照片\"/assertVisible:\\\\n    id: \"start_photo\"/g' maestro/flows/*.yaml)",
+      "Read(//Users/mark/.maestro/tests/2026-04-04_192805/**)",
+      "Read(//private/tmp/cleanpic_test_media/**)",
+      "Bash(sips --getProperty format /tmp/cleanpic_test_media/test_01.jpg)"
     ]
   }
 }

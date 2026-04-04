@@ -5,6 +5,10 @@
 appId: com.cleanpic.android
 ---
 - launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 10000
 - waitForAnimationToEnd
 
 # 进入设置

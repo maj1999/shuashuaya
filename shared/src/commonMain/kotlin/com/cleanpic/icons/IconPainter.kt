@@ -3,6 +3,7 @@ package com.cleanpic.icons
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -26,9 +27,11 @@ fun IconPainter(
         IconStrokeCap.ROUND -> StrokeCap.Round
         IconStrokeCap.SQUARE -> StrokeCap.Square
     }
+    // 缓存 path 解析结果，避免每帧重新解析（settings 图标 path 有 500+ 字符）
+    val basePath = remember(icon.pathData) { parseSvgPath(icon.pathData) }
 
     Canvas(modifier = modifier.size(size)) {
-        val path = parseSvgPath(icon.pathData)
+        val path = Path().apply { addPath(basePath) }
         val scaleX = this.size.width / icon.viewportWidth
         val scaleY = this.size.height / icon.viewportHeight
         val matrix = Matrix().apply { scale(scaleX, scaleY) }

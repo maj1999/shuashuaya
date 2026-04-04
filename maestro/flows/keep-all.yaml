@@ -5,20 +5,25 @@
 appId: com.cleanpic.android
 ---
 - launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 10000
 - waitForAnimationToEnd
 
 # 确保轮播模式
 - tapOn:
     id: "settings_button"
 - waitForAnimationToEnd
-- tapOn: "轮播"
+- tapOn: "轮播相册"
 - waitForAnimationToEnd
 - tapOn:
     id: "back_button"
 - waitForAnimationToEnd
 
 # 进入照片浏览
-- tapOn: ".*随机清理照片"
+- tapOn:
+    id: "start_photo"
 - waitForAnimationToEnd
 - tapOn:
     text: "授权"
@@ -29,7 +34,7 @@ appId: com.cleanpic.android
     optional: true
 - waitForAnimationToEnd
 - tapOn:
-    text: ".*随机清理照片"
+    id: "start_photo"
     optional: true
 - waitForAnimationToEnd
 

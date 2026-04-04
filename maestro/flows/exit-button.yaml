@@ -6,6 +6,10 @@
 appId: com.cleanpic.android
 ---
 - launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 10000
 - waitForAnimationToEnd
 
 # ===== E19a: 轮播模式退出 =====
@@ -14,14 +18,15 @@ appId: com.cleanpic.android
 - tapOn:
     id: "settings_button"
 - waitForAnimationToEnd
-- tapOn: "轮播"
+- tapOn: "轮播相册"
 - waitForAnimationToEnd
 - tapOn:
     id: "back_button"
 - waitForAnimationToEnd
 
 # 进入照片浏览
-- tapOn: ".*随机清理照片"
+- tapOn:
+    id: "start_photo"
 - waitForAnimationToEnd
 - tapOn:
     text: "授权"
@@ -32,7 +37,7 @@ appId: com.cleanpic.android
     optional: true
 - waitForAnimationToEnd
 - tapOn:
-    text: ".*随机清理照片"
+    id: "start_photo"
     optional: true
 - waitForAnimationToEnd
 
@@ -47,7 +52,8 @@ appId: com.cleanpic.android
 - waitForAnimationToEnd
 
 # 验证回到首页
-- assertVisible: ".*随机清理照片"
+- assertVisible:
+    id: "start_photo"
 - takeScreenshot: exit-carousel-back-home
 
 # ===== E19b: 卡片模式退出 =====
@@ -56,14 +62,15 @@ appId: com.cleanpic.android
 - tapOn:
     id: "settings_button"
 - waitForAnimationToEnd
-- tapOn: "卡片"
+- tapOn: "卡片左右"
 - waitForAnimationToEnd
 - tapOn:
     id: "back_button"
 - waitForAnimationToEnd
 
 # 进入照片浏览
-- tapOn: ".*随机清理照片"
+- tapOn:
+    id: "start_photo"
 - waitForAnimationToEnd
 
 # 验证退出按钮可见
@@ -74,7 +81,8 @@ appId: com.cleanpic.android
 - waitForAnimationToEnd
 
 # 验证回到首页
-- assertVisible: ".*随机清理照片"
+- assertVisible:
+    id: "start_photo"
 - takeScreenshot: exit-swipecard-back-home
 
 # ===== E19c: 全屏模式退出 =====
@@ -83,14 +91,15 @@ appId: com.cleanpic.android
 - tapOn:
     id: "settings_button"
 - waitForAnimationToEnd
-- tapOn: "全屏"
+- tapOn: "全屏上下"
 - waitForAnimationToEnd
 - tapOn:
     id: "back_button"
 - waitForAnimationToEnd
 
 # 进入照片浏览
-- tapOn: ".*随机清理照片"
+- tapOn:
+    id: "start_photo"
 - waitForAnimationToEnd
 
 # 验证退出按钮可见（全屏模式已有）
@@ -101,12 +110,13 @@ appId: com.cleanpic.android
 - waitForAnimationToEnd
 
 # 验证回到首页
-- assertVisible: ".*随机清理照片"
+- assertVisible:
+    id: "start_photo"
 - takeScreenshot: exit-fullscreen-back-home
 
 # 恢复轮播模式
 - tapOn:
     id: "settings_button"
 - waitForAnimationToEnd
-- tapOn: "轮播"
+- tapOn: "轮播相册"
 - waitForAnimationToEnd

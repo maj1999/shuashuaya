@@ -91,7 +91,7 @@ scripts/check-env.sh
 
 ### 第一步：启动模拟器
 
-在 Android Studio 中创建一个 AVD（推荐 Pixel 6 / API 34），然后：
+**方式一：使用脚本（推荐，需要已创建 AVD）**
 
 ```bash
 # 启动模拟器（会自动等待启动完成，并注入测试媒体）
@@ -103,6 +103,32 @@ scripts/emulators/android.sh start --cold
 # 查看模拟器状态
 scripts/emulators/android.sh status
 ```
+
+**方式二：纯命令行创建并启动 AVD（不需要 Android Studio）**
+
+```bash
+# 1. 安装 Android SDK 命令行工具（macOS）
+brew install --cask android-commandlinetools
+
+# 2. 接受许可协议
+yes | sdkmanager --licenses
+
+# 3. 安装必要组件
+sdkmanager "platform-tools" "platforms;android-34" "emulator" "system-images;android-34;google_apis;arm64-v8a"
+
+# 4. 创建 AVD
+avdmanager create avd -n CleanPic_API34 -k "system-images;android-34;google_apis;arm64-v8a" -d pixel_6
+
+# 5. 启动模拟器
+emulator -avd CleanPic_API34 &
+
+# 6. 等待启动完成
+adb wait-for-device
+adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done'
+echo "模拟器就绪"
+```
+
+> Intel Mac 用 `x86_64` 替换 `arm64-v8a`。如果 `emulator` 不在 PATH 中，完整路径通常为 `$ANDROID_HOME/emulator/emulator`。
 
 > 如果已有模拟器运行中或连接了实机，可跳过此步。用 `adb devices` 确认设备在线即可。
 

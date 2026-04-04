@@ -1,49 +1,49 @@
-# UI Theme Redesign — Plan A: Infrastructure
+# UI 主题重设计 — Plan A：基础设施
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **执行者须知：** 必须使用 superpowers:subagent-driven-development（推荐）或 superpowers:executing-plans 逐任务执行本计划。步骤使用 `- [ ]` 语法跟踪进度。
 
-**Goal:** Extend the theme system with layout identifiers, typed enums, vector icon system, and shared page state interfaces — the foundation all 5 new themes build on.
+**目标：** 扩展主题系统，添加布局标识、类型安全枚举、矢量图标系统和共享页面 State 接口——这是 5 个新主题的基础。
 
-**Architecture:** ThemeTokens gets new fields (layoutId, iconStroke*, progressStyle, buttonStyle, titleFontFamily). Each page defines a shared State class that encapsulates business logic, so the 5 layout variants only handle UI. AppIcons provides themed ImageVector icons replacing all emoji.
+**架构：** ThemeTokens 新增字段（layoutId、iconStroke*、progressStyle、buttonStyle、titleFontFamily）。每个页面定义共享 State 类封装业务逻辑，5 个布局变体只负责 UI 呈现。AppIcons 提供主题化的 ImageVector 图标替换所有 emoji。
 
-**Tech Stack:** Kotlin 2.1.21, Compose Multiplatform 1.7.3, kotlin.test
+**技术栈：** Kotlin 2.1.21、Compose Multiplatform 1.7.3、kotlin.test
 
-**Spec:** `docs/superpowers/specs/2026-04-04-ui-theme-redesign-design.md`
+**设计 Spec：** `docs/superpowers/specs/2026-04-04-ui-theme-redesign-design.md`
 
-**Depends on:** Nothing (this is the first plan)
-**Blocks:** Plan B (warm theme end-to-end), Plan C (remaining 4 themes)
-
----
-
-## File Map
-
-| Action | File | Responsibility |
-|--------|------|---------------|
-| Modify | `shared/src/commonMain/kotlin/com/cleanpic/theme/ThemeTokens.kt` | Add enums + new fields |
-| Modify | `shared/src/commonMain/kotlin/com/cleanpic/theme/ThemeManager.kt` | Update default, add migration fallback |
-| Modify | `shared/src/commonMain/kotlin/com/cleanpic/settings/AppSettings.kt` | Update default theme to "warm" |
-| Create | `shared/src/commonMain/kotlin/com/cleanpic/theme/WarmTheme.kt` | First new theme definition |
-| Create | `shared/src/commonMain/kotlin/com/cleanpic/icons/AppIcons.kt` | Unified vector icon entry point |
-| Create | `shared/src/commonMain/kotlin/com/cleanpic/ui/home/HomeScreenState.kt` | Shared home page state |
-| Create | `shared/src/commonMain/kotlin/com/cleanpic/ui/result/ResultScreenState.kt` | Shared result page state |
-| Create | `shared/src/commonMain/kotlin/com/cleanpic/ui/settings/SettingsScreenState.kt` | Shared settings page state |
-| Create | `shared/src/commonMain/kotlin/com/cleanpic/ui/splash/SplashScreenState.kt` | Shared splash page state |
-| Modify | `shared/src/commonTest/kotlin/com/cleanpic/theme/ThemeManagerTest.kt` | Update tests for new defaults + migration |
-| Modify | `shared/src/commonTest/kotlin/com/cleanpic/settings/AppSettingsTest.kt` | Update default theme assertion |
-| Create | `shared/src/commonTest/kotlin/com/cleanpic/icons/AppIconsTest.kt` | Test icon generation per theme |
+**依赖：** 无（这是第一个计划）
+**阻塞：** Plan B（warm 主题端到端）、Plan C（剩余 4 个主题）
 
 ---
 
-### Task 1: Extend ThemeTokens with enums and new fields
+## 文件清单
 
-**Files:**
-- Modify: `shared/src/commonMain/kotlin/com/cleanpic/theme/ThemeTokens.kt`
+| 操作 | 文件 | 职责 |
+|------|------|------|
+| 修改 | `shared/src/commonMain/kotlin/com/cleanpic/theme/ThemeTokens.kt` | 添加枚举 + 新字段 |
+| 修改 | `shared/src/commonMain/kotlin/com/cleanpic/theme/ThemeManager.kt` | 更新默认值，添加迁移回退 |
+| 修改 | `shared/src/commonMain/kotlin/com/cleanpic/settings/AppSettings.kt` | 默认主题改为 "warm" |
+| 新建 | `shared/src/commonMain/kotlin/com/cleanpic/theme/WarmTheme.kt` | 第一个新主题定义 |
+| 新建 | `shared/src/commonMain/kotlin/com/cleanpic/icons/AppIcons.kt` | 统一矢量图标入口 |
+| 新建 | `shared/src/commonMain/kotlin/com/cleanpic/ui/home/HomeScreenState.kt` | 首页共享状态 |
+| 新建 | `shared/src/commonMain/kotlin/com/cleanpic/ui/result/ResultScreenState.kt` | 结果页共享状态 |
+| 新建 | `shared/src/commonMain/kotlin/com/cleanpic/ui/settings/SettingsScreenState.kt` | 设置页共享状态 |
+| 新建 | `shared/src/commonMain/kotlin/com/cleanpic/ui/splash/SplashScreenState.kt` | 闪屏共享状态 |
+| 修改 | `shared/src/commonTest/kotlin/com/cleanpic/theme/ThemeManagerTest.kt` | 更新测试适配新默认值 + 迁移 |
+| 修改 | `shared/src/commonTest/kotlin/com/cleanpic/settings/AppSettingsTest.kt` | 更新默认主题断言 |
+| 新建 | `shared/src/commonTest/kotlin/com/cleanpic/icons/AppIconsTest.kt` | 测试图标生成 |
 
-- [ ] **Step 1: Write the failing test**
+---
 
-Create test that validates new enum types and fields exist:
+### 任务 1：扩展 ThemeTokens 枚举和新字段
 
-File: `shared/src/commonTest/kotlin/com/cleanpic/theme/ThemeTokensTest.kt`
+**文件：**
+- 修改：`shared/src/commonMain/kotlin/com/cleanpic/theme/ThemeTokens.kt`
+
+- [ ] **步骤 1：写失败的测试**
+
+新建测试文件验证枚举类型和字段：
+
+文件：`shared/src/commonTest/kotlin/com/cleanpic/theme/ThemeTokensTest.kt`
 
 ```kotlin
 package com.cleanpic.theme
@@ -81,14 +81,14 @@ class ThemeTokensTest {
 }
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [ ] **步骤 2：运行测试确认失败**
 
-Run: `scripts/test.sh`
-Expected: FAIL — ThemeLayoutId, ProgressStyle, ButtonStyle not defined
+运行：`scripts/test.sh`
+预期：失败 — ThemeLayoutId、ProgressStyle、ButtonStyle 未定义
 
-- [ ] **Step 3: Implement ThemeTokens extension**
+- [ ] **步骤 3：实现 ThemeTokens 扩展**
 
-Replace `shared/src/commonMain/kotlin/com/cleanpic/theme/ThemeTokens.kt` with:
+替换 `shared/src/commonMain/kotlin/com/cleanpic/theme/ThemeTokens.kt` 为：
 
 ```kotlin
 package com.cleanpic.theme
@@ -162,7 +162,7 @@ data class ThemeTokens(
     val animDuration: Long,
     val animEasing: String,
     val animButtonPress: ButtonPressAnim,
-    // v2: 布局与图标
+    // v2：布局与图标
     val layoutId: ThemeLayoutId = ThemeLayoutId.WARM,
     val iconStrokeWidth: Float = 1.8f,
     val iconStrokeColor: Long = 0xFF333333,
@@ -172,14 +172,14 @@ data class ThemeTokens(
 )
 ```
 
-Note: New fields have defaults so existing theme definitions still compile without modification.
+注意：新字段都有默认值，确保现有主题定义无需修改即可编译。
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [ ] **步骤 4：运行测试确认通过**
 
-Run: `scripts/test.sh`
-Expected: ALL PASS (new tests + existing tests, since defaults preserve backward compatibility)
+运行：`scripts/test.sh`
+预期：全部通过（新测试 + 现有测试，因为默认值保持向后兼容）
 
-- [ ] **Step 5: Commit**
+- [ ] **步骤 5：提交**
 
 ```bash
 git add shared/src/commonMain/kotlin/com/cleanpic/theme/ThemeTokens.kt \
@@ -189,14 +189,14 @@ git commit -m "feat: extend ThemeTokens with layout/icon/style enums and fields"
 
 ---
 
-### Task 2: Create WarmTheme definition
+### 任务 2：创建 WarmTheme 定义
 
-**Files:**
-- Create: `shared/src/commonMain/kotlin/com/cleanpic/theme/WarmTheme.kt`
+**文件：**
+- 新建：`shared/src/commonMain/kotlin/com/cleanpic/theme/WarmTheme.kt`
 
-- [ ] **Step 1: Write the failing test**
+- [ ] **步骤 1：写失败的测试**
 
-Add to `shared/src/commonTest/kotlin/com/cleanpic/theme/ThemeTokensTest.kt`:
+在 `shared/src/commonTest/kotlin/com/cleanpic/theme/ThemeTokensTest.kt` 中添加：
 
 ```kotlin
 @Test fun warm_theme_has_correct_layout_id() {
@@ -214,21 +214,21 @@ Add to `shared/src/commonTest/kotlin/com/cleanpic/theme/ThemeTokensTest.kt`:
 }
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [ ] **步骤 2：运行测试确认失败**
 
-Run: `scripts/test.sh`
-Expected: FAIL — WarmTheme not defined
+运行：`scripts/test.sh`
+预期：失败 — WarmTheme 未定义
 
-- [ ] **Step 3: Create WarmTheme**
+- [ ] **步骤 3：创建 WarmTheme**
 
-File: `shared/src/commonMain/kotlin/com/cleanpic/theme/WarmTheme.kt`
+文件：`shared/src/commonMain/kotlin/com/cleanpic/theme/WarmTheme.kt`
 
 ```kotlin
 package com.cleanpic.theme
 
 /**
  * 温暖手工感主题 — 暖色调、大圆角、柔和阴影、衬线标题
- * 参考: Bear / Things
+ * 参考：Bear / Things
  */
 val WarmTheme = ThemeTokens(
     id = "warm",
@@ -263,12 +263,12 @@ val WarmTheme = ThemeTokens(
 )
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [ ] **步骤 4：运行测试确认通过**
 
-Run: `scripts/test.sh`
-Expected: ALL PASS
+运行：`scripts/test.sh`
+预期：全部通过
 
-- [ ] **Step 5: Commit**
+- [ ] **步骤 5：提交**
 
 ```bash
 git add shared/src/commonMain/kotlin/com/cleanpic/theme/WarmTheme.kt \
@@ -278,17 +278,17 @@ git commit -m "feat: add WarmTheme as first v2 theme definition"
 
 ---
 
-### Task 3: Update ThemeManager defaults and add migration fallback
+### 任务 3：更新 ThemeManager 默认值和迁移回退
 
-**Files:**
-- Modify: `shared/src/commonMain/kotlin/com/cleanpic/theme/ThemeManager.kt`
-- Modify: `shared/src/commonMain/kotlin/com/cleanpic/settings/AppSettings.kt`
-- Modify: `shared/src/commonTest/kotlin/com/cleanpic/theme/ThemeManagerTest.kt`
-- Modify: `shared/src/commonTest/kotlin/com/cleanpic/settings/AppSettingsTest.kt`
+**文件：**
+- 修改：`shared/src/commonMain/kotlin/com/cleanpic/theme/ThemeManager.kt`
+- 修改：`shared/src/commonMain/kotlin/com/cleanpic/settings/AppSettings.kt`
+- 修改：`shared/src/commonTest/kotlin/com/cleanpic/theme/ThemeManagerTest.kt`
+- 修改：`shared/src/commonTest/kotlin/com/cleanpic/settings/AppSettingsTest.kt`
 
-- [ ] **Step 1: Update ThemeManagerTest**
+- [ ] **步骤 1：更新 ThemeManagerTest**
 
-Replace `shared/src/commonTest/kotlin/com/cleanpic/theme/ThemeManagerTest.kt`:
+替换 `shared/src/commonTest/kotlin/com/cleanpic/theme/ThemeManagerTest.kt`：
 
 ```kotlin
 package com.cleanpic.theme
@@ -321,32 +321,32 @@ class ThemeManagerTest {
         val oldIds = listOf("dreamy-gradient", "soft-minimal", "cute-playful", "elegant-dark", "natural-warm")
         for (oldId in oldIds) {
             manager.switchTheme(oldId)
-            assertEquals("warm", manager.currentTheme.value.id, "Old ID '$oldId' should fall back to warm")
+            assertEquals("warm", manager.currentTheme.value.id, "旧 ID '$oldId' 应回退到 warm")
         }
     }
 
     @Test fun all_themes_have_complete_tokens() {
         val manager = ThemeManager()
         manager.allThemes.forEach { theme ->
-            assertTrue(theme.colorPrimary != 0L, "${theme.id} missing colorPrimary")
-            assertTrue(theme.colorBackground != 0L, "${theme.id} missing colorBackground")
-            assertTrue(theme.colorDanger != 0L, "${theme.id} missing colorDanger")
-            assertTrue(theme.colorSuccess != 0L, "${theme.id} missing colorSuccess")
-            assertTrue(theme.borderRadius >= 0, "${theme.id} invalid borderRadius")
-            assertTrue(theme.iconStrokeWidth > 0, "${theme.id} invalid iconStrokeWidth")
+            assertTrue(theme.colorPrimary != 0L, "${theme.id} 缺少 colorPrimary")
+            assertTrue(theme.colorBackground != 0L, "${theme.id} 缺少 colorBackground")
+            assertTrue(theme.colorDanger != 0L, "${theme.id} 缺少 colorDanger")
+            assertTrue(theme.colorSuccess != 0L, "${theme.id} 缺少 colorSuccess")
+            assertTrue(theme.borderRadius >= 0, "${theme.id} borderRadius 无效")
+            assertTrue(theme.iconStrokeWidth > 0, "${theme.id} iconStrokeWidth 无效")
         }
     }
 
     @Test fun all_themes_available() {
         val manager = ThemeManager()
-        assertEquals(1, manager.allThemes.size) // Only WarmTheme for now; Plan C adds remaining 4
+        assertEquals(1, manager.allThemes.size) // 当前仅 WarmTheme；Plan C 添加剩余 4 个
     }
 }
 ```
 
-- [ ] **Step 2: Update AppSettingsTest**
+- [ ] **步骤 2：更新 AppSettingsTest**
 
-Replace `shared/src/commonTest/kotlin/com/cleanpic/settings/AppSettingsTest.kt`:
+替换 `shared/src/commonTest/kotlin/com/cleanpic/settings/AppSettingsTest.kt`：
 
 ```kotlin
 package com.cleanpic.settings
@@ -376,14 +376,14 @@ class AppSettingsTest {
 }
 ```
 
-- [ ] **Step 3: Run tests to verify they fail**
+- [ ] **步骤 3：运行测试确认失败**
 
-Run: `scripts/test.sh`
-Expected: FAIL — ThemeManager still uses old themes, AppSettings default is still "dreamy-gradient"
+运行：`scripts/test.sh`
+预期：失败 — ThemeManager 仍使用旧主题，AppSettings 默认值仍为 "dreamy-gradient"
 
-- [ ] **Step 4: Update ThemeManager**
+- [ ] **步骤 4：更新 ThemeManager**
 
-Replace `shared/src/commonMain/kotlin/com/cleanpic/theme/ThemeManager.kt`:
+替换 `shared/src/commonMain/kotlin/com/cleanpic/theme/ThemeManager.kt`：
 
 ```kotlin
 package com.cleanpic.theme
@@ -394,7 +394,7 @@ import kotlinx.coroutines.flow.StateFlow
 class ThemeManager {
     val allThemes = listOf(
         WarmTheme
-        // Plan C will add: MinimalTheme, GeometricTheme, PlayfulTheme, EditorialTheme
+        // Plan C 将添加：MinimalTheme、GeometricTheme、PlayfulTheme、EditorialTheme
     )
 
     private val _currentTheme = MutableStateFlow(WarmTheme)
@@ -407,20 +407,20 @@ class ThemeManager {
 }
 ```
 
-- [ ] **Step 5: Update AppSettings default**
+- [ ] **步骤 5：更新 AppSettings 默认值**
 
-In `shared/src/commonMain/kotlin/com/cleanpic/settings/AppSettings.kt`, change line 12:
+在 `shared/src/commonMain/kotlin/com/cleanpic/settings/AppSettings.kt` 中，修改第 12 行：
 
 ```kotlin
 override var theme: String = "warm"
 ```
 
-- [ ] **Step 6: Run tests to verify they pass**
+- [ ] **步骤 6：运行测试确认通过**
 
-Run: `scripts/test.sh`
-Expected: ALL PASS
+运行：`scripts/test.sh`
+预期：全部通过
 
-- [ ] **Step 7: Commit**
+- [ ] **步骤 7：提交**
 
 ```bash
 git add shared/src/commonMain/kotlin/com/cleanpic/theme/ThemeManager.kt \
@@ -432,15 +432,15 @@ git commit -m "feat: update ThemeManager to use WarmTheme as default with migrat
 
 ---
 
-### Task 4: Create AppIcons vector icon system
+### 任务 4：创建 AppIcons 矢量图标系统
 
-**Files:**
-- Create: `shared/src/commonMain/kotlin/com/cleanpic/icons/AppIcons.kt`
-- Create: `shared/src/commonTest/kotlin/com/cleanpic/icons/AppIconsTest.kt`
+**文件：**
+- 新建：`shared/src/commonMain/kotlin/com/cleanpic/icons/AppIcons.kt`
+- 新建：`shared/src/commonTest/kotlin/com/cleanpic/icons/AppIconsTest.kt`
 
-- [ ] **Step 1: Write the failing test**
+- [ ] **步骤 1：写失败的测试**
 
-File: `shared/src/commonTest/kotlin/com/cleanpic/icons/AppIconsTest.kt`
+文件：`shared/src/commonTest/kotlin/com/cleanpic/icons/AppIconsTest.kt`
 
 ```kotlin
 package com.cleanpic.icons
@@ -460,7 +460,7 @@ class AppIconsTest {
         )
         for (name in iconNames) {
             val icon = AppIcons.get(name, WarmTheme)
-            assertTrue(icon.pathData.isNotEmpty(), "Icon '$name' has no path data")
+            assertTrue(icon.pathData.isNotEmpty(), "图标 '$name' 没有 path 数据")
         }
     }
 
@@ -474,7 +474,7 @@ class AppIconsTest {
     @Test fun unknown_icon_name_throws() {
         try {
             AppIcons.get("nonexistent", WarmTheme)
-            assertTrue(false, "Should have thrown")
+            assertTrue(false, "应当抛出异常")
         } catch (e: IllegalArgumentException) {
             assertTrue(e.message!!.contains("nonexistent"))
         }
@@ -482,14 +482,14 @@ class AppIconsTest {
 }
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [ ] **步骤 2：运行测试确认失败**
 
-Run: `scripts/test.sh`
-Expected: FAIL — AppIcons not defined
+运行：`scripts/test.sh`
+预期：失败 — AppIcons 未定义
 
-- [ ] **Step 3: Implement AppIcons**
+- [ ] **步骤 3：实现 AppIcons**
 
-File: `shared/src/commonMain/kotlin/com/cleanpic/icons/AppIcons.kt`
+文件：`shared/src/commonMain/kotlin/com/cleanpic/icons/AppIcons.kt`
 
 ```kotlin
 package com.cleanpic.icons
@@ -498,7 +498,7 @@ import com.cleanpic.theme.IconStrokeCap
 import com.cleanpic.theme.ThemeTokens
 
 /**
- * 描述一个主题化的矢量图标（平台无关数据）。
+ * 主题化矢量图标描述（平台无关数据）。
  * Compose 层通过 toImageVector() 扩展转为 ImageVector 或直接用 Canvas 绘制。
  */
 data class IconDef(
@@ -534,7 +534,7 @@ object AppIcons {
 
     fun get(name: String, theme: ThemeTokens): IconDef {
         val pathData = paths[name]
-            ?: throw IllegalArgumentException("Unknown icon: $name")
+            ?: throw IllegalArgumentException("未知图标：$name")
         return IconDef(
             name = name,
             pathData = pathData,
@@ -544,17 +544,17 @@ object AppIcons {
         )
     }
 
-    /** All available icon names */
+    /** 所有可用的图标名称 */
     val allNames: Set<String> get() = paths.keys
 }
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [ ] **步骤 4：运行测试确认通过**
 
-Run: `scripts/test.sh`
-Expected: ALL PASS
+运行：`scripts/test.sh`
+预期：全部通过
 
-- [ ] **Step 5: Commit**
+- [ ] **步骤 5：提交**
 
 ```bash
 git add shared/src/commonMain/kotlin/com/cleanpic/icons/AppIcons.kt \
@@ -564,17 +564,17 @@ git commit -m "feat: add AppIcons vector icon system with 13 themed icons"
 
 ---
 
-### Task 5: Create shared page State interfaces
+### 任务 5：创建共享页面 State 接口
 
-**Files:**
-- Create: `shared/src/commonMain/kotlin/com/cleanpic/ui/home/HomeScreenState.kt`
-- Create: `shared/src/commonMain/kotlin/com/cleanpic/ui/result/ResultScreenState.kt`
-- Create: `shared/src/commonMain/kotlin/com/cleanpic/ui/settings/SettingsScreenState.kt`
-- Create: `shared/src/commonMain/kotlin/com/cleanpic/ui/splash/SplashScreenState.kt`
+**文件：**
+- 新建：`shared/src/commonMain/kotlin/com/cleanpic/ui/home/HomeScreenState.kt`
+- 新建：`shared/src/commonMain/kotlin/com/cleanpic/ui/result/ResultScreenState.kt`
+- 新建：`shared/src/commonMain/kotlin/com/cleanpic/ui/settings/SettingsScreenState.kt`
+- 新建：`shared/src/commonMain/kotlin/com/cleanpic/ui/splash/SplashScreenState.kt`
 
-- [ ] **Step 1: Create HomeScreenState**
+- [ ] **步骤 1：创建 HomeScreenState**
 
-File: `shared/src/commonMain/kotlin/com/cleanpic/ui/home/HomeScreenState.kt`
+文件：`shared/src/commonMain/kotlin/com/cleanpic/ui/home/HomeScreenState.kt`
 
 ```kotlin
 package com.cleanpic.ui.home
@@ -597,9 +597,9 @@ data class HomeScreenState(
 )
 ```
 
-- [ ] **Step 2: Create ResultScreenState**
+- [ ] **步骤 2：创建 ResultScreenState**
 
-File: `shared/src/commonMain/kotlin/com/cleanpic/ui/result/ResultScreenState.kt`
+文件：`shared/src/commonMain/kotlin/com/cleanpic/ui/result/ResultScreenState.kt`
 
 ```kotlin
 package com.cleanpic.ui.result
@@ -625,9 +625,9 @@ data class ResultScreenState(
 )
 ```
 
-- [ ] **Step 3: Create SettingsScreenState**
+- [ ] **步骤 3：创建 SettingsScreenState**
 
-File: `shared/src/commonMain/kotlin/com/cleanpic/ui/settings/SettingsScreenState.kt`
+文件：`shared/src/commonMain/kotlin/com/cleanpic/ui/settings/SettingsScreenState.kt`
 
 ```kotlin
 package com.cleanpic.ui.settings
@@ -649,9 +649,9 @@ data class SettingsScreenState(
 )
 ```
 
-- [ ] **Step 4: Create SplashScreenState**
+- [ ] **步骤 4：创建 SplashScreenState**
 
-File: `shared/src/commonMain/kotlin/com/cleanpic/ui/splash/SplashScreenState.kt`
+文件：`shared/src/commonMain/kotlin/com/cleanpic/ui/splash/SplashScreenState.kt`
 
 ```kotlin
 package com.cleanpic.ui.splash
@@ -667,12 +667,12 @@ data class SplashScreenState(
 )
 ```
 
-- [ ] **Step 5: Verify compilation**
+- [ ] **步骤 5：验证编译**
 
-Run: `scripts/build-android.sh`
-Expected: BUILD SUCCESSFUL (state classes are data classes, no external dependencies beyond existing model types)
+运行：`scripts/build-android.sh`
+预期：构建成功（State 类是 data class，仅依赖已有的 model 类型）
 
-- [ ] **Step 6: Commit**
+- [ ] **步骤 6：提交**
 
 ```bash
 git add shared/src/commonMain/kotlin/com/cleanpic/ui/home/HomeScreenState.kt \
@@ -684,16 +684,16 @@ git commit -m "feat: add shared page state interfaces for theme layout dispatch"
 
 ---
 
-### Task 6: Delete old theme files
+### 任务 6：删除旧主题文件
 
-**Files:**
-- Delete: `shared/src/commonMain/kotlin/com/cleanpic/theme/DreamyGradient.kt`
-- Delete: `shared/src/commonMain/kotlin/com/cleanpic/theme/SoftMinimal.kt`
-- Delete: `shared/src/commonMain/kotlin/com/cleanpic/theme/CutePlayful.kt`
-- Delete: `shared/src/commonMain/kotlin/com/cleanpic/theme/ElegantDark.kt`
-- Delete: `shared/src/commonMain/kotlin/com/cleanpic/theme/NaturalWarm.kt`
+**文件：**
+- 删除：`shared/src/commonMain/kotlin/com/cleanpic/theme/DreamyGradient.kt`
+- 删除：`shared/src/commonMain/kotlin/com/cleanpic/theme/SoftMinimal.kt`
+- 删除：`shared/src/commonMain/kotlin/com/cleanpic/theme/CutePlayful.kt`
+- 删除：`shared/src/commonMain/kotlin/com/cleanpic/theme/ElegantDark.kt`
+- 删除：`shared/src/commonMain/kotlin/com/cleanpic/theme/NaturalWarm.kt`
 
-- [ ] **Step 1: Delete old theme files**
+- [ ] **步骤 1：删除旧主题文件**
 
 ```bash
 rm shared/src/commonMain/kotlin/com/cleanpic/theme/DreamyGradient.kt
@@ -703,17 +703,17 @@ rm shared/src/commonMain/kotlin/com/cleanpic/theme/ElegantDark.kt
 rm shared/src/commonMain/kotlin/com/cleanpic/theme/NaturalWarm.kt
 ```
 
-- [ ] **Step 2: Run tests to verify nothing breaks**
+- [ ] **步骤 2：运行测试确认不受影响**
 
-Run: `scripts/test.sh`
-Expected: ALL PASS (ThemeManager now only references WarmTheme)
+运行：`scripts/test.sh`
+预期：全部通过（ThemeManager 现在只引用 WarmTheme）
 
-- [ ] **Step 3: Verify build**
+- [ ] **步骤 3：验证构建**
 
-Run: `scripts/build-android.sh`
-Expected: BUILD SUCCESSFUL
+运行：`scripts/build-android.sh`
+预期：构建成功
 
-- [ ] **Step 4: Commit**
+- [ ] **步骤 4：提交**
 
 ```bash
 git add -u shared/src/commonMain/kotlin/com/cleanpic/theme/
@@ -722,21 +722,21 @@ git commit -m "refactor: remove 5 old theme definitions (replaced by v2 themes)"
 
 ---
 
-### Task 7: Verify full test suite and build
+### 任务 7：全量验证测试和构建
 
-- [ ] **Step 1: Run full unit tests**
+- [ ] **步骤 1：运行完整单元测试**
 
-Run: `scripts/test.sh`
-Expected: ALL PASS
+运行：`scripts/test.sh`
+预期：全部通过
 
-- [ ] **Step 2: Run full build**
+- [ ] **步骤 2：运行完整构建**
 
-Run: `scripts/build-android.sh`
-Expected: BUILD SUCCESSFUL
+运行：`scripts/build-android.sh`
+预期：构建成功
 
-If any compilation errors occur due to old theme references elsewhere in the codebase (e.g., settings UI referencing old theme names), note them — they will be resolved in Plan B when we rewrite the screen composables.
+如果出现因代码中其他地方引用旧主题名导致的编译错误，记录下来——将在 Plan B 重写页面 composable 时解决。
 
-- [ ] **Step 3: Final commit if any fixups needed**
+- [ ] **步骤 3：如有修复则提交**
 
 ```bash
 git add -A && git commit -m "fix: resolve any remaining old theme references"
@@ -744,15 +744,15 @@ git add -A && git commit -m "fix: resolve any remaining old theme references"
 
 ---
 
-## Plan A Completion Checklist
+## Plan A 完成检查清单
 
-After all tasks:
-- [ ] ThemeTokens has ThemeLayoutId, ProgressStyle, ButtonStyle, IconStrokeCap enums
-- [ ] WarmTheme defined with all v2 fields
-- [ ] ThemeManager defaults to WarmTheme, unknown IDs fall back
-- [ ] AppSettings default theme is "warm"
-- [ ] AppIcons has 13 vector icons with theme-aware parameters
-- [ ] 4 shared page State classes created (Home/Result/Settings/Splash)
-- [ ] Old 5 theme files deleted
-- [ ] All unit tests pass
-- [ ] Build succeeds
+所有任务完成后确认：
+- [ ] ThemeTokens 包含 ThemeLayoutId、ProgressStyle、ButtonStyle、IconStrokeCap 枚举
+- [ ] WarmTheme 使用所有 v2 字段完整定义
+- [ ] ThemeManager 默认使用 WarmTheme，未知 ID 回退
+- [ ] AppSettings 默认主题为 "warm"
+- [ ] AppIcons 包含 13 个主题化矢量图标
+- [ ] 4 个共享页面 State 类已创建（Home/Result/Settings/Splash）
+- [ ] 旧 5 个主题文件已删除
+- [ ] 所有单元测试通过
+- [ ] 构建成功

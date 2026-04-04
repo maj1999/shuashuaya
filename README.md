@@ -28,11 +28,6 @@
 |-----------|-----------|-----------|
 | ![轮播](docs/screenshots/viewer-carousel.png) | ![卡片](docs/screenshots/viewer-swipecard.png) | ![全屏](docs/screenshots/viewer-fullscreen.png) |
 
-### 视频播放（轮播 / 卡片模式内联播放 + 静音控制）
-
-| 轮播模式播放视频 | 卡片模式播放视频 |
-|----------------|----------------|
-| ![轮播视频](docs/screenshots/video-carousel.png) | ![卡片视频](docs/screenshots/video-swipecard.png) |
 
 ## 技术栈
 

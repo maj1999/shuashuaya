@@ -192,28 +192,22 @@ private fun ActionButtons(theme: ThemeTokens, viewerViewModel: ViewerViewModel) 
         modifier = Modifier.fillMaxWidth().padding(horizontal = 48.dp),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        Button(
+        ThemedActionButton(
+            iconName = "delete",
+            color = theme.colorDanger,
+            theme = theme,
             onClick = { viewerViewModel.markDelete() },
-            shape = CircleShape,
-            modifier = Modifier.size(64.dp).testTag("delete_button"),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(theme.colorDanger)
-            ),
-            contentPadding = PaddingValues(0.dp)
-        ) {
-            IconPainter("delete", theme, size = 24.dp, colorOverride = theme.colorDanger)
-        }
-        Button(
+            size = 64.dp,
+            testTag = "delete_button"
+        )
+        ThemedActionButton(
+            iconName = "keep",
+            color = theme.colorSuccess,
+            theme = theme,
             onClick = { viewerViewModel.markKept() },
-            shape = CircleShape,
-            modifier = Modifier.size(64.dp).testTag("keep_button"),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(theme.colorSuccess)
-            ),
-            contentPadding = PaddingValues(0.dp)
-        ) {
-            IconPainter("keep", theme, size = 28.dp, colorOverride = theme.colorSuccess)
-        }
+            size = 64.dp,
+            testTag = "keep_button"
+        )
     }
 }
 

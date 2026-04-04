@@ -159,28 +159,22 @@ private fun SideActions(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Button(
+        ThemedActionButton(
+            iconName = "delete",
+            color = theme.colorDanger,
+            theme = theme,
             onClick = onDelete,
-            shape = CircleShape,
-            modifier = Modifier.size(56.dp).testTag("delete_button"),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(theme.colorDanger)
-            ),
-            contentPadding = PaddingValues(0.dp)
-        ) {
-            IconPainter("delete", theme, size = 22.dp, colorOverride = theme.colorDanger)
-        }
-        Button(
+            size = 56.dp,
+            testTag = "delete_button"
+        )
+        ThemedActionButton(
+            iconName = "keep",
+            color = theme.colorSuccess,
+            theme = theme,
             onClick = onKeep,
-            shape = CircleShape,
-            modifier = Modifier.size(56.dp).testTag("keep_button"),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(theme.colorSuccess)
-            ),
-            contentPadding = PaddingValues(0.dp)
-        ) {
-            IconPainter("keep", theme, size = 24.dp, colorOverride = theme.colorSuccess)
-        }
+            size = 56.dp,
+            testTag = "keep_button"
+        )
     }
 }
 

@@ -42,7 +42,7 @@ appId: com.cleanpic.android
 - waitForAnimationToEnd
 
 # 截图验证（应显示 N / 5）
-- takeScreenshot: round-count-5
+- takeScreenshot: maestro/screenshots/round-count-5
 
 # 操作 5 张全部保留
 - tapOn:
@@ -63,7 +63,7 @@ appId: com.cleanpic.android
 
 # 验证结果页
 - assertVisible: "保留"
-- takeScreenshot: round-count-result
+- takeScreenshot: maestro/screenshots/round-count-result
 
 # 恢复默认数量 10
 - tapOn: ".*返回首页"

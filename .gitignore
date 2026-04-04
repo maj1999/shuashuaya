@@ -33,14 +33,12 @@ Thumbs.db
 # Android
 androidApp/libs/
 
-# Maestro E2E screenshots (generated in project root by maestro test)
-/browse-photos-*.png
-/delete-confirm-*.png
-/theme-*.png
+# Maestro E2E screenshots
+maestro/screenshots/*
+!maestro/screenshots/.gitkeep
 
 # Test assets (generated locally, not tracked)
 test-assets/**/*.jpg
 test-assets/**/*.png
 test-assets/**/*.mp4
 !test-assets/**/.gitkeep
-*.png

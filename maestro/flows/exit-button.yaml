@@ -54,7 +54,7 @@ appId: com.cleanpic.android
 # 验证回到首页
 - assertVisible:
     id: "start_photo"
-- takeScreenshot: exit-carousel-back-home
+- takeScreenshot: maestro/screenshots/exit-carousel-back-home
 
 # ===== E19b: 卡片模式退出 =====
 
@@ -83,7 +83,7 @@ appId: com.cleanpic.android
 # 验证回到首页
 - assertVisible:
     id: "start_photo"
-- takeScreenshot: exit-swipecard-back-home
+- takeScreenshot: maestro/screenshots/exit-swipecard-back-home
 
 # ===== E19c: 全屏模式退出 =====
 
@@ -112,7 +112,7 @@ appId: com.cleanpic.android
 # 验证回到首页
 - assertVisible:
     id: "start_photo"
-- takeScreenshot: exit-fullscreen-back-home
+- takeScreenshot: maestro/screenshots/exit-fullscreen-back-home
 
 # 恢复轮播模式
 - tapOn:

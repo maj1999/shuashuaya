@@ -41,7 +41,7 @@ appId: com.cleanpic.android
 
 # 验证卡片模式提示
 - assertVisible: ".*左滑删除.*"
-- takeScreenshot: swipe-card-viewer
+- takeScreenshot: maestro/screenshots/swipe-card-viewer
 
 # 左滑 = 删除，右滑 = 保留（操作 10 张，需足够长的滑动距离触发 150dp 阈值）
 - swipe:
@@ -105,7 +105,7 @@ appId: com.cleanpic.android
 # 验证结果页
 - assertVisible: "删除"
 - assertVisible: "保留"
-- takeScreenshot: swipe-card-result
+- takeScreenshot: maestro/screenshots/swipe-card-result
 
 # 恢复轮播模式
 - tapOn: ".*返回首页"

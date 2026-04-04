@@ -75,4 +75,4 @@ appId: com.cleanpic.android
 - waitForAnimationToEnd
 
 # 验证进入新一轮 viewer
-- takeScreenshot: next-round-viewer
+- takeScreenshot: maestro/screenshots/next-round-viewer

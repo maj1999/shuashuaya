@@ -43,7 +43,7 @@ appId: com.cleanpic.android
 - assertVisible: ".*左滑删除.*"
 
 # 截图：卡片模式下的照片缩略图
-- takeScreenshot: swipe-card-thumbnail-1
+- takeScreenshot: maestro/screenshots/swipe-card-thumbnail-1
 
 # 右滑保留，查看下一张
 - swipe:
@@ -53,7 +53,7 @@ appId: com.cleanpic.android
 - waitForAnimationToEnd
 
 # 截图：第 2 张照片
-- takeScreenshot: swipe-card-thumbnail-2
+- takeScreenshot: maestro/screenshots/swipe-card-thumbnail-2
 
 # 恢复轮播模式
 - swipe:

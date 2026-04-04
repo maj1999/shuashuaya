@@ -44,7 +44,7 @@ appId: com.cleanpic.android
     id: "exit_button"
 
 # 截图：全屏视频播放中（应看到视频画面，非 emoji）
-- takeScreenshot: fullscreen-video-playing
+- takeScreenshot: maestro/screenshots/fullscreen-video-playing
 
 # 验证顶部栏可见
 - assertVisible:
@@ -57,7 +57,7 @@ appId: com.cleanpic.android
     duration: 2000
 
 # 再次截图验证画面变化（视频在播放）
-- takeScreenshot: fullscreen-video-playing-2
+- takeScreenshot: maestro/screenshots/fullscreen-video-playing-2
 
 # 恢复轮播模式
 - tapOn:

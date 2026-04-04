@@ -16,13 +16,13 @@ appId: com.cleanpic.android
 - tapOn:
     id: "settings_button"
 - waitForAnimationToEnd
-- takeScreenshot: theme-settings-default-warm
+- takeScreenshot: maestro/screenshots/theme-settings-default-warm
 
 # --- 切换到"大胆几何" ---
 - tapOn:
     id: "theme_geometric"
 - waitForAnimationToEnd
-- takeScreenshot: theme-geometric
+- takeScreenshot: maestro/screenshots/theme-geometric
 - tapOn:
     id: "back_button"
 - waitForAnimationToEnd
@@ -34,7 +34,7 @@ appId: com.cleanpic.android
 - tapOn:
     id: "theme_minimal"
 - waitForAnimationToEnd
-- takeScreenshot: theme-minimal
+- takeScreenshot: maestro/screenshots/theme-minimal
 - tapOn:
     id: "back_button"
 - waitForAnimationToEnd
@@ -46,7 +46,7 @@ appId: com.cleanpic.android
 - tapOn:
     id: "theme_playful"
 - waitForAnimationToEnd
-- takeScreenshot: theme-playful
+- takeScreenshot: maestro/screenshots/theme-playful
 - tapOn:
     id: "back_button"
 - waitForAnimationToEnd
@@ -58,13 +58,13 @@ appId: com.cleanpic.android
 - tapOn:
     id: "theme_editorial"
 - waitForAnimationToEnd
-- takeScreenshot: theme-editorial
+- takeScreenshot: maestro/screenshots/theme-editorial
 
 # --- 切回"温暖手工感" ---
 - tapOn:
     id: "theme_warm"
 - waitForAnimationToEnd
-- takeScreenshot: theme-warm-restored
+- takeScreenshot: maestro/screenshots/theme-warm-restored
 - tapOn:
     id: "back_button"
 - waitForAnimationToEnd

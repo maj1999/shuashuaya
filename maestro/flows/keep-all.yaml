@@ -74,4 +74,4 @@ appId: com.cleanpic.android
 - assertVisible: "保留"
 - assertVisible: "释放"
 - assertVisible: ".*再来一轮"
-- takeScreenshot: keep-all-result
+- takeScreenshot: maestro/screenshots/keep-all-result

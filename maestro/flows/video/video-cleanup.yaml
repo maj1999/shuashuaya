@@ -39,7 +39,7 @@ appId: com.cleanpic.android
 - waitForAnimationToEnd
 
 # 截图验证（可能进入 viewer 或空状态）
-- takeScreenshot: video-cleanup-viewer
+- takeScreenshot: maestro/screenshots/video-cleanup-viewer
 
 # 如果有视频，操作（2 个视频，全部保留）
 - tapOn:
@@ -51,4 +51,4 @@ appId: com.cleanpic.android
     optional: true
 - waitForAnimationToEnd
 
-- takeScreenshot: video-cleanup-result
+- takeScreenshot: maestro/screenshots/video-cleanup-result

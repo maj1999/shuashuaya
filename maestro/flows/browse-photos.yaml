@@ -42,7 +42,7 @@ appId: com.cleanpic.android
 - waitForAnimationToEnd
 
 # 验证进入 viewer（进度 N / M）
-- takeScreenshot: browse-photos-viewer
+- takeScreenshot: maestro/screenshots/browse-photos-viewer
 
 # 操作 10 张：交替删除和保留
 - tapOn:
@@ -80,4 +80,4 @@ appId: com.cleanpic.android
 - assertVisible: "删除"
 - assertVisible: "保留"
 - assertVisible: "释放"
-- takeScreenshot: browse-photos-result
+- takeScreenshot: maestro/screenshots/browse-photos-result

@@ -40,7 +40,7 @@ appId: com.cleanpic.android
 - waitForAnimationToEnd
 
 # 截图：视频缩略图 + 播放图标应可见
-- takeScreenshot: carousel-video-thumbnail
+- takeScreenshot: maestro/screenshots/carousel-video-thumbnail
 
 # 点击播放图标
 - tapOn:
@@ -56,7 +56,7 @@ appId: com.cleanpic.android
 # 验证静音按钮可见
 - assertVisible:
     id: "mute_button"
-- takeScreenshot: carousel-video-playing
+- takeScreenshot: maestro/screenshots/carousel-video-playing
 
 # 点击静音按钮切换声音
 - tapOn:
@@ -64,7 +64,7 @@ appId: com.cleanpic.android
 - waitForAnimationToEnd
 - assertVisible:
     id: "mute_button"
-- takeScreenshot: carousel-video-unmuted
+- takeScreenshot: maestro/screenshots/carousel-video-unmuted
 
 # 退出
 - tapOn:

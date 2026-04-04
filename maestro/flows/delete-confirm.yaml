@@ -82,7 +82,7 @@ appId: com.cleanpic.android
 # 确认删除前：验证待删除区域和确认按钮可见
 - assertVisible: "待删除项目"
 - assertVisible: ".*确认删除.*"
-- takeScreenshot: delete-confirm-before
+- takeScreenshot: maestro/screenshots/delete-confirm-before
 
 # 点击确认删除
 - tapOn: ".*确认删除.*"
@@ -92,4 +92,4 @@ appId: com.cleanpic.android
 - assertNotVisible: "待删除项目"
 - assertNotVisible: ".*确认删除.*"
 - assertVisible: ".*已成功删除.*"
-- takeScreenshot: delete-confirm-after
+- takeScreenshot: maestro/screenshots/delete-confirm-after

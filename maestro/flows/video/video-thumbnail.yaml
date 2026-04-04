@@ -44,4 +44,4 @@ appId: com.cleanpic.android
     text: ".*\\d+ / \\d+.*"
 
 # 截图：视频缩略图（应显示视频首帧，而非 emoji）
-- takeScreenshot: video-thumbnail-carousel
+- takeScreenshot: maestro/screenshots/video-thumbnail-carousel

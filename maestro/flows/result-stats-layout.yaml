@@ -81,4 +81,4 @@ appId: com.cleanpic.android
     text: ".*(KB|MB|GB|B).*"
 
 # 截图验证卡片等高布局
-- takeScreenshot: result-stats-layout
+- takeScreenshot: maestro/screenshots/result-stats-layout

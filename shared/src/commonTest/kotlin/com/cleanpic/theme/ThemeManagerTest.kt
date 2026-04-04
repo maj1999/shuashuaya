@@ -13,8 +13,8 @@ class ThemeManagerTest {
 
     @Test fun switch_theme_updates_current() {
         val manager = ThemeManager()
-        manager.switchTheme("warm")
-        assertEquals("warm", manager.currentTheme.value.id)
+        manager.switchTheme("geometric")
+        assertEquals("geometric", manager.currentTheme.value.id)
     }
 
     @Test fun unknown_theme_id_falls_back_to_default() {
@@ -46,6 +46,13 @@ class ThemeManagerTest {
 
     @Test fun all_themes_available() {
         val manager = ThemeManager()
-        assertEquals(1, manager.allThemes.size)
+        assertEquals(5, manager.allThemes.size)
+    }
+
+    @Test fun each_theme_has_unique_layout_id() {
+        val manager = ThemeManager()
+        val layoutIds = manager.allThemes.map { it.layoutId }.toSet()
+        assertEquals(5, layoutIds.size)
+        assertEquals(ThemeLayoutId.entries.toSet(), layoutIds)
     }
 }

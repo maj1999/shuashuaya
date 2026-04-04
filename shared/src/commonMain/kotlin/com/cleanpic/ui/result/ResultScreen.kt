@@ -78,6 +78,10 @@ fun ResultScreen(
     )
 
     when (theme.layoutId) {
-        else -> WarmResultLayout(state)
+        ThemeLayoutId.MINIMAL   -> MinimalResultLayout(state)
+        ThemeLayoutId.GEOMETRIC -> GeometricResultLayout(state)
+        ThemeLayoutId.WARM      -> WarmResultLayout(state)
+        ThemeLayoutId.PLAYFUL   -> PlayfulResultLayout(state)
+        ThemeLayoutId.EDITORIAL -> EditorialResultLayout(state)
     }
 }

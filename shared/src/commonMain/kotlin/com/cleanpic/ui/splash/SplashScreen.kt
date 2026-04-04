@@ -1,6 +1,7 @@
 package com.cleanpic.ui.splash
 
 import androidx.compose.runtime.*
+import com.cleanpic.theme.ThemeLayoutId
 import com.cleanpic.theme.ThemeTokens
 import kotlinx.coroutines.delay
 
@@ -12,6 +13,10 @@ fun SplashScreen(theme: ThemeTokens, onFinished: () -> Unit) {
     }
     val state = SplashScreenState(theme = theme, onSplashComplete = onFinished)
     when (theme.layoutId) {
-        else -> WarmSplashLayout(state)
+        ThemeLayoutId.MINIMAL   -> MinimalSplashLayout(state)
+        ThemeLayoutId.GEOMETRIC -> GeometricSplashLayout(state)
+        ThemeLayoutId.WARM      -> WarmSplashLayout(state)
+        ThemeLayoutId.PLAYFUL   -> PlayfulSplashLayout(state)
+        ThemeLayoutId.EDITORIAL -> EditorialSplashLayout(state)
     }
 }

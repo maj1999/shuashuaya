@@ -1,6 +1,7 @@
 package com.cleanpic.ui.settings
 
 import androidx.compose.runtime.*
+import com.cleanpic.theme.ThemeLayoutId
 import com.cleanpic.theme.ThemeTokens
 import com.cleanpic.ui.navigation.AppRouter
 import com.cleanpic.viewmodel.SettingsViewModel
@@ -34,6 +35,10 @@ fun SettingsScreen(router: AppRouter, theme: ThemeTokens) {
     )
 
     when (theme.layoutId) {
-        else -> WarmSettingsLayout(state)
+        ThemeLayoutId.MINIMAL   -> MinimalSettingsLayout(state)
+        ThemeLayoutId.GEOMETRIC -> GeometricSettingsLayout(state)
+        ThemeLayoutId.WARM      -> WarmSettingsLayout(state)
+        ThemeLayoutId.PLAYFUL   -> PlayfulSettingsLayout(state)
+        ThemeLayoutId.EDITORIAL -> EditorialSettingsLayout(state)
     }
 }

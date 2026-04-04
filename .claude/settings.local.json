@@ -74,7 +74,22 @@
       "Bash(grep -E \"\\\\.kt$\")",
       "Bash(./gradlew testDebugUnitTest -p shared)",
       "Bash(./gradlew compileKotlin -p shared)",
-      "Bash(./gradlew compileDebugKotlinAndroid -p shared)"
+      "Bash(./gradlew compileDebugKotlinAndroid -p shared)",
+      "Bash(./gradlew :shared:testDebugUnitTest --tests \"com.cleanpic.icons.AppIconsTest\")",
+      "Read(//opt/homebrew/bin/**)",
+      "Read(//usr/local/bin/**)",
+      "Read(//Users/mark/.android/avd/**)",
+      "Bash(adb wait-for-device:*)",
+      "Bash(curl -sL --proxy http://127.0.0.1:7897 \"https://api.github.com/repos/mobile-dev-inc/maestro/releases/latest\")",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(d.get\\('tag_name','unknown'\\)\\); [print\\(a['name'], a['browser_download_url']\\) for a in d.get\\('assets',[]\\) if 'maestro' in a['name'].lower\\(\\)]\")",
+      "Bash(aria2c -x 16 -s 16 -k 1M --all-proxy=http://127.0.0.1:7897 -d /tmp -o maestro.zip https://github.com/mobile-dev-inc/Maestro/releases/download/cli-2.4.0/maestro.zip)",
+      "Bash(mkdir -p ~/.maestro)",
+      "Bash(unzip -o /tmp/maestro.zip -d ~/.maestro/)",
+      "Bash(~/.maestro/bin/maestro --version)",
+      "Bash(grep -v \"^$\")",
+      "Bash(~/.maestro/bin/maestro test:*)",
+      "Bash(git:*)",
+      "Bash(./gradlew :shared:compileDebugKotlinAndroid)"
     ]
   }
 }

@@ -1,6 +1,12 @@
 package com.cleanpic.ui
 
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import com.cleanpic.di.ServiceLocator
 import com.cleanpic.model.MediaType
 import com.cleanpic.ui.navigation.AppRouter
@@ -13,6 +19,7 @@ import com.cleanpic.ui.result.ResultScreen
 import com.cleanpic.ui.settings.SettingsScreen
 import com.cleanpic.viewmodel.ViewerViewModel
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun CleanPicApp() {
     val themeManager = ServiceLocator.themeManager
@@ -20,13 +27,15 @@ fun CleanPicApp() {
     val router = rememberAppRouter()
     val viewerViewModel = remember { ViewerViewModel() }
 
-    when (val route = router.currentRoute) {
-        is Route.Splash -> SplashScreen(theme) {
-            router.navigate(Route.Home, clearBackStackUpTo = Route.Splash, inclusive = true)
+    Box(modifier = Modifier.fillMaxSize().semantics { testTagsAsResourceId = true }) {
+        when (val route = router.currentRoute) {
+            is Route.Splash -> SplashScreen(theme) {
+                router.navigate(Route.Home, clearBackStackUpTo = Route.Splash, inclusive = true)
+            }
+            is Route.Home -> HomeScreen(router, theme, viewerViewModel)
+            is Route.Viewer -> ViewerScreen(router, theme, viewerViewModel, route.type)
+            is Route.Result -> ResultScreen(router, theme, viewerViewModel)
+            is Route.Settings -> SettingsScreen(router, theme)
         }
-        is Route.Home -> HomeScreen(router, theme, viewerViewModel)
-        is Route.Viewer -> ViewerScreen(router, theme, viewerViewModel, route.type)
-        is Route.Result -> ResultScreen(router, theme, viewerViewModel)
-        is Route.Settings -> SettingsScreen(router, theme)
     }
 }

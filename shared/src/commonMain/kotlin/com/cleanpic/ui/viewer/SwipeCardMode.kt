@@ -191,12 +191,14 @@ private fun CardContent(
         if (isVideo && !isPlaying && onPlayClick != null) {
             PlayButtonOverlay(
                 onClick = onPlayClick,
+                theme = theme,
                 modifier = Modifier.align(Alignment.Center)
             )
         }
         // 文件信息
         FileInfoOverlay(
             item = item,
+            theme = theme,
             isMuted = if (isVideo && isPlaying) isMuted else null,
             onToggleMute = onToggleMute,
             modifier = Modifier.align(Alignment.BottomCenter)

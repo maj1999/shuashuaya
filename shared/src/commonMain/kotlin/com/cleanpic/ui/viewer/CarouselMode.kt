@@ -19,10 +19,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cleanpic.icons.IconPainter
 import com.cleanpic.model.MediaType
 import com.cleanpic.model.ViewerItem
 import com.cleanpic.theme.ThemeTokens
@@ -155,12 +155,14 @@ private fun MainCard(
         if (isVideo && !isPlaying) {
             PlayButtonOverlay(
                 onClick = onPlayClick,
+                theme = theme,
                 modifier = Modifier.align(Alignment.Center)
             )
         }
         // 文件信息叠层
         FileInfoOverlay(
             item = item,
+            theme = theme,
             isMuted = if (isVideo && isPlaying) isMuted else null,
             onToggleMute = onToggleMute,
             modifier = Modifier.align(Alignment.BottomCenter)
@@ -198,7 +200,7 @@ private fun ActionButtons(theme: ThemeTokens, viewerViewModel: ViewerViewModel) 
             ),
             contentPadding = PaddingValues(0.dp)
         ) {
-            Text(text = "🗑️", fontSize = 24.sp)
+            IconPainter("delete", theme, size = 24.dp, colorOverride = theme.colorDanger)
         }
         Button(
             onClick = { viewerViewModel.markKept() },
@@ -209,7 +211,7 @@ private fun ActionButtons(theme: ThemeTokens, viewerViewModel: ViewerViewModel) 
             ),
             contentPadding = PaddingValues(0.dp)
         ) {
-            Text(text = "✓", fontSize = 28.sp, fontWeight = FontWeight.Bold)
+            IconPainter("keep", theme, size = 28.dp, colorOverride = theme.colorSuccess)
         }
     }
 }
@@ -230,7 +232,7 @@ internal fun DurationBadge(durationMs: Long, modifier: Modifier = Modifier) {
 }
 
 @Composable
-internal fun PlayButtonOverlay(onClick: () -> Unit, modifier: Modifier = Modifier) {
+internal fun PlayButtonOverlay(onClick: () -> Unit, theme: ThemeTokens, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .size(48.dp)
@@ -239,17 +241,14 @@ internal fun PlayButtonOverlay(onClick: () -> Unit, modifier: Modifier = Modifie
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = "▶",
-            fontSize = 24.sp,
-            color = Color.White.copy(alpha = 0.8f)
-        )
+        IconPainter("play", theme, size = 24.dp, colorOverride = 0xFFFFFFFF)
     }
 }
 
 @Composable
 internal fun FileInfoOverlay(
     item: ViewerItem,
+    theme: ThemeTokens,
     modifier: Modifier = Modifier,
     isMuted: Boolean? = null,
     onToggleMute: (() -> Unit)? = null
@@ -282,10 +281,7 @@ internal fun FileInfoOverlay(
             if (isMuted != null && onToggleMute != null) {
                 Spacer(modifier = Modifier.weight(1f))
                 TextButton(onClick = onToggleMute) {
-                    Text(
-                        text = if (isMuted) "🔇" else "🔊",
-                        fontSize = 18.sp
-                    )
+                    IconPainter(if (isMuted) "mute" else "unmute", theme, size = 18.dp)
                 }
             }
         }

@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cleanpic.di.ServiceLocator
+import com.cleanpic.icons.IconPainter
 import com.cleanpic.model.InteractionMode
 import com.cleanpic.model.MediaType
 import com.cleanpic.theme.ThemeTokens
@@ -111,11 +112,15 @@ private fun ProgressHeader(
             verticalAlignment = Alignment.CenterVertically
         ) {
             TextButton(onClick = onExit) {
-                Text(
-                    text = "← 退出",
-                    fontSize = 14.sp,
-                    color = Color(theme.colorTextSecondary)
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconPainter("back", theme, size = 14.dp)
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "退出",
+                        fontSize = 14.sp,
+                        color = Color(theme.colorTextSecondary)
+                    )
+                }
             }
             Text(
                 text = "$current / $total",

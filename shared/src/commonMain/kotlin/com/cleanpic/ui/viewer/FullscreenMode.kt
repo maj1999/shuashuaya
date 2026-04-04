@@ -14,10 +14,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cleanpic.icons.IconPainter
 import com.cleanpic.model.MediaType
 import com.cleanpic.model.ViewerItem
 import com.cleanpic.theme.ThemeTokens
@@ -75,6 +75,7 @@ fun FullscreenMode(
         // 底部文件信息 + 视频控件
         BottomInfo(
             item = currentItem,
+            theme = theme,
             isMuted = isMuted,
             onToggleMute = { isMuted = !isMuted },
             modifier = Modifier.align(Alignment.BottomCenter)
@@ -121,11 +122,15 @@ private fun TopBar(
         verticalAlignment = Alignment.CenterVertically
     ) {
         TextButton(onClick = onExit) {
-            Text(
-                text = "← 退出",
-                color = Color.White,
-                fontSize = 15.sp
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconPainter("back", theme, size = 15.dp)
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = "退出",
+                    color = Color.White,
+                    fontSize = 15.sp
+                )
+            }
         }
         Spacer(modifier = Modifier.weight(1f))
         Text(
@@ -159,7 +164,7 @@ private fun SideActions(
             ),
             contentPadding = PaddingValues(0.dp)
         ) {
-            Text(text = "🗑️", fontSize = 22.sp)
+            IconPainter("delete", theme, size = 22.dp, colorOverride = theme.colorDanger)
         }
         Button(
             onClick = onKeep,
@@ -170,11 +175,7 @@ private fun SideActions(
             ),
             contentPadding = PaddingValues(0.dp)
         ) {
-            Text(
-                text = "✓",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
+            IconPainter("keep", theme, size = 24.dp, colorOverride = theme.colorSuccess)
         }
     }
 }
@@ -182,6 +183,7 @@ private fun SideActions(
 @Composable
 private fun BottomInfo(
     item: ViewerItem,
+    theme: ThemeTokens,
     isMuted: Boolean,
     onToggleMute: () -> Unit,
     modifier: Modifier
@@ -224,10 +226,7 @@ private fun BottomInfo(
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 TextButton(onClick = onToggleMute) {
-                    Text(
-                        text = if (isMuted) "🔇" else "🔊",
-                        fontSize = 20.sp
-                    )
+                    IconPainter(if (isMuted) "mute" else "unmute", theme, size = 20.dp)
                 }
             }
         }

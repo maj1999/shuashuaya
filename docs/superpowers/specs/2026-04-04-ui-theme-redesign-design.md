@@ -79,7 +79,7 @@ status: approved
 - **配色：** 背景渐变 #667EEA→#764BA2，元素 rgba(255,255,255,0.1-0.2)，边框 rgba(255,255,255,0.15-0.25)
 - **字体：** 系统无衬线，font-weight 600-700，白色
 - **圆角：** 16-24dp
-- **毛玻璃：** backdrop-filter blur(8-12dp)，白色 10-15% 透明度
+- **毛玻璃：** API 31+ 使用 `RenderEffect.createBlurEffect` 实现真实模糊；API 26-30 降级为半透明纯色（rgba(255,255,255,0.15)）+ 1px 白色边框模拟，视觉上可接受
 - **动画：** 350ms，easeOutBounce/overshoot，BOUNCE 按压
 
 **各页面布局：**
@@ -143,44 +143,106 @@ status: approved
 
 ### ThemeTokens 扩展
 
-现有 ThemeTokens 需要新增字段以支持布局差异和图标参数：
+现有 ThemeTokens 需要新增字段以支持布局差异和图标参数。所有枚举类型的字段使用 enum 而非 String，与现有 `ButtonPressAnim` 模式保持一致：
 
+```kotlin
+// 新增枚举
+enum class ThemeLayoutId { MINIMAL, GEOMETRIC, WARM, PLAYFUL, EDITORIAL }
+enum class ProgressStyle { THIN, BOLD, SOFT, GLASS, EDITORIAL }
+enum class ButtonStyle { OUTLINED, FILLED, SHADOW, GLASS, TEXT }
+
+// ThemeTokens 新增字段
+layoutId: ThemeLayoutId                // 布局标识，用于 when 分发（编译期穷举检查）
+iconStrokeWidth: Float                 // 图标线宽
+iconStrokeColor: Long                  // 图标默认颜色
+iconStrokeCap: StrokeCap               // androidx.compose.ui.graphics.StrokeCap
+titleFontFamily: FontFamily            // androidx.compose.ui.text.font.FontFamily（Default/Serif）
+progressStyle: ProgressStyle           // 进度条样式
+buttonStyle: ButtonStyle               // 按钮样式
 ```
-// 新增字段
-layoutId: String           // 布局标识：minimal/geometric/warm/playful/editorial
-iconStrokeWidth: Float     // 图标线宽
-iconStrokeColor: Long      // 图标默认颜色
-iconStrokeCap: StrokeCap   // 线端样式：Butt/Round/Square
-titleFontFamily: String    // 标题字体族：System/Serif
-progressStyle: String      // 进度条样式：thin/bold/soft/glass/editorial
-buttonStyle: String        // 按钮样式：outlined/filled/shadow/glass/text
+
+### 共享业务逻辑接口
+
+每个页面的 5 个布局变体共享同一套业务逻辑。逻辑在原始 Screen Composable 中管理，通过 State 对象传入布局：
+
+```kotlin
+// 首页共享状态
+class HomeScreenState(
+    val theme: ThemeTokens,
+    val isLimitedAccess: Boolean,
+    val showPermissionDeniedDialog: Boolean,
+    val showPermissionPermanentDialog: Boolean,
+    val onStartPhoto: () -> Unit,
+    val onStartVideo: () -> Unit,
+    val onOpenSettings: () -> Unit,
+    val onRequestPermission: () -> Unit,
+    val onDismissDialog: () -> Unit,
+)
+
+// 结果页共享状态
+class ResultScreenState(
+    val theme: ThemeTokens,
+    val deletedCount: Int,
+    val keptCount: Int,
+    val freedSpace: String,
+    val pendingDeleteItems: List<MediaItem>,
+    val isDeleting: Boolean,
+    val deleteResult: String?,
+    val onConfirmDelete: () -> Unit,
+    val onCancelItem: (MediaItem) -> Unit,
+    val onNextRound: () -> Unit,
+    val onGoHome: () -> Unit,
+)
+
+// 设置页共享状态
+class SettingsScreenState(
+    val theme: ThemeTokens,
+    val allThemes: List<ThemeTokens>,
+    val currentMode: InteractionMode,
+    val currentCount: Int,
+    val onThemeChange: (String) -> Unit,
+    val onModeChange: (InteractionMode) -> Unit,
+    val onCountChange: (Int) -> Unit,
+    val onBack: () -> Unit,
+)
+
+// 闪屏共享状态
+class SplashScreenState(
+    val theme: ThemeTokens,
+    val onSplashComplete: () -> Unit,
+)
 ```
 
-### 页面组件结构
+### 导航与路由
 
-每个页面根据 `layoutId` 分发到不同的布局 Composable：
+AppRouter、Route 定义和 ViewModel 注入保持不变。每个 Screen Composable（HomeScreen、ResultScreen 等）的函数签名不变，内部先构造 State 对象，再根据 `theme.layoutId` 分发：
 
-```
-// 示例：首页
+```kotlin
 @Composable
-fun HomeScreen(theme: ThemeTokens) {
+fun HomeScreen(router: AppRouter, theme: ThemeTokens, viewerViewModel: ViewerViewModel) {
+    // 业务逻辑保持在这里（权限检查、对话框管理等）
+    val state = HomeScreenState(
+        theme = theme,
+        isLimitedAccess = ...,
+        // ... 其余字段
+    )
     when (theme.layoutId) {
-        "minimal"   -> MinimalHomeLayout(theme)
-        "geometric" -> GeometricHomeLayout(theme)
-        "warm"      -> WarmHomeLayout(theme)
-        "playful"   -> PlayfulHomeLayout(theme)
-        "editorial" -> EditorialHomeLayout(theme)
+        ThemeLayoutId.MINIMAL   -> MinimalHomeLayout(state)
+        ThemeLayoutId.GEOMETRIC -> GeometricHomeLayout(state)
+        ThemeLayoutId.WARM      -> WarmHomeLayout(state)
+        ThemeLayoutId.PLAYFUL   -> PlayfulHomeLayout(state)
+        ThemeLayoutId.EDITORIAL -> EditorialHomeLayout(state)
     }
 }
 ```
 
-每个 Layout Composable 是独立的，包含自己的布局逻辑、装饰元素和动画。共享业务逻辑（权限请求、媒体加载、导航等）通过参数传入。
+使用 sealed enum `ThemeLayoutId` 确保 `when` 表达式编译期穷举检查，不会遗漏新增主题。
 
 ### 图标封装
 
 创建统一的图标入口，根据主题返回对应参数的 ImageVector：
 
-```
+```kotlin
 object AppIcons {
     @Composable
     fun Delete(theme: ThemeTokens): ImageVector { ... }
@@ -191,6 +253,16 @@ object AppIcons {
     // ...
 }
 ```
+
+注意：图标是纯 Composable 函数，不需要依赖注入。
+
+### 公共组件处理
+
+以下组件保持单一实现，通过 ThemeTokens 参数化样式（不按主题拆分）：
+- `PermissionBanner` — 根据主题调整背景色、文字色、图标
+- `SimpleDialog` — 根据主题调整圆角、按钮样式、字体
+- `LoadingView`（ViewerScreen 内）— 根据主题调整加载指示器颜色和样式
+- `ProgressHeader`（ViewerScreen 内）— 根据 `theme.progressStyle` 切换进度条样式（细线/粗条/柔和/毛玻璃/分割线+文本计数）
 
 ### 文件组织
 
@@ -257,8 +329,78 @@ Viewer 的 3 种交互模式（CarouselMode/SwipeCardMode/FullscreenMode）不�
 
 这是因为交互逻辑（拖拽、滑动、手势）是共享的，只有视觉呈现不同。
 
+## 系统深色模式
+
+App 不跟随系统深色模式。主题选择完全由用户在设置页控制。"大胆几何"本身是深色主题，其余为浅色。状态栏颜色跟随当前主题的背景色自动适配（深色背景用浅色状态栏图标，反之亦然）。
+
+## 装饰性 emoji 处理
+
+除操作类图标外，以下装饰性 emoji 也需替换：
+
+| 当前 emoji | 位置 | 替换方案 |
+|-----------|------|---------|
+| ✨ | 首页标题装饰、闪屏 | 删除，各主题闪屏用 Canvas 绘制主题特色图标 |
+| 🎉 | 结果页完成庆祝 | 各主题独立的完成图标（极简=无，几何=五边形勾选，温暖=圆形勾选，活泼=毛玻璃勾选，杂志=文字标题） |
+| 🖼️🃏📱 | 设置页交互模式指示 | 替换为 SVG ImageVector（轮播=横向卡片组，滑卡=倾斜卡片，全屏=全屏矩形） |
+
+## 闪屏动画技术说明
+
+各主题闪屏动画均使用 Compose `Canvas` API + `Animatable` 实现：
+- 极简（线条勾勒）：`PathMeasure` + `pathLength` 动画实现 path trimming 效果
+- 几何（色块旋转）：`graphicsLayer { rotationZ }` + `drawRect` 渐变填充
+- 温暖（卡片浮出）：`scale` + `alpha` 组合动画，`drawRoundRect` 绘制阴影
+- 活泼（弹性弹出）：`spring(dampingRatio = 0.6f)` 弹性动画 + `drawCircle` 光点
+- 杂志（打字机）：逐字 `drawText` + `drawLine` 从中心扩展动画
+
+不使用 Lottie 等第三方库，保持 APK 体积最小。
+
+## 字体策略
+
+- 衬线字体（温暖/杂志主题）：使用 `FontFamily.Serif`，Android 上映射为 Noto Serif
+- 无衬线字体（其余主题）：使用 `FontFamily.Default`
+- 不捆绑自定义字体文件，依赖系统字体，未来跨平台时通过 `expect/actual` 扩展
+
 ## 迁移策略
+
+### 步骤
 
 1. 删除现有 5 个主题定义文件（DreamyGradient/SoftMinimal/CutePlayful/ElegantDark/NaturalWarm）
 2. 默认主题从 DreamyGradient 改为 warm（温暖手工感），作为最友好的默认体验
 3. 用户已保存的主题偏好如果是旧 ID，回退到默认主题
+
+### 需修改的具体文件
+
+| 文件 | 修改内容 |
+|------|---------|
+| `shared/.../theme/ThemeTokens.kt` | 新增字段和枚举类型 |
+| `shared/.../theme/ThemeManager.kt` | 替换 5 个主题注册，更新默认主题 |
+| `shared/.../settings/AppSettings.kt` | 默认 theme 从 `"dreamy-gradient"` 改为 `"warm"` |
+| `shared/.../theme/DreamyGradient.kt` 等 5 个旧主题文件 | 删除 |
+| `shared/.../ui/home/HomeScreen.kt` | 提取业务逻辑到 State，添加 when 分发 |
+| `shared/.../ui/result/ResultScreen.kt` | 同上 |
+| `shared/.../ui/settings/SettingsScreen.kt` | 同上 |
+| `shared/.../ui/splash/SplashScreen.kt` | 同上 |
+| `shared/.../ui/common/EmptyStateScreen.kt` | 同上 |
+| `shared/.../ui/viewer/CarouselMode.kt` | 内部参数化，不拆分 |
+| `shared/.../ui/viewer/SwipeCardMode.kt` | 同上 |
+| `shared/.../ui/viewer/FullscreenMode.kt` | 同上 |
+| `shared/.../ui/viewer/ViewerScreen.kt` | LoadingView + ProgressHeader 参数化 |
+| `shared/.../ui/common/PermissionBanner.kt` | 参数化样式 |
+| `shared/.../ui/common/SimpleDialog.kt` | 参数化样式 |
+| `shared/src/commonTest/.../ThemeManagerTest.kt` | 更新测试用例适配新主题 |
+
+### 需同步更新的文档
+
+| 文档 | 修改内容 |
+|------|---------|
+| `docs/architecture/cleanpic/theme-system.md` | 完整重写，描述新的 5 主题体系 |
+| `docs/architecture/overview.md` | 更新主题系统相关章节 |
+| `docs/architecture/domain-model.md` | 新增术语：ThemeLayoutId、ProgressStyle、ButtonStyle、HomeScreenState 等 |
+
+## 建议实现顺序
+
+1. ThemeTokens 扩展 + 枚举定义 + 共享 State 接口
+2. AppIcons 图标系统
+3. 一个主题（warm）端到端完整实现（验证架构可行性）
+4. 剩余 4 个主题逐一实现
+5. 迁移策略 + 测试更新 + 文档同步

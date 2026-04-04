@@ -5,17 +5,15 @@ import kotlinx.coroutines.flow.StateFlow
 
 class ThemeManager {
     val allThemes = listOf(
-        DreamyGradientTheme,
-        SoftMinimalTheme,
-        CutePlayfulTheme,
-        ElegantDarkTheme,
-        NaturalWarmTheme
+        WarmTheme
+        // Plan C 将添加：MinimalTheme、GeometricTheme、PlayfulTheme、EditorialTheme
     )
 
-    private val _currentTheme = MutableStateFlow(DreamyGradientTheme)
+    private val _currentTheme = MutableStateFlow(WarmTheme)
     val currentTheme: StateFlow<ThemeTokens> = _currentTheme
 
     fun switchTheme(id: String) {
-        allThemes.find { it.id == id }?.let { _currentTheme.value = it }
+        val target = allThemes.find { it.id == id }
+        _currentTheme.value = target ?: WarmTheme
     }
 }

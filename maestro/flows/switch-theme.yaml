@@ -1,19 +1,78 @@
 # maestro/flows/switch-theme.yaml
 #
-# E2E: 首页 → 设置 → 切换主题 → 返回验证
+# E2E: 首页 → 设置 → 切换 5 个新主题 → 返回验证布局变化
 #
 appId: com.cleanpic.android
 ---
 - launchApp
 - waitForAnimationToEnd
-- tapOn: "⚙️"
+
+# 进入设置
+- tapOn:
+    id: "settings_button"
 - waitForAnimationToEnd
 - assertVisible: "设置"
 - assertVisible: "主题"
-- takeScreenshot: theme-settings
-- tapOn: "优雅暗黑"
+- takeScreenshot: theme-settings-default-warm
+
+# --- 切换到"大胆几何"（深色主题）---
+- tapOn: "大胆几何"
 - waitForAnimationToEnd
-- takeScreenshot: theme-dark-applied
-- tapOn: "←"
+- takeScreenshot: theme-settings-geometric
+
+# 返回首页验证布局变化（双卡片并排）
+- tapOn:
+    id: "back_button"
 - waitForAnimationToEnd
-- takeScreenshot: theme-home-after-switch
+- takeScreenshot: theme-home-geometric
+
+# 回到设置继续验证
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+
+# --- 切换到"克制极简" ---
+- tapOn: "克制极简"
+- waitForAnimationToEnd
+- takeScreenshot: theme-settings-minimal
+
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd
+- takeScreenshot: theme-home-minimal
+
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+
+# --- 切换到"活泼精致" ---
+- tapOn: "活泼精致"
+- waitForAnimationToEnd
+- takeScreenshot: theme-settings-playful
+
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd
+- takeScreenshot: theme-home-playful
+
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+
+# --- 切换到"杂志排版" ---
+- tapOn: "杂志排版"
+- waitForAnimationToEnd
+- takeScreenshot: theme-settings-editorial
+
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd
+- takeScreenshot: theme-home-editorial
+
+# --- 切换回默认"温暖手工感" ---
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+- tapOn: "温���手工感"
+- waitForAnimationToEnd
+- takeScreenshot: theme-settings-warm-restored

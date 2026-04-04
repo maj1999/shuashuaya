@@ -8,7 +8,7 @@
 |------|------|
 | 三端统一 | 一套 Kotlin 共享代码同时运行在 Android、iOS、HarmonyOS |
 | 原生性能 | 照片/视频加载零桥接开销，动画 >= 55fps |
-| 可主题化 | 语义化 Token 架构，5 套主题一键切换 |
+| 可主题化 | 语义化 Token 架构，5 套主题（各含独立布局）一键切换，所有图标为矢量绘制 |
 | 安全删除 | 批量延迟删除，1 次系统弹窗，支持反悔 |
 | 纯本地 | 无网络请求，不收集任何用户数据 |
 
@@ -18,7 +18,7 @@
 graph TB
     subgraph "shared/ (Kotlin Multiplatform)"
         UI["ui/<br/>Splash / Home / Viewer<br/>Result / Settings"]
-        Theme["theme/<br/>ThemeManager<br/>5 套 ThemeTokens"]
+        Theme["theme/<br/>ThemeManager<br/>5 套 ThemeTokens + AppIcons"]
         Interaction["interaction/<br/>Carousel / SwipeCard<br/>Fullscreen"]
         Media["media/<br/>MediaRepository<br/>RandomPicker"]
         Settings["settings/<br/>AppSettings"]
@@ -62,7 +62,8 @@ graph TB
 | ui/viewer | 核心浏览页，承载 3 种交互模式 | shared |
 | ui/result | 结果统计 + 删除确认 + 再来一轮 | shared |
 | ui/settings | 主题/模式/数量切换 | shared |
-| ThemeManager | 主题状态管理，切换时更新全局 Token | shared |
+| ThemeManager | 主题状态管理，切换时更新全局 Token + 布局标识 | shared |
+| AppIcons | 统一矢量图标入口，根据主题 Token 返回对应风格的 ImageVector | shared |
 | InteractionMode | 3 种浏览交互的统一接口 | shared |
 | MediaRepository | 媒体查询/删除的跨平台抽象 (expect/actual) | shared + 各平台 |
 | RandomPicker | 随机不重复选取 + 会话级去重 | shared |
@@ -74,7 +75,7 @@ graph TB
 | 子模块 | 文档 | 说明 |
 |--------|------|------|
 | 数据流与状态 | [cleanpic/overview.md](cleanpic/overview.md) | 数据流、导航栈、状态管理、删除策略、持久化 |
-| 主题系统 | [cleanpic/theme-system.md](cleanpic/theme-system.md) | Token 定义、5 套主题色板、动画 Token |
+| 主题系统 | [cleanpic/theme-system.md](cleanpic/theme-system.md) | Token 定义（v2：含布局标识+图标参数）、5 套新主题、矢量图标系统、页面分发架构 |
 | 原生 Module | [cleanpic/native-modules.md](cleanpic/native-modules.md) | MediaModule/PermissionModule/VideoPlayer 各平台实现 |
 | 技术栈选型 | [tech-stack.md](tech-stack.md) | 框架选型对比与最终决策 |
 | 领域模型 | [domain-model.md](domain-model.md) | 业务术语 <-> 技术术语映射 SSOT |
@@ -85,7 +86,8 @@ graph TB
 cleanpic/
 ├── shared/
 │   ├── ui/          — Splash / Home / Viewer / Result / Settings
-│   ├── theme/       — ThemeManager + 5 套 ThemeTokens
+│   ├── theme/       — ThemeManager + 5 套 ThemeTokens + AppIcons
+│   ├── icons/       — 统一矢量图标入口 (ImageVector)
 │   ├── interaction/ — CarouselMode / SwipeCardMode / FullscreenMode
 │   ├── media/       — MediaRepository(expect) + RandomPicker
 │   └── settings/    — AppSettings(expect)

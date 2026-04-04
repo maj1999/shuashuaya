@@ -43,3 +43,4 @@ test-assets/**/*.jpg
 test-assets/**/*.png
 test-assets/**/*.mp4
 !test-assets/**/.gitkeep
+*.png

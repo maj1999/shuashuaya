@@ -30,4 +30,18 @@ class ThemeTokensTest {
             values.map { it.name }.toSet()
         )
     }
+
+    @Test fun warm_theme_has_correct_layout_id() {
+        assertEquals(ThemeLayoutId.WARM, WarmTheme.layoutId)
+        assertEquals("warm", WarmTheme.id)
+        assertEquals("温暖手工感", WarmTheme.name)
+    }
+
+    @Test fun warm_theme_has_correct_icon_params() {
+        assertEquals(1.8f, WarmTheme.iconStrokeWidth)
+        assertEquals(IconStrokeCap.ROUND, WarmTheme.iconStrokeCap)
+        assertEquals(ProgressStyle.SOFT, WarmTheme.progressStyle)
+        assertEquals(ButtonStyle.SHADOW, WarmTheme.buttonStyle)
+        assertEquals("Serif", WarmTheme.titleFontFamily)
+    }
 }

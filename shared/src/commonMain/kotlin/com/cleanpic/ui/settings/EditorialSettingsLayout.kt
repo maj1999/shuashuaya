@@ -94,7 +94,8 @@ fun EditorialSettingsLayout(state: SettingsScreenState) {
                         EditorialThemeStrip(
                             tokens = t,
                             isSelected = t.id == state.theme.id,
-                            onClick = { state.onThemeChange(t.id) }
+                            onClick = { state.onThemeChange(t.id) },
+                            testTag = "theme_${t.id}"
                         )
                     }
                 }
@@ -199,7 +200,8 @@ private fun EditorialSectionLabel(text: String) {
 private fun EditorialThemeStrip(
     tokens: ThemeTokens,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    testTag: String = ""
 ) {
     val gradientColors = tokens.gradientMain?.colors?.map { Color(it) }
         ?: listOf(Color(tokens.colorPrimary), Color(tokens.colorAccent))
@@ -209,6 +211,7 @@ private fun EditorialThemeStrip(
     Column(
         modifier = Modifier
             .width(40.dp)
+            .then(if (testTag.isNotEmpty()) Modifier.testTag(testTag) else Modifier)
             .clickable(onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

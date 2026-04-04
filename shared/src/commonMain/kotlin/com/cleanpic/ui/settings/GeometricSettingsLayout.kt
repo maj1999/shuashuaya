@@ -75,13 +75,14 @@ fun GeometricSettingsLayout(state: SettingsScreenState) {
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(100.dp)
+                        .height(90.dp)
                 ) {
                     items(state.allThemes) { t ->
                         GeometricThemeCard(
                             tokens = t,
                             isSelected = t.id == state.theme.id,
-                            onClick = { state.onThemeChange(t.id) }
+                            onClick = { state.onThemeChange(t.id) },
+                            testTag = "theme_${t.id}"
                         )
                     }
                 }
@@ -168,7 +169,8 @@ private fun GeometricSectionTitle(title: String) {
 private fun GeometricThemeCard(
     tokens: ThemeTokens,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    testTag: String = ""
 ) {
     val gradientColors = tokens.gradientMain?.colors?.map { Color(it) }
         ?: listOf(Color(tokens.colorPrimary), Color(tokens.colorAccent))
@@ -183,10 +185,11 @@ private fun GeometricThemeCard(
 
     Column(
         modifier = Modifier
-            .width(80.dp)
+            .width(60.dp)
             .then(borderMod)
             .clip(RoundedCornerShape(16.dp))
             .background(Color(0xFF16213E))
+            .then(if (testTag.isNotEmpty()) Modifier.testTag(testTag) else Modifier)
             .clickable(onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

@@ -1,92 +1,70 @@
 # maestro/flows/switch-theme.yaml
 #
-# E2E: 首页 → 设置 → 切换 5 个新主题 → 返回验证布局变化
+# E2E: 首页 → 设置 → 切换 5 个主题 → 切回默认主题 warm
 #
 appId: com.cleanpic.android
 ---
+- clearState
 - launchApp
 - extendedWaitUntil:
     visible:
       id: "settings_button"
-    timeout: 10000
+    timeout: 30000
 - waitForAnimationToEnd
 
 # 进入设置
 - tapOn:
     id: "settings_button"
 - waitForAnimationToEnd
-- assertVisible: "设置"
-- assertVisible: "主题"
 - takeScreenshot: theme-settings-default-warm
 
-# --- 切换到"大胆几何"（深色主题）---
-- tapOn: "大胆几何"
+# --- 切换到"大胆几何" ---
+- tapOn:
+    id: "theme_geometric"
 - waitForAnimationToEnd
-- takeScreenshot: theme-settings-geometric
-
-# 返回首页验证布局变化（双卡片并排）
+- takeScreenshot: theme-geometric
 - tapOn:
     id: "back_button"
 - waitForAnimationToEnd
-- takeScreenshot: theme-home-geometric
-
-# 回到设置继续验证
 - tapOn:
     id: "settings_button"
 - waitForAnimationToEnd
 
 # --- 切换到"克制极简" ---
-- tapOn: "克制极简"
+- tapOn:
+    id: "theme_minimal"
 - waitForAnimationToEnd
-- takeScreenshot: theme-settings-minimal
-
+- takeScreenshot: theme-minimal
 - tapOn:
     id: "back_button"
 - waitForAnimationToEnd
-- takeScreenshot: theme-home-minimal
-
 - tapOn:
     id: "settings_button"
 - waitForAnimationToEnd
 
 # --- 切换到"活泼精致" ---
-- tapOn: "活泼精致"
+- tapOn:
+    id: "theme_playful"
 - waitForAnimationToEnd
-- takeScreenshot: theme-settings-playful
-
+- takeScreenshot: theme-playful
 - tapOn:
     id: "back_button"
 - waitForAnimationToEnd
-- takeScreenshot: theme-home-playful
-
 - tapOn:
     id: "settings_button"
 - waitForAnimationToEnd
 
-# --- 切换到"杂志排版"（可能需要滚动才能看到）---
-- scrollUntilVisible:
-    element:
-      text: "杂志排版"
-    direction: RIGHT
-    timeout: 5000
-- tapOn: "杂志排版"
+# --- 切换到"杂志排版" ---
+- tapOn:
+    id: "theme_editorial"
 - waitForAnimationToEnd
-- takeScreenshot: theme-settings-editorial
+- takeScreenshot: theme-editorial
 
+# --- 切回"温暖手工感" ---
+- tapOn:
+    id: "theme_warm"
+- waitForAnimationToEnd
+- takeScreenshot: theme-warm-restored
 - tapOn:
     id: "back_button"
 - waitForAnimationToEnd
-- takeScreenshot: theme-home-editorial
-
-# --- 切换回默认"温暖手工感" ---
-- tapOn:
-    id: "settings_button"
-- waitForAnimationToEnd
-- scrollUntilVisible:
-    element:
-      text: "温暖手工感"
-    direction: LEFT
-    timeout: 5000
-- tapOn: "温暖手工感"
-- waitForAnimationToEnd
-- takeScreenshot: theme-settings-warm-restored

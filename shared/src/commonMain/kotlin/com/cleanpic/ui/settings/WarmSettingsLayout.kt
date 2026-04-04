@@ -76,14 +76,15 @@ fun WarmSettingsLayout(state: SettingsScreenState) {
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(100.dp)
+                        .height(90.dp)
                 ) {
                     items(state.allThemes) { t ->
                         WarmThemeCard(
                             tokens = t,
                             isSelected = t.id == state.theme.id,
                             currentTheme = theme,
-                            onClick = { state.onThemeChange(t.id) }
+                            onClick = { state.onThemeChange(t.id) },
+                            testTag = "theme_${t.id}"
                         )
                     }
                 }
@@ -181,7 +182,8 @@ private fun WarmThemeCard(
     tokens: ThemeTokens,
     isSelected: Boolean,
     currentTheme: ThemeTokens,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    testTag: String = ""
 ) {
     val gradientColors = tokens.gradientMain?.colors?.map { Color(it) }
         ?: listOf(Color(tokens.colorPrimary), Color(tokens.colorAccent))
@@ -196,7 +198,7 @@ private fun WarmThemeCard(
 
     Column(
         modifier = Modifier
-            .width(80.dp)
+            .width(60.dp)
             .shadow(
                 elevation = if (isSelected) 4.dp else 2.dp,
                 shape = RoundedCornerShape(currentTheme.borderRadius.dp),
@@ -206,6 +208,7 @@ private fun WarmThemeCard(
             .then(borderMod)
             .clip(RoundedCornerShape(currentTheme.borderRadius.dp))
             .background(Color.White)
+            .then(if (testTag.isNotEmpty()) Modifier.testTag(testTag) else Modifier)
             .clickable(onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

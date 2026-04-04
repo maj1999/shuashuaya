@@ -91,7 +91,8 @@ fun MinimalSettingsLayout(state: SettingsScreenState) {
                         MinimalThemeBlock(
                             tokens = t,
                             isSelected = t.id == state.theme.id,
-                            onClick = { state.onThemeChange(t.id) }
+                            onClick = { state.onThemeChange(t.id) },
+                            testTag = "theme_${t.id}"
                         )
                     }
                 }
@@ -175,7 +176,8 @@ private fun MinimalSectionLabel(label: String) {
 private fun MinimalThemeBlock(
     tokens: ThemeTokens,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    testTag: String = ""
 ) {
     val gradientColors = tokens.gradientMain?.colors?.map { Color(it) }
         ?: listOf(Color(tokens.colorPrimary), Color(tokens.colorAccent))
@@ -189,6 +191,7 @@ private fun MinimalThemeBlock(
             .border(borderWidth, borderColor, RoundedCornerShape(2.dp))
             .clip(RoundedCornerShape(2.dp))
             .background(Color.White)
+            .then(if (testTag.isNotEmpty()) Modifier.testTag(testTag) else Modifier)
             .clickable(onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

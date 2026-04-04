@@ -22,8 +22,18 @@
 
 ## 测试层
 
-- [x] `testing/strategy.md` — 分层测试策略总览
+- [x] `testing/strategy.md` — 分层测试策略总览（已更新 US-CP-07/07a 追溯）
 - [x] `testing/scenarios/ep1-photo-cleanup.md` — Epic 1 照片清理场景
 - [x] `testing/scenarios/ep2-video-cleanup.md` — Epic 2 视频清理场景
-- [x] `testing/scenarios/ep3-theme-interaction.md` — Epic 3 主题与交互场景
+- [x] `testing/scenarios/ep3-theme-interaction.md` — Epic 3 主题与交互场景（已更新 v2 主题）
 - [x] `testing/scenarios/tech-nfr.md` — NFR 性能/兼容性/安全
+
+## 设计 Spec
+
+- [x] `superpowers/specs/2026-04-04-ui-theme-redesign-design.md` — UI 主题重设计 Spec
+
+## 实现计划
+
+- [x] `superpowers/plans/2026-04-04-ui-theme-redesign-plan-a-infrastructure.md` — Plan A 基础设施
+- [x] `superpowers/plans/2026-04-04-ui-theme-redesign-plan-b-warm-theme.md` — Plan B 温暖主题端到端
+- [x] `superpowers/plans/2026-04-04-ui-theme-redesign-plan-c-remaining-themes.md` — Plan C 剩余 4 主题

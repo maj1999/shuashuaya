@@ -295,9 +295,10 @@ shared/src/commonMain/kotlin/com/cleanpic/
     │   └── EditorialHome.kt
     ├── viewer/
     │   ├── ViewerScreen.kt
-    │   ├── CarouselMode.kt      // 内部根据主题调整视觉参数
+    │   ├── CarouselMode.kt           // 内部根据主题调整视觉参数
     │   ├── SwipeCardMode.kt
-    │   └── FullscreenMode.kt
+    │   ├── FullscreenMode.kt
+    │   └── ThemedActionButton.kt     // 主题化删除/保留按钮（共享组件）
     ├── result/
     │   ├── ResultScreen.kt      // when 分发
     │   ├── MinimalResult.kt
@@ -306,12 +307,9 @@ shared/src/commonMain/kotlin/com/cleanpic/
     │   ├── PlayfulResult.kt
     │   └── EditorialResult.kt
     ├── settings/
-    │   ├── SettingsScreen.kt    // when 分发
-    │   ├── MinimalSettings.kt
-    │   ├── GeometricSettings.kt
-    │   ├── WarmSettings.kt
-    │   ├── PlayfulSettings.kt
-    │   └── EditorialSettings.kt
+    │   ├── SettingsScreen.kt         // 构造 State → 调用共享布局
+    │   ├── SettingsScreenState.kt    // 共享状态接口
+    │   └── SharedSettingsLayout.kt   // 统一布局，文字/间距/结构一致，视觉差异通过 ThemeTokens
     └── common/
         ├── EmptyStateScreen.kt  // 根据主题分发
         ├── PermissionBanner.kt  // 根据主题调整样式
@@ -321,13 +319,17 @@ shared/src/commonMain/kotlin/com/cleanpic/
 ### Viewer 处理方式
 
 Viewer 的 3 种交互模式（CarouselMode/SwipeCardMode/FullscreenMode）不按主题拆分独立文件，而是在现有文件内通过 theme 参数调整：
-- 按钮形状和颜色
+- 按钮形状和颜色（通过 `ThemedActionButton` 共享组件，根据 `theme.buttonStyle` 选择描边/填充/阴影/毛玻璃/文字风格）
 - 进度条样式
 - 卡片圆角和阴影
 - 文件信息显示样式
 - 动画参数
 
 这是因为交互逻辑（拖拽、滑动、手势）是共享的，只有视觉呈现不同。
+
+### 设置页处理方式
+
+设置页使用 `SharedSettingsLayout` 统一布局——所有主题共享相同的文字大小、间距和内容结构（标题 18sp、分区标题 15sp、模式标签 12sp、数量 15sp），确保切换主题时不突兀。视觉差异仅通过 ThemeTokens 驱动：颜色、圆角、字体族（衬线/无衬线）、背景。不按主题拆分独立布局文件。
 
 ## 系统深色模式
 

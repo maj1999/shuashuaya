@@ -228,7 +228,9 @@ fun HomeScreen(router: AppRouter, theme: ThemeTokens, viewModel: ViewerViewModel
 }
 ```
 
-Viewer 的 3 种交互模式不按主题拆分文件，在内部通过 theme 参数调整视觉。
+Viewer 的 3 种交互模式不按主题拆分文件，在内部通过 theme 参数调整视觉。删除/保留按钮通过 `ThemedActionButton` 共享组件实现，根据 `theme.buttonStyle` 自动切换风格（描边/填充/阴影/毛玻璃/文字）。
+
+设置页使用 `SharedSettingsLayout` 统一布局——所有主题共享相同的文字大小和内容结构，视觉差异仅通过 ThemeTokens 驱动（颜色、圆角、字体族、背景），确保切换主题时体验一致。
 
 ## 系统深色模式
 

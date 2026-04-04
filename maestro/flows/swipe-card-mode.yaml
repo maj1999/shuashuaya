@@ -95,6 +95,13 @@ appId: com.cleanpic.android
     duration: 300
 - waitForAnimationToEnd
 
+# 等待结果页加载
+- extendedWaitUntil:
+    visible:
+      text: ".*返回首页"
+    timeout: 10000
+- waitForAnimationToEnd
+
 # 验证结果页
 - assertVisible: "删除"
 - assertVisible: "保留"

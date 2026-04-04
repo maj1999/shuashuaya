@@ -63,7 +63,12 @@ appId: com.cleanpic.android
     id: "settings_button"
 - waitForAnimationToEnd
 
-# --- 切换到"杂志排版" ---
+# --- 切换到"杂志排版"（可能需要滚动才能看到）---
+- scrollUntilVisible:
+    element:
+      text: "杂志排版"
+    direction: RIGHT
+    timeout: 5000
 - tapOn: "杂志排版"
 - waitForAnimationToEnd
 - takeScreenshot: theme-settings-editorial
@@ -77,6 +82,11 @@ appId: com.cleanpic.android
 - tapOn:
     id: "settings_button"
 - waitForAnimationToEnd
-- tapOn: "温���手工感"
+- scrollUntilVisible:
+    element:
+      text: "温暖手工感"
+    direction: LEFT
+    timeout: 5000
+- tapOn: "温暖手工感"
 - waitForAnimationToEnd
 - takeScreenshot: theme-settings-warm-restored

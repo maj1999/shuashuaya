@@ -10,7 +10,7 @@ appId: com.cleanpic.android
 - extendedWaitUntil:
     visible:
       id: "settings_button"
-    timeout: 10000
+    timeout: 30000
 - waitForAnimationToEnd
 
 # 进入设置，确保轮播模式

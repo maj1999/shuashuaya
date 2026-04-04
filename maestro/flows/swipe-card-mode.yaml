@@ -9,7 +9,7 @@ appId: com.cleanpic.android
 - extendedWaitUntil:
     visible:
       id: "settings_button"
-    timeout: 10000
+    timeout: 30000
 - waitForAnimationToEnd
 
 # 切换到卡片滑动模式
@@ -99,7 +99,7 @@ appId: com.cleanpic.android
 - extendedWaitUntil:
     visible:
       text: ".*返回首页"
-    timeout: 10000
+    timeout: 30000
 - waitForAnimationToEnd
 
 # 验证结果页

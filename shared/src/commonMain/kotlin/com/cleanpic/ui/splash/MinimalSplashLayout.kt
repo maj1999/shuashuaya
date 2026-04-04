@@ -42,12 +42,7 @@ fun MinimalSplashLayout(state: SplashScreenState) {
                 modifier = Modifier.size(64.dp),
                 contentAlignment = Alignment.Center
             ) {
-                com.cleanpic.icons.IconPainter(
-                    name = "photo",
-                    theme = theme,
-                    size = 40.dp,
-                    colorOverride = 0xFF666666
-                )
+                com.cleanpic.icons.LogoPainter(size = 56.dp)
             }
 
             Spacer(modifier = Modifier.height(20.dp))

@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.cleanpic.icons.IconPainter
+import com.cleanpic.icons.LogoPainter
 
 @Composable
 fun WarmSplashLayout(state: SplashScreenState) {
@@ -61,7 +61,7 @@ fun WarmSplashLayout(state: SplashScreenState) {
                     .background(Color.White),
                 contentAlignment = Alignment.Center
             ) {
-                IconPainter("photo", theme, size = 40.dp)
+                LogoPainter(size = 56.dp)
             }
             Spacer(modifier = Modifier.height(16.dp))
             // 衬线字体 "刷刷鸭"（18sp）

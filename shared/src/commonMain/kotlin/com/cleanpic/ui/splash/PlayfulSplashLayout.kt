@@ -20,7 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.cleanpic.icons.IconPainter
+import com.cleanpic.icons.LogoPainter
 
 @Composable
 fun PlayfulSplashLayout(state: SplashScreenState) {
@@ -71,12 +71,7 @@ fun PlayfulSplashLayout(state: SplashScreenState) {
                     .border(1.dp, Color(0x33FFFFFF), RoundedCornerShape(28.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                IconPainter(
-                    name = "photo",
-                    theme = state.theme,
-                    size = 44.dp,
-                    colorOverride = 0xFFFFFFFF.toLong()
-                )
+                LogoPainter(size = 56.dp)
             }
 
             Spacer(modifier = Modifier.height(20.dp))

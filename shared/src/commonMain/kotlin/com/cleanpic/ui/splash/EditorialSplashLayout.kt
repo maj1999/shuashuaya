@@ -13,7 +13,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.cleanpic.icons.IconPainter
+import com.cleanpic.icons.LogoPainter
 
 private val EditorialBg = Color(0xFFFFFFF5)
 private val EditorialText = Color(0xFF1A1A1A)
@@ -95,13 +95,8 @@ fun EditorialSplashLayout(state: SplashScreenState) {
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // 淡色相机图标
-            IconPainter(
-                name = "photo",
-                theme = theme,
-                size = 24.dp,
-                colorOverride = 0xFFCCCCCC
-            )
+            // 鸭子 logo 图标
+            LogoPainter(size = 56.dp)
         }
     }
 }

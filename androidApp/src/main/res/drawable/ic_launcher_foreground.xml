@@ -1,124 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     CleanPic 自适应图标前景层
-    设计：倾斜照片卡片 + 金色闪光星 ✨
-    传达：优雅的照片清理体验，而非冷冰冰的工具
+    设计：暖色鸭子 + 消散照片/视频 + sparkle
+    素材：SVG Repo Small Duck（CC0 公共领域）
     画布 108dp，安全区中心 72dp
 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- ==================== 照片卡片（倾斜 -8°）==================== -->
-    <group
-        android:pivotX="46"
-        android:pivotY="58"
-        android:rotation="-8">
+    <!-- ==================== 消散中的照片/视频（鸭子右上方） ==================== -->
 
-        <!-- 卡片投影（柔和阴影感） -->
-        <group
-            android:translateX="1.5"
-            android:translateY="2">
-            <path
-                android:pathData="M30,38 C30,35 32.5,33 35.5,33 L58.5,33 C61.5,33 64,35 64,38 L64,74 C64,77 61.5,79 58.5,79 L35.5,79 C32.5,79 30,77 30,74 Z"
-                android:fillColor="#3A1A9E"
-                android:fillAlpha="0.2" />
-        </group>
-
-        <!-- 主卡片（白色，大圆角） -->
+    <!-- 照片 1（较实） -->
+    <group android:translateX="68" android:translateY="16" android:rotation="8"
+        android:pivotX="8" android:pivotY="6">
         <path
-            android:pathData="M30,38 C30,35 32.5,33 35.5,33 L58.5,33 C61.5,33 64,35 64,38 L64,74 C64,77 61.5,79 58.5,79 L35.5,79 C32.5,79 30,77 30,74 Z"
+            android:pathData="M0,0 L16,0 C17.1,0 18,0.9 18,2 L18,12 C18,13.1 17.1,14 16,14 L2,14 C0.9,14 0,13.1 0,12 L0,2 C0,0.9 0.9,0 2,0 Z"
             android:fillColor="#FFFFFF"
-            android:fillAlpha="0.95" />
-
-        <!-- 卡片顶部高光（玻璃感） -->
+            android:fillAlpha="0.7" />
         <path
-            android:pathData="M30,38 C30,35 32.5,33 35.5,33 L58.5,33 C61.5,33 64,35 64,38 L64,42 L30,42 Z"
-            android:fillColor="#FFFFFF"
-            android:fillAlpha="0.3" />
-
-        <!-- 照片内容：柔和山景（薰衣草色，呼应主题） -->
-        <path
-            android:pathData="M30,67 L40,56 L47,62 L56,50 L64,62 L64,74 C64,77 61.5,79 58.5,79 L35.5,79 C32.5,79 30,77 30,74 Z">
-            <aapt:attr name="android:fillColor">
-                <gradient
-                    android:type="linear"
-                    android:startX="30"
-                    android:startY="50"
-                    android:endX="64"
-                    android:endY="79"
-                    android:startColor="#D4C5F0"
-                    android:endColor="#E8DFF5" />
-            </aapt:attr>
-        </path>
-
-        <!-- 远山（更淡的层次） -->
-        <path
-            android:pathData="M30,71 L38,63 L44,67 L50,60 L58,66 L64,62 L64,74 C64,77 61.5,79 58.5,79 L35.5,79 C32.5,79 30,77 30,74 Z"
-            android:fillColor="#C9B8E8"
+            android:pathData="M1,1 L17,1 L17,9 L1,9 Z"
+            android:fillColor="#FFECD2"
             android:fillAlpha="0.5" />
-
-        <!-- 太阳（暖金色小圆） -->
-        <path
-            android:pathData="M56,43 m-3.5,0 a3.5,3.5 0 1,1 7,0 a3.5,3.5 0 1,1 -7,0"
-            android:fillColor="#FFE082" />
-
-        <!-- 太阳光晕 -->
-        <path
-            android:pathData="M56,43 m-5.5,0 a5.5,5.5 0 1,1 11,0 a5.5,5.5 0 1,1 -11,0"
-            android:fillColor="#FFE082"
-            android:fillAlpha="0.15" />
-
     </group>
 
-    <!-- ==================== ✨ 闪光星群（金色，代表清爽焕新） ==================== -->
+    <!-- 照片 2（半透明，含播放三角=视频） -->
+    <group android:translateX="76" android:translateY="28" android:rotation="-5"
+        android:pivotX="7" android:pivotY="5">
+        <path
+            android:pathData="M0,0 L14,0 C15.1,0 16,0.9 16,2 L16,10 C16,11.1 15.1,12 14,12 L2,12 C0.9,12 0,11.1 0,10 L0,2 C0,0.9 0.9,0 2,0 Z"
+            android:fillColor="#FFFFFF"
+            android:fillAlpha="0.4" />
+        <!-- 播放三角 -->
+        <path
+            android:pathData="M5,3 L5,9 L11,6 Z"
+            android:fillColor="#D4A574"
+            android:fillAlpha="0.45" />
+    </group>
 
-    <!-- 主星：大四角星 -->
-    <path
-        android:pathData="M74,32 L77.5,21 L81,32 L92,35.5 L81,39 L77.5,50 L74,39 L63,35.5 Z"
-        android:fillColor="#FFD54F" />
+    <!-- 照片 3（快消失） -->
+    <group android:translateX="82" android:translateY="40" android:rotation="12"
+        android:pivotX="5" android:pivotY="4">
+        <path
+            android:pathData="M0,0 L10,0 C11.1,0 12,0.9 12,2 L12,8 C12,9.1 11.1,10 10,10 L2,10 C0.9,10 0,9.1 0,8 L0,2 C0,0.9 0.9,0 2,0 Z"
+            android:fillColor="#FFFFFF"
+            android:fillAlpha="0.2" />
+    </group>
 
-    <!-- 主星中心高光 -->
-    <path
-        android:pathData="M76,34 L77.5,29 L79,34 L84,35.5 L79,37 L77.5,42 L76,37 L71,35.5 Z"
-        android:fillColor="#FFF8E1"
-        android:fillAlpha="0.6" />
+    <!-- ==================== 鸭子主体 ==================== -->
 
-    <!-- 中星 -->
-    <path
-        android:pathData="M87,21 L88.5,16 L90,21 L95,22.5 L90,24 L88.5,29 L87,24 L82,22.5 Z"
-        android:fillColor="#FFE082"
-        android:fillAlpha="0.85" />
+    <group android:scaleX="0.344" android:scaleY="0.344"
+        android:translateX="18" android:translateY="12">
+        <path
+            android:pathData="M105.572,101.811c9.889,-6.368 27.417,-16.464 28.106,-42.166c0.536,-20.278 -9.971,-49.506 -49.155,-50.878C53.041,7.659 39.9,28.251 36.071,46.739l-0.928,-0.126c-1.932,0 -3.438,1.28 -5.34,2.889c-2.084,1.784 -4.683,3.979 -7.792,4.308c-3.573,0.361 -8.111,-1.206 -11.698,-2.449c-4.193,-1.431 -6.624,-2.047 -8.265,-0.759c-1.503,1.163 -2.178,3.262 -2.028,6.226c0.331,6.326 4.971,18.917 16.016,25.778c7.67,4.765 16.248,5.482 20.681,5.482c0.006,0 0.006,0 0.006,0c2.37,0 4.945,-0.239 7.388,-0.726c2.741,4.218 5.228,7.476 6.037,9.752c2.054,5.851 -27.848,25.087 -27.848,55.01c0,29.916 22.013,48.475 56.727,48.475h55.004c30.593,0 70.814,-29.908 75.291,-92.48C180.781,132.191 167.028,98.15 105.572,101.811z"
+            android:fillColor="#FFD54F" />
 
-    <!-- 小星 -->
-    <path
-        android:pathData="M64,23 L65,20 L66,23 L69,24 L66,25 L65,28 L64,25 L61,24 Z"
-        android:fillColor="#FFF8E1"
-        android:fillAlpha="0.7" />
+        <path
+            android:pathData="M18.941,77.945C8.775,71.617 4.992,58.922 5.294,55.525c0.897,0.24 2.194,0.689 3.228,1.042c4.105,1.415 9.416,3.228 14.068,2.707c4.799,-0.499 8.253,-3.437 10.778,-5.574c0.607,-0.509 1.393,-1.176 1.872,-1.491c0.87,0.315 0.962,0.693 1.176,3.14c0.196,2.26 0.473,5.37 2.362,9.006c1.437,2.761 3.581,5.705 5.646,8.542c1.701,2.336 4.278,5.871 4.535,6.404c-0.445,1.184 -4.907,3.282 -12.229,3.282C30.177,82.591 23.69,80.904 18.941,77.945z"
+            android:fillColor="#FF8F00" />
 
-    <!-- 微小星 -->
-    <path
-        android:pathData="M90,38 L90.8,36 L91.5,38 L93.5,38.7 L91.5,39.5 L90.8,41.5 L90,39.5 L88,38.7 Z"
-        android:fillColor="#FFE082"
-        android:fillAlpha="0.5" />
+        <path
+            android:pathData="M149.159,155.398l-20.63,11.169l13.408,9.293c0,0 -49.854,15.813 -72.198,-6.885c-11.006,-11.16 -13.06,-28.533 4.124,-38.84c17.184,-10.312 84.609,3.943 84.609,3.943L134.295,147.8L149.159,155.398z"
+            android:fillColor="#FFCA28" />
 
-    <!-- 光点散粒 -->
-    <path
-        android:pathData="M70,44 m-1.2,0 a1.2,1.2 0 1,1 2.4,0 a1.2,1.2 0 1,1 -2.4,0"
-        android:fillColor="#FFE082"
-        android:fillAlpha="0.5" />
+        <path
+            android:pathData="M65.8,49.4 m-8.9,0 a8.9,8.9 0 1,1 17.8,0 a8.9,8.9 0 1,1 -17.8,0"
+            android:fillColor="#3E2723" />
+
+        <path
+            android:pathData="M63,46.5 m-3.5,0 a3.5,3.5 0 1,1 7,0 a3.5,3.5 0 1,1 -7,0"
+            android:fillColor="#FFFFFF"
+            android:fillAlpha="0.85" />
+
+        <path
+            android:pathData="M50,72 m-8,0 a8,5 0 1,1 16,0 a8,5 0 1,1 -16,0"
+            android:fillColor="#FFAB91"
+            android:fillAlpha="0.35" />
+    </group>
+
+    <!-- ==================== Sparkle 闪光星 ==================== -->
 
     <path
-        android:pathData="M83,14 m-1,0 a1,1 0 1,1 2,0 a1,1 0 1,1 -2,0"
-        android:fillColor="#FFF8E1"
+        android:pathData="M92,18 L93.5,14 L95,18 L99,19.5 L95,21 L93.5,25 L92,21 L88,19.5 Z"
+        android:fillColor="#FFB300"
+        android:fillAlpha="0.65" />
+
+    <path
+        android:pathData="M86,10 L87,8 L88,10 L90,11 L88,12 L87,14 L86,12 L84,11 Z"
+        android:fillColor="#FFB300"
         android:fillAlpha="0.4" />
 
     <path
-        android:pathData="M60,16 m-0.8,0 a0.8,0.8 0 1,1 1.6,0 a0.8,0.8 0 1,1 -1.6,0"
-        android:fillColor="#FFFFFF"
-        android:fillAlpha="0.35" />
+        android:pathData="M97,28 L97.5,26.5 L98,28 L99.5,28.5 L98,29 L97.5,30.5 L97,29 L95.5,28.5 Z"
+        android:fillColor="#FFB300"
+        android:fillAlpha="0.3" />
 
 </vector>

@@ -12,6 +12,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cleanpic.icons.IconPainter
 import com.cleanpic.theme.ThemeTokens
 
 @Composable
@@ -25,7 +26,7 @@ fun PermissionBanner(theme: ThemeTokens, onClick: () -> Unit) {
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = "⚠️", fontSize = 16.sp)
+        IconPainter("warning", theme, size = 16.dp)
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = "当前仅能访问部分照片，点击授权全部",

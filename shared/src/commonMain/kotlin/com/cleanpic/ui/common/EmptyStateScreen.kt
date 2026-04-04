@@ -12,12 +12,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cleanpic.icons.IconPainter
 import com.cleanpic.model.MediaType
 import com.cleanpic.theme.ThemeTokens
 
 @Composable
 fun EmptyStateScreen(theme: ThemeTokens, type: MediaType, onBack: () -> Unit) {
-    val emoji = if (type == MediaType.PHOTO) "📷" else "🎬"
+    val iconName = if (type == MediaType.PHOTO) "photo" else "video"
     val message = if (type == MediaType.PHOTO) "相册空空如也" else "没有视频"
 
     Column(
@@ -27,7 +28,7 @@ fun EmptyStateScreen(theme: ThemeTokens, type: MediaType, onBack: () -> Unit) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = emoji, fontSize = 72.sp)
+        IconPainter(iconName, theme, size = 72.dp)
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = message,

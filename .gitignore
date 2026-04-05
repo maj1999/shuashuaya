@@ -16,6 +16,7 @@ build/
 
 # Local config
 local.properties
+.env
 
 # Logs
 logs/

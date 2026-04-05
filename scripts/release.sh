@@ -106,17 +106,17 @@ echo "  ✅ GitHub Release 创建成功"
 echo ""
 echo "【6/6】更新 Cloudflare Worker..."
 
-# 更新 worker/src/index.js 中的版本号和 changelog
-sed -i '' "s/\"version\": \"[^\"]*\"/\"version\": \"${VERSION}\"/g" "$WORKER_CONFIG"
-sed -i '' "s/\"changelog\": \"[^\"]*\"/\"changelog\": \"${CHANGELOG}\"/g" "$WORKER_CONFIG"
-sed -i '' "s/\"versionCode\": [0-9]*/\"versionCode\": ${NEW_CODE}/" "$WORKER_CONFIG"
+# 更新 worker/src/index.js 中的版本号和 changelog（JS 对象 key 无引号）
+sed -i '' "s/version: \"[^\"]*\"/version: \"${VERSION}\"/g" "$WORKER_CONFIG"
+sed -i '' "s/changelog: \"[^\"]*\"/changelog: \"${CHANGELOG}\"/g" "$WORKER_CONFIG"
+sed -i '' "s/versionCode: [0-9]*/versionCode: ${NEW_CODE}/" "$WORKER_CONFIG"
 
 cd "$WORKER_DIR"
 if [ -z "${CLOUDFLARE_API_TOKEN:-}" ]; then
     echo "  ⚠️  未设置 CLOUDFLARE_API_TOKEN，跳过自动部署"
     echo "  请手动运行: cd worker && CLOUDFLARE_API_TOKEN=你的token npx wrangler deploy"
 else
-    npx wrangler deploy --quiet
+    npx wrangler deploy
     echo "  ✅ Worker 部署成功"
 fi
 

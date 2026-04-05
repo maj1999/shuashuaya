@@ -264,3 +264,12 @@ object ServiceLocator {
 | cloudflare | `worker/` | 新增（Workers 脚本 + wrangler 配置） |
 | docs | `architecture/overview.md` | 修改（更新"纯本地"描述） |
 | docs | `architecture/domain-model.md` | 修改（添加更新相关术语） |
+
+## 部署与配置
+
+详见 [自动更新部署与配置指南](../../deployment/auto-update-setup.md)，包含：
+- Cloudflare Workers 首次部署步骤
+- 项目环境变量配置（`.env`）
+- 发布新版本的一键脚本使用说明
+- Fork 项目用户指南
+- 故障排查

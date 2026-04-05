@@ -20,6 +20,10 @@
 - [x] `architecture/cleanpic/theme-system.md` — 主题系统设计
 - [x] `architecture/cleanpic/native-modules.md` — 原生 Module 设计
 
+## 部署层
+
+- [x] `deployment/auto-update-setup.md` — 自动更新部署与配置指南
+
 ## 测试层
 
 - [x] `testing/strategy.md` — 分层测试策略总览（已更新 US-CP-07/07a 追溯）

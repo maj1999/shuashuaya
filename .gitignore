@@ -25,6 +25,9 @@ logs/
 .DS_Store
 Thumbs.db
 
+# Node
+node_modules/
+
 # Superpowers / Claude
 .superpowers/
 

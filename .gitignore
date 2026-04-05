@@ -37,6 +37,9 @@ androidApp/libs/
 maestro/screenshots/*
 !maestro/screenshots/.gitkeep
 
+# Maestro test photos (generated locally)
+maestro/test-photos/
+
 # Test assets (generated locally, not tracked)
 test-assets/**/*.jpg
 test-assets/**/*.png

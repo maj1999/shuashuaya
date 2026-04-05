@@ -5,6 +5,7 @@
 #
 appId: com.cleanpic.android
 ---
+- stopApp
 - launchApp
 - extendedWaitUntil:
     visible:
@@ -17,6 +18,8 @@ appId: com.cleanpic.android
     id: "settings_button"
 - waitForAnimationToEnd
 - tapOn: "轮播相册"
+- waitForAnimationToEnd
+- tapOn: "5"
 - waitForAnimationToEnd
 - tapOn:
     id: "back_button"
@@ -39,7 +42,7 @@ appId: com.cleanpic.android
     optional: true
 - waitForAnimationToEnd
 
-# 混合操作：5 删除 + 5 保留（确保释放值有单位）
+# 混合操作：3 删除 + 2 保留（确保释放值有单位）
 - tapOn:
     id: "delete_button"
 - waitForAnimationToEnd
@@ -48,21 +51,6 @@ appId: com.cleanpic.android
 - waitForAnimationToEnd
 - tapOn:
     id: "delete_button"
-- waitForAnimationToEnd
-- tapOn:
-    id: "delete_button"
-- waitForAnimationToEnd
-- tapOn:
-    id: "delete_button"
-- waitForAnimationToEnd
-- tapOn:
-    id: "keep_button"
-- waitForAnimationToEnd
-- tapOn:
-    id: "keep_button"
-- waitForAnimationToEnd
-- tapOn:
-    id: "keep_button"
 - waitForAnimationToEnd
 - tapOn:
     id: "keep_button"

@@ -12,6 +12,8 @@ import com.cleanpic.media.AndroidVideoPlayer
 import com.cleanpic.permission.AndroidPermission
 import com.cleanpic.settings.AndroidAppSettings
 import com.cleanpic.ui.CleanPicApp
+import com.cleanpic.update.AndroidUpdateInstaller
+import com.cleanpic.update.UpdateChecker
 
 class MainActivity : ComponentActivity() {
 
@@ -47,7 +49,13 @@ class MainActivity : ComponentActivity() {
             mediaRepo = AndroidMediaRepository(applicationContext),
             settings = AndroidAppSettings(applicationContext),
             permission = androidPermission,
-            player = AndroidVideoPlayer()
+            player = AndroidVideoPlayer(),
+            updater = if (BuildConfig.ENABLE_UPDATE_CHECK) {
+                UpdateChecker(BuildConfig.UPDATE_API_URL)
+            } else null,
+            installer = if (BuildConfig.ENABLE_UPDATE_CHECK) {
+                AndroidUpdateInstaller(applicationContext)
+            } else null
         )
 
         setContent {

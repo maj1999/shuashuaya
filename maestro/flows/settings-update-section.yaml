@@ -1,0 +1,47 @@
+# maestro/flows/settings-update-section.yaml
+#
+# E2E: 设置页版本更新区域 — 验证 UI 元素存在
+# 对应: US-CP-14, US-CP-16
+#
+appId: com.cleanpic.android
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 30000
+- waitForAnimationToEnd
+
+# 进入设置页
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+
+# 验证自动检查更新开关存在
+- assertVisible:
+    id: "auto_check_update_toggle"
+
+# 验证检查更新按钮存在
+- assertVisible:
+    id: "check_update_button"
+
+# 截图记录
+- takeScreenshot: maestro/screenshots/settings-update-section
+
+# 点击检查更新按钮
+- tapOn:
+    id: "check_update_button"
+
+# 等待检查结果（网络请求可能失败，但结果消息应该出现）
+- extendedWaitUntil:
+    visible:
+      id: "check_result_message"
+    timeout: 10000
+
+- takeScreenshot: maestro/screenshots/settings-update-check-result
+
+# 返回首页
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd

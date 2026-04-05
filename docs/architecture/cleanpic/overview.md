@@ -8,6 +8,7 @@
 |--------|------|------|
 | 主题系统 | [theme-system.md](theme-system.md) | Token 定义与 5 套主题 |
 | 原生 Module | [native-modules.md](native-modules.md) | 各平台 MediaModule/权限/视频播放 |
+| 自动升级 | [auto-update.md](auto-update.md) | UpdateChecker/UpdateInstaller + Cloudflare Workers |
 
 ## 数据流
 
@@ -95,6 +96,7 @@
 theme: String           — 默认 "dreamy-gradient"
 interactionMode: String — 默认 "carousel"
 roundCount: Int         — 默认 10，可选 5/10/15/20
+autoCheckUpdate: Boolean — 默认 true，是否启动时自动检查更新
 ```
 
 ### 各平台存储方案

@@ -4,6 +4,7 @@ interface AppSettings {
     var theme: String
     var interactionMode: String
     var roundCount: Int
+    var autoCheckUpdate: Boolean
 }
 
 private val VALID_COUNTS = setOf(5, 10, 15, 20)
@@ -11,6 +12,7 @@ private val VALID_COUNTS = setOf(5, 10, 15, 20)
 open class InMemoryAppSettings : AppSettings {
     override var theme: String = "warm"
     override var interactionMode: String = "carousel"
+    override var autoCheckUpdate: Boolean = true
 
     private var _roundCount: Int = 10
     override var roundCount: Int

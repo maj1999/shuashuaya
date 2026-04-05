@@ -7,3 +7,4 @@
 | US-CP-07, 07a, 08, 09 | EP3: 主题与个性化 | cleanpic | [cleanpic.md](cleanpic.md) | ⚙️ 进行中 |
 | US-CP-10 ~ 11 | EP4: 设置与偏好 | cleanpic | [cleanpic.md](cleanpic.md) | 待开始 |
 | US-CP-12 | EP5: 浏览体验增强 | cleanpic | [cleanpic.md](cleanpic.md) | 待开始 |
+| US-CP-13 ~ 16 | EP6: 自动升级 | cleanpic | [cleanpic.md](cleanpic.md) | 待开始 |

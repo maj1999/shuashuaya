@@ -26,4 +26,8 @@ class AndroidAppSettings(context: Context) : AppSettings {
                 prefs.edit().putInt("round_count", value).apply()
             }
         }
+
+    override var autoCheckUpdate: Boolean
+        get() = prefs.getBoolean("auto_check_update", true)
+        set(value) = prefs.edit().putBoolean("auto_check_update", value).apply()
 }

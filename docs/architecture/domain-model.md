@@ -24,6 +24,13 @@
 | 交互模式 | InteractionMode | 浏览页的操作方式（轮播/卡片/全屏） |
 | 设置 | AppSettings | 持久化的用户偏好（主题/模式/数量） |
 | 已展示集合 | shownIds (SessionState) | 本次会话中已展示过的媒体 ID 集合，用于去重 |
+| 版本检查 | UpdateChecker.checkForUpdate() | 请求远程 API 获取最新版本信息并与本地版本比较 |
+| 更新信息 | UpdateInfo | 包含版本号、下载地址、是否强制、更新日志的数据结构 |
+| 强制更新 | UpdateStatus.FORCE_UPDATE | 用户必须更新才能继续使用（不可关闭弹窗） |
+| 可选更新 | UpdateStatus.OPTIONAL_UPDATE | 用户可选择稍后提醒 |
+| 下载安装 | UpdateInstaller.startUpdate() | 各平台独立实现的更新包下载与安装 |
+| 版本 API | Cloudflare Workers /api/version | 返回各平台最新版本信息的远程接口 |
+| 下载代理 | Cloudflare Workers /download/ | 代理 GitHub Release 资源下载，解决国内访问 |
 
 ## 核心数据模型
 

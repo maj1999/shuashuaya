@@ -5,6 +5,7 @@
 #
 appId: com.cleanpic.android
 ---
+- stopApp
 - launchApp
 - extendedWaitUntil:
     visible:

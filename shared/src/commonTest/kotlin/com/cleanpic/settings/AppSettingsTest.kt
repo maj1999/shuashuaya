@@ -22,4 +22,15 @@ class AppSettingsTest {
         settings.roundCount = 99
         assertEquals(10, settings.roundCount)
     }
+
+    @Test fun auto_check_update_defaults_to_true() {
+        val settings = InMemoryAppSettings()
+        assertEquals(true, settings.autoCheckUpdate)
+    }
+
+    @Test fun auto_check_update_write_and_read() {
+        val settings = InMemoryAppSettings()
+        settings.autoCheckUpdate = false
+        assertEquals(false, settings.autoCheckUpdate)
+    }
 }

@@ -4,6 +4,7 @@
 #
 appId: com.cleanpic.android
 ---
+- stopApp
 - launchApp
 - extendedWaitUntil:
     visible:
@@ -16,6 +17,8 @@ appId: com.cleanpic.android
     id: "settings_button"
 - waitForAnimationToEnd
 - tapOn: "轮播相册"
+- waitForAnimationToEnd
+- tapOn: "5"
 - waitForAnimationToEnd
 - tapOn:
     id: "back_button"
@@ -38,21 +41,6 @@ appId: com.cleanpic.android
     optional: true
 - waitForAnimationToEnd
 
-- tapOn:
-    id: "keep_button"
-- waitForAnimationToEnd
-- tapOn:
-    id: "keep_button"
-- waitForAnimationToEnd
-- tapOn:
-    id: "keep_button"
-- waitForAnimationToEnd
-- tapOn:
-    id: "keep_button"
-- waitForAnimationToEnd
-- tapOn:
-    id: "keep_button"
-- waitForAnimationToEnd
 - tapOn:
     id: "keep_button"
 - waitForAnimationToEnd

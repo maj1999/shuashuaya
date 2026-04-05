@@ -1,0 +1,40 @@
+# maestro/flows/auto-check-update-toggle.yaml
+#
+# E2E: 关闭/开启自动检查更新开关
+# 对应: US-CP-16
+#
+appId: com.cleanpic.android
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 30000
+- waitForAnimationToEnd
+
+# 进入设置页
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+
+# 确认开关存在且默认开启
+- assertVisible:
+    id: "auto_check_update_toggle"
+
+# 点击关闭自动检查更新
+- tapOn:
+    id: "auto_check_update_toggle"
+- waitForAnimationToEnd
+- takeScreenshot: maestro/screenshots/auto-check-update-off
+
+# 点击重新开启
+- tapOn:
+    id: "auto_check_update_toggle"
+- waitForAnimationToEnd
+- takeScreenshot: maestro/screenshots/auto-check-update-on
+
+# 返回
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd

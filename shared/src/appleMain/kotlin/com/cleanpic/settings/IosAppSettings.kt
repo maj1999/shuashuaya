@@ -28,4 +28,14 @@ class IosAppSettings : AppSettings {
                 defaults.setInteger(value.toLong(), forKey = "round_count")
             }
         }
+
+    override var autoCheckUpdate: Boolean
+        get() {
+            // NSUserDefaults returns false for unset booleans, so use object check for default=true
+            val obj = defaults.objectForKey("auto_check_update")
+            return if (obj == null) true else defaults.boolForKey("auto_check_update")
+        }
+        set(value) {
+            defaults.setBool(value, forKey = "auto_check_update")
+        }
 }

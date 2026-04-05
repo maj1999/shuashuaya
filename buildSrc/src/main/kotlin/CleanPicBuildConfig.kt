@@ -24,6 +24,10 @@ object Versions {
     // Media
     const val COIL = "3.0.4"
     const val MEDIA3 = "1.3.1"
+
+    // Network
+    const val KTOR = "3.1.1"
+    const val KOTLINX_SERIALIZATION = "1.7.3"
 }
 
 object Deps {
@@ -48,4 +52,6 @@ object AppConfig {
     const val GROUP = "com.cleanpic"
     const val VERSION_NAME = "1.1.1"
     const val VERSION_CODE = 12
+    const val UPDATE_API_URL = "https://cleanpic-update.workers.dev"
+    const val ENABLE_UPDATE_CHECK = true
 }

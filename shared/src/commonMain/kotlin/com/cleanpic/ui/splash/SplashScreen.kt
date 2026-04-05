@@ -1,13 +1,30 @@
 package com.cleanpic.ui.splash
 
 import androidx.compose.runtime.*
+import com.cleanpic.di.ServiceLocator
 import com.cleanpic.theme.ThemeLayoutId
 import com.cleanpic.theme.ThemeTokens
+import com.cleanpic.update.UpdateCheckResult
+import com.cleanpic.update.UpdateStatus
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun SplashScreen(theme: ThemeTokens, onFinished: () -> Unit) {
     LaunchedEffect(Unit) {
+        // 启动时后台检查更新（如果启用）
+        launch {
+            val checker = ServiceLocator.updateChecker
+            val settings = ServiceLocator.appSettings
+            if (checker != null && settings.autoCheckUpdate) {
+                try {
+                    val result = checker.checkForUpdate()
+                    ServiceLocator.cachedUpdateResult = result
+                } catch (_: Exception) {
+                    // 静默失败
+                }
+            }
+        }
         delay(1500L)
         onFinished()
     }

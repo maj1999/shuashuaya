@@ -10,7 +10,7 @@
 | 原生性能 | 照片/视频加载零桥接开销，动画 >= 55fps |
 | 可主题化 | 语义化 Token 架构，5 套主题（各含独立布局）一键切换，所有图标为矢量绘制 |
 | 安全删除 | 批量延迟删除，1 次系统弹窗，支持反悔 |
-| 纯本地 | 无网络请求，不收集任何用户数据 |
+| 近本地 | 除版本检查外无网络请求，不收集任何用户数据 |
 
 ## 架构图
 
@@ -22,6 +22,7 @@ graph TB
         Interaction["interaction/<br/>Carousel / SwipeCard<br/>Fullscreen"]
         Media["media/<br/>MediaRepository<br/>RandomPicker"]
         Settings["settings/<br/>AppSettings"]
+        Update["update/<br/>UpdateChecker<br/>UpdateInstaller"]
     end
 
     subgraph "android/"
@@ -49,6 +50,7 @@ graph TB
     UI --> Interaction
     UI --> Media
     UI --> Settings
+    UI --> Update
     Media --> A_Media & I_Media & H_Media
     Settings --> A_Store & I_Store & H_Store
 ```
@@ -69,6 +71,8 @@ graph TB
 | RandomPicker | 随机不重复选取 + 会话级去重 | shared |
 | AppSettings | 偏好持久化的跨平台抽象 (expect/actual) | shared + 各平台 |
 | VideoPlayer | 视频播放的跨平台抽象 (expect/actual) | shared + 各平台 |
+| UpdateChecker | 版本检查逻辑（调用远程 API，比较版本号） | shared |
+| UpdateInstaller | 下载安装更新的跨平台抽象 (expect/actual) | shared + 各平台 |
 
 ## 子文档导航
 
@@ -77,6 +81,7 @@ graph TB
 | 数据流与状态 | [cleanpic/overview.md](cleanpic/overview.md) | 数据流、导航栈、状态管理、删除策略、持久化 |
 | 主题系统 | [cleanpic/theme-system.md](cleanpic/theme-system.md) | Token 定义（v2：含布局标识+图标参数）、5 套新主题、矢量图标系统、页面分发架构 |
 | 原生 Module | [cleanpic/native-modules.md](cleanpic/native-modules.md) | MediaModule/PermissionModule/VideoPlayer 各平台实现 |
+| 自动升级 | [cleanpic/auto-update.md](cleanpic/auto-update.md) | UpdateChecker/UpdateInstaller + Cloudflare Workers 后端 |
 | 技术栈选型 | [tech-stack.md](tech-stack.md) | 框架选型对比与最终决策 |
 | 领域模型 | [domain-model.md](domain-model.md) | 业务术语 <-> 技术术语映射 SSOT |
 
@@ -100,8 +105,8 @@ cleanpic/
 
 ## 安全与隐私
 
-- 纯本地处理，无网络请求，不收集任何用户数据
-- 仅申请相册读取和删除权限，不申请无关权限
+- 除版本检查外纯本地处理，版本检查仅传输当前版本号和平台标识，不收集任何用户数据
+- 仅申请相册读取和删除权限及网络权限（用于版本检查），不申请无关权限
 - 上架前准备隐私政策文档
 
 ## 无障碍设计

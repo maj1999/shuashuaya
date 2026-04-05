@@ -1,5 +1,7 @@
 package com.cleanpic.ui.settings
 
+import com.cleanpic.AppInfo
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -172,7 +174,7 @@ fun PlayfulSettingsLayout(state: SettingsScreenState) {
                     ) {
                         Column {
                             Text(
-                                text = "刷刷鸭 v1.0.0",
+                                text = AppInfo.displayVersion,
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = Color.White

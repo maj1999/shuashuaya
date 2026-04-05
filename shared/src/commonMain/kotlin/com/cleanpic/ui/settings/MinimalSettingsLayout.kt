@@ -1,5 +1,7 @@
 package com.cleanpic.ui.settings
 
+import com.cleanpic.AppInfo
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -149,7 +151,7 @@ fun MinimalSettingsLayout(state: SettingsScreenState) {
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(
-                    text = "刷刷鸭 v1.0.0",
+                    text = AppInfo.displayVersion,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Light,
                     color = Color(0xFFBBBBBB),

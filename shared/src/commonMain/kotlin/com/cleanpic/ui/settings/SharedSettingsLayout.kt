@@ -1,5 +1,7 @@
 package com.cleanpic.ui.settings
 
+import com.cleanpic.AppInfo
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -317,7 +319,7 @@ private fun AboutSection(theme: ThemeTokens) {
     )
     Spacer(modifier = Modifier.height(16.dp))
     Text(
-        text = "刷刷鸭 v1.1.0",
+        text = AppInfo.displayVersion,
         fontSize = 13.sp,
         color = Color(theme.colorTextSecondary)
     )

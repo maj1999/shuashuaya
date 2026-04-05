@@ -46,6 +46,6 @@ object Deps {
 object AppConfig {
     const val APPLICATION_ID = "com.cleanpic.android"
     const val GROUP = "com.cleanpic"
-    const val VERSION_NAME = "0.1.0"
-    const val VERSION_CODE = 1
+    const val VERSION_NAME = "1.1.0"
+    const val VERSION_CODE = 11
 }

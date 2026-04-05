@@ -1,5 +1,7 @@
 package com.cleanpic.ui.settings
 
+import com.cleanpic.AppInfo
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -162,7 +164,7 @@ fun EditorialSettingsLayout(state: SettingsScreenState) {
             // 脚注
             item {
                 Text(
-                    text = "刷刷鸭 v1.0.0",
+                    text = AppInfo.displayVersion,
                     fontSize = 9.sp,
                     fontFamily = FontFamily.Serif,
                     color = EditorialSecondary,

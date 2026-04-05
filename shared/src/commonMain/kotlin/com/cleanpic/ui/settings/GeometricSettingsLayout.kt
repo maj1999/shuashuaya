@@ -1,5 +1,7 @@
 package com.cleanpic.ui.settings
 
+import com.cleanpic.AppInfo
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -142,7 +144,7 @@ fun GeometricSettingsLayout(state: SettingsScreenState) {
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "刷刷鸭 v1.0.0  ·  纯本地处理，不收集任何数据",
+                    text = "${AppInfo.displayVersion}  ·  纯本地处理，不收集任何数据",
                     fontSize = 12.sp,
                     color = Color(0x4DFFFFFF),
                     modifier = Modifier.fillMaxWidth()

@@ -11,6 +11,11 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
+    <!-- 整体缩小并居中 -->
+    <group android:scaleX="0.78" android:scaleY="0.78"
+        android:pivotX="54" android:pivotY="54"
+        android:translateY="6">
+
     <!-- ==================== 消散中的照片/视频（鸭子右上方） ==================== -->
 
     <!-- 照片 1（较实） -->
@@ -96,5 +101,7 @@
         android:pathData="M97,28 L97.5,26.5 L98,28 L99.5,28.5 L98,29 L97.5,30.5 L97,29 L95.5,28.5 Z"
         android:fillColor="#FFB300"
         android:fillAlpha="0.3" />
+
+    </group> <!-- 整体缩小居中 -->
 
 </vector>

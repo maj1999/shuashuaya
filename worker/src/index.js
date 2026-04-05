@@ -79,7 +79,7 @@ export default {
     const downloadMatch = url.pathname.match(/^\/download\/(android|ios|harmonyos)\/(v[\d.]+)$/);
     if (downloadMatch) {
       const [, platform, tag] = downloadMatch;
-      const repo = env.GITHUB_REPO || "user/shuashuaya";
+      const repo = env.GITHUB_REPO || "maj1999/shuashuaya";
       const assetName = ASSET_NAMES[platform];
 
       if (!assetName) {

@@ -1,7 +1,8 @@
 name = "cleanpic-update"
 main = "src/index.js"
 compatibility_date = "2024-01-01"
+account_id = "b237facb5cd368a96919c417b0b33893"
 
 # GitHub Release 代理的仓库配置
 [vars]
-GITHUB_REPO = "user/shuashuaya"
+GITHUB_REPO = "maj1999/shuashuaya"

@@ -45,13 +45,11 @@ fun CleanPicApp() {
             }
             is Route.Home -> {
                 HomeScreen(router, theme, viewerViewModel)
-                // 进入首页后检查是否需要弹更新提示
-                if (!updateDialogShown) {
-                    val result = ServiceLocator.cachedUpdateResult
-                    if (result.status != UpdateStatus.UP_TO_DATE && result.updateInfo != null) {
-                        showUpdateDialog = true
-                        updateDialogShown = true
-                    }
+                // 响应式监听更新结果
+                val updateResult by ServiceLocator.cachedUpdateResult.collectAsState()
+                if (!updateDialogShown && updateResult.status != UpdateStatus.UP_TO_DATE && updateResult.updateInfo != null) {
+                    showUpdateDialog = true
+                    updateDialogShown = true
                 }
             }
             is Route.Viewer -> ViewerScreen(router, theme, viewerViewModel, route.type)
@@ -61,7 +59,7 @@ fun CleanPicApp() {
 
         // 更新弹窗
         if (showUpdateDialog) {
-            val result = ServiceLocator.cachedUpdateResult
+            val result = ServiceLocator.cachedUpdateResult.value
             val info = result.updateInfo
             if (info != null) {
                 UpdateDialog(

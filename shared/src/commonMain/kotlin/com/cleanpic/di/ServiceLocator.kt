@@ -9,6 +9,7 @@ import com.cleanpic.update.UpdateCheckResult
 import com.cleanpic.update.UpdateChecker
 import com.cleanpic.update.UpdateInstaller
 import com.cleanpic.update.UpdateStatus
+import kotlinx.coroutines.flow.MutableStateFlow
 
 object ServiceLocator {
     lateinit var mediaRepository: MediaRepository
@@ -20,7 +21,7 @@ object ServiceLocator {
     // 自动升级
     var updateChecker: UpdateChecker? = null
     var updateInstaller: UpdateInstaller? = null
-    var cachedUpdateResult: UpdateCheckResult = UpdateCheckResult(UpdateStatus.UP_TO_DATE)
+    val cachedUpdateResult = MutableStateFlow(UpdateCheckResult(UpdateStatus.UP_TO_DATE))
 
     fun initialize(
         mediaRepo: MediaRepository,

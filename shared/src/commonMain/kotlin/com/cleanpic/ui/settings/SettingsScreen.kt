@@ -60,7 +60,7 @@ fun SettingsScreen(router: AppRouter, theme: ThemeTokens) {
                 }
                 try {
                     val result = checker.checkForUpdate()
-                    ServiceLocator.cachedUpdateResult = result
+                    ServiceLocator.cachedUpdateResult.value = result
                     manualCheckResult = result
                     checkResultMessage = when (result.status) {
                         UpdateStatus.UP_TO_DATE -> "已是最新版本"
@@ -73,7 +73,7 @@ fun SettingsScreen(router: AppRouter, theme: ThemeTokens) {
                 isCheckingUpdate = false
             }
         },
-        updateCheckResult = manualCheckResult ?: ServiceLocator.cachedUpdateResult.let {
+        updateCheckResult = manualCheckResult ?: ServiceLocator.cachedUpdateResult.value.let {
             if (it.status != UpdateStatus.UP_TO_DATE) it else null
         },
         checkResultMessage = checkResultMessage

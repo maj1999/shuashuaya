@@ -12,7 +12,8 @@
 - **5 套主题** — 温暖手工感 / 克制极简 / 大胆几何 / 活泼精致 / 杂志排版（每个主题独立布局，切换主题 = 换一个 App）
 - **矢量图标** — 全部图标使用 SVG path + Canvas 绘制，风格随主题变化，告别 emoji
 - **安全删除** — 浏览时仅标记，结果页统一确认，支持反悔
-- **纯本地** — 无网络请求，不收集任何用户数据
+- **自动更新** — 启动时自动检测新版本，支持强制/可选更新，可在设置页关闭
+- **隐私优先** — 除版本检查外纯本地处理，不收集任何用户数据
 
 ## 截图
 
@@ -54,19 +55,21 @@ cleanpic/
 │       │       ├── media/      # 媒体仓库 + 随机选取
 │       │       ├── theme/      # 主题管理（5 套 ThemeTokens + 布局标识）
 │       │       ├── settings/   # 偏好设置
+│       │       ├── update/     # 自动更新（版本检查 + 更新弹窗）
 │       │       ├── permission/ # 权限管理
 │       │       └── di/         # 依赖注入
-│       ├── androidMain/        # Android 平台实现
-│       ├── appleMain/          # iOS 平台实现
+│       ├── androidMain/        # Android 平台实现（含 AndroidUpdateInstaller）
+│       ├── appleMain/          # iOS 平台实现（含 IosUpdateInstaller）
 │       └── commonTest/         # 单元测试
 ├── androidApp/                 # Android 壳工程
+├── worker/                     # Cloudflare Workers（版本检查 API + 下载代理）
 ├── maestro/                    # E2E 测试
-│   ├── flows/                  # 照片相关测试流程（11 个）
+│   ├── flows/                  # 照片相关测试流程（13 个）
 │   ├── flows/video/            # 视频相关测试流程（5 个，需 ffmpeg 生成资源）
 │   └── screenshots/            # 测试截图输出（git 忽略）
-├── scripts/                    # 构建/运行/测试脚本
+├── scripts/                    # 构建/运行/测试/发布脚本
 ├── test-assets/                # 测试媒体（本地生成）
-└── docs/                       # 产品/架构/测试文档
+└── docs/                       # 产品/架构/测试/部署文档
 ```
 
 ## 快速开始
@@ -168,13 +171,13 @@ scripts/test-android.sh
 ### 运行测试
 
 ```bash
-# 单元测试（51 用例）
+# 单元测试（71 用例）
 scripts/test.sh
 
 # 生成测试媒体（12 张照片 + 2 个视频，E2E 测试前需要）
 scripts/generate-test-assets.sh
 
-# E2E 照片测试（11 个流程，需要 Maestro + 模拟器 + 已部署 App + 相册中有照片）
+# E2E 照片测试（13 个流程，需要 Maestro + 模拟器 + 已部署 App + 相册中有照片）
 ~/.maestro/bin/maestro test maestro/flows/
 
 # E2E 视频测试（5 个流程，额外需要 ffmpeg 生成的视频资源）
@@ -185,8 +188,17 @@ scripts/generate-test-assets.sh
 
 ```bash
 ./gradlew :androidApp:assembleRelease
-# 输出: androidApp/build/outputs/apk/release/androidApp-release.apk
+# 输出: androidApp/build/outputs/apk/release/刷刷鸭.apk
 ```
+
+### 发布新版本（含自动更新）
+
+```bash
+# 一键发布：更新版本号 → 构建 APK → GitHub Release → 部署 Worker
+./scripts/release.sh 1.3.0 "更新说明"
+```
+
+首次使用需要配置 Cloudflare Workers，详见 [自动更新部署指南](docs/deployment/auto-update-setup.md)。
 
 ## 测试覆盖
 
@@ -197,7 +209,8 @@ scripts/generate-test-assets.sh
 | RandomPickerTest | 7 | 随机选取、去重、边界 |
 | ThemeManagerTest | 6 | 5 主题切换、旧 ID 迁移回退、Token 完整性 |
 | ThemeTokensTest | 5 | 枚举值验证、WarmTheme 参数校验 |
-| AppSettingsTest | 3 | 读写、默认值、非法值防御 |
+| AppSettingsTest | 5 | 读写、默认值、非法值防御、autoCheckUpdate |
+| UpdateCheckerTest | 18 | 版本比较、强制更新、平台提取、完整评估 |
 | AppIconsTest | 3 | 13 图标定义、主题参数跟随、未知名异常 |
 | SvgPathParserTest | 13 | SVG 命令解析（M/L/H/V/C/A/Z）、13 图标 path 全量验证 |
 | ViewerViewModelTest | 13 | 加载、标记、删除、统计 |
@@ -205,7 +218,7 @@ scripts/generate-test-assets.sh
 
 ### E2E 测试（L4）
 
-**照片测试（maestro/flows/，11 个）：**
+**照片测试（maestro/flows/，13 个）：**
 
 | 流程 | 场景 | 内容 |
 |------|------|------|
@@ -220,6 +233,8 @@ scripts/generate-test-assets.sh
 | swipe-card-thumbnail | E10 | 卡片模式缩略图展示 |
 | result-stats-layout | E12 | 结果页统计布局验证 |
 | exit-button | E19 | 三种模式中途退出按钮 |
+| settings-update-section | EP6 | 设置页版本更新区域 UI 验证 |
+| auto-check-update-toggle | EP6 | 自动检查更新开关开/关 |
 
 **视频测试（maestro/flows/video/，5 个，需 ffmpeg 生成测试视频）：**
 
@@ -246,16 +261,22 @@ scripts/generate-test-assets.sh
 - [x] 真实照片/视频缩略图加载（Coil 3）
 - [x] 视频播放器集成（ExoPlayer，三种模式均支持）
 
-### V1.1（当前）
+### V1.1
 
 - [x] **UI 主题全面重设计** — 5 个主题各有独立布局，切换主题等于换一个 App
 - [x] **矢量图标系统** — SVG Path 解析器 + Canvas 渲染，13 个主题化图标替换全部 emoji
 - [x] **State 分发架构** — 业务逻辑与 UI 布局分离，每页 5 个布局变体
+
+### V1.2（当前）
+
+- [x] **自动更新系统** — Cloudflare Workers 版本检查 API + GitHub Release 下载代理，支持强制/可选更新
+- [x] **设置页更新入口** — 自动检查更新开关、手动检查按钮、红点提示新版本
+- [x] **一键发布脚本** — `scripts/release.sh` 自动完成版本号更新→构建→GitHub Release→Worker 部署
 - [ ] iOS 平台适配
 - [ ] 删除动画效果
 - [ ] 相册权限 LIMITED 模式下的增量授权引导
 
-### V1.2（规划中）
+### V1.3（规划中）
 
 - [ ] HarmonyOS NEXT 适配
 - [ ] 数据统计（累计清理张数、释放空间）
@@ -279,6 +300,8 @@ scripts/generate-test-assets.sh
 | 技术栈选型 | [docs/architecture/tech-stack.md](docs/architecture/tech-stack.md) |
 | 主题系统（v2） | [docs/architecture/cleanpic/theme-system.md](docs/architecture/cleanpic/theme-system.md) |
 | UI 重设计 Spec | [docs/superpowers/specs/2026-04-04-ui-theme-redesign-design.md](docs/superpowers/specs/2026-04-04-ui-theme-redesign-design.md) |
+| 自动更新设计 | [docs/architecture/cleanpic/auto-update.md](docs/architecture/cleanpic/auto-update.md) |
+| 自动更新部署指南 | [docs/deployment/auto-update-setup.md](docs/deployment/auto-update-setup.md) |
 | 测试策略 | [docs/testing/strategy.md](docs/testing/strategy.md) |
 | 测试场景 | [docs/testing/scenarios/](docs/testing/scenarios/) |
 

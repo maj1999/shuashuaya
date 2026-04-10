@@ -34,11 +34,12 @@ Kotlin Multiplatform + Compose Multiplatform 的照片/视频随机清理 App。
 
 **任何代码修改都必须保证测试覆盖完整。** 这是不可跳过的硬性规则：
 
-1. **新增功能** — 必须同时新增对应的 Maestro E2E 测试流（`maestro/flows/`）和/或单元测试
-2. **Bug 修复** — 必须先确认有覆盖该场景的测试，没有则先补测试，再修复代码
+1. **新增功能** — 必须同时完善单元测试 **和** Maestro E2E 测试流（`maestro/flows/`），并实际运行通过
+2. **Bug 修复** — 必须先确认有覆盖该场景的测试，没有则先补单元测试和 E2E 测试，再修复代码；修复后运行全部相关测试
 3. **UI 变更** — 修改任何 Viewer/Result/Settings 页面后，运行相关 Maestro 测试验证无回归
 4. **提交前** — 必须运行 `scripts/test.sh`（单元测试）+ 相关 Maestro 测试流，全部通过才能提交
 5. **不允许裸提交** — 禁止在没有运行测试的情况下提交代码变更
+6. **无论 Bug 修复还是功能迭代** — 完成编码后必须：① 完善单元测试覆盖 ② 运行单元测试通过 ③ 完善 E2E 测试覆盖 ④ 运行 E2E 测试通过。缺一不可
 
 ### 测试验证流程
 
@@ -59,6 +60,51 @@ Kotlin Multiplatform + Compose Multiplatform 的照片/视频随机清理 App。
 - [ ] 如果修改了已有行为，现有测试是否需要同步更新？
 - [ ] 如果新增了用户可见的行为，是否新增了对应测试？
 - [ ] 测试是否实际运行过并通过？
+
+---
+
+## 版本管理与发布（强制执行）
+
+**版本号格式：`MAJOR.MINOR.PATCH`（如 1.2.3）**
+
+### 版本号升级规则
+
+| 变更类型 | 升级位 | 示例 | 说明 |
+|---------|--------|------|------|
+| Bug 修复 | PATCH | 1.2.0 → 1.2.1 | 修复缺陷，不改变功能行为 |
+| 新增/增强功能 | MINOR | 1.2.1 → 1.3.0 | 新增用户可见功能或显著增强现有功能，PATCH 归零 |
+| 主版本升级 | MAJOR | 1.3.0 → 2.0.0 | **仅在用户明确要求时升级**，MINOR 和 PATCH 归零 |
+
+### 版本号修改位置
+
+升级版本号时需同步修改以下文件（`scripts/release.sh` 会自动处理）：
+- `buildSrc/src/main/kotlin/CleanPicBuildConfig.kt` — `VERSION_NAME` + `VERSION_CODE`（+1）
+- `shared/src/commonMain/kotlin/com/cleanpic/AppInfo.kt` — `VERSION`
+
+### 发布流程
+
+**每次升级版本号后，必须询问用户：**
+
+> "版本号已升级到 x.y.z，是否需要发布 Release？发布后用户将可以自动检测到新版本并升级。"
+
+如果用户确认发布，执行 `scripts/release.sh <版本号> "<更新说明>"` 完成：
+1. 构建 Release APK
+2. 创建 GitHub Release（附带 APK）
+3. 更新 Cloudflare Worker 版本信息（触发客户端自动更新检测）
+
+### 完整提交检查清单
+
+每次代码修改完成后，按以下顺序执行：
+
+```
+1. 完善单元测试 + E2E 测试覆盖
+2. scripts/build-android.sh                              → 编译通过
+3. scripts/test.sh                                        → 单元测试通过
+4. adb install -r <apk> && maestro test maestro/flows/   → E2E 通过
+5. 升级版本号（Bug → PATCH，功能 → MINOR）
+6. 提交代码
+7. 询问用户是否发布 Release
+```
 
 ---
 

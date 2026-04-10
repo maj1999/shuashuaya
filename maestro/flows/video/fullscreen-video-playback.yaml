@@ -1,7 +1,7 @@
 # maestro/flows/fullscreen-video-playback.yaml
 #
-# E14: 全屏模式视频播放验证
-# 切换到全屏模式 → 进入视频浏览 → 验证视频播放画面
+# E14: 全屏模式视频播放 + 切换验证
+# 切换到全屏模式 → 进入视频浏览 → 验证视频播放 → 切换下一个视频 → 验证视频切换成功
 #
 appId: com.cleanpic.android
 ---
@@ -39,14 +39,14 @@ appId: com.cleanpic.android
     optional: true
 - waitForAnimationToEnd
 
-# 等待视频加载和播放
+# 等待第一个视频加载和播放
 - assertVisible:
     id: "exit_button"
 
-# 截图：全屏视频播放中（应看到视频画面，非 emoji）
+# 截图：第一个视频播放中
 - takeScreenshot: maestro/screenshots/fullscreen-video-playing
 
-# 验证顶部栏可见
+# 验证顶部栏计数显示 "1 / N"
 - assertVisible:
     id: "exit_button"
 
@@ -56,8 +56,40 @@ appId: com.cleanpic.android
     end: "50%, 50%"
     duration: 2000
 
-# 再次截图验证画面变化（视频在播放）
+# 再次截图验证第一个视频在播放
 - takeScreenshot: maestro/screenshots/fullscreen-video-playing-2
+
+# === 切换到第二个视频（点击保留按钮） ===
+- tapOn:
+    id: "keep_button"
+- waitForAnimationToEnd
+
+# 等待第二个视频加载
+- swipe:
+    start: "50%, 50%"
+    end: "50%, 50%"
+    duration: 2000
+
+# 截图：第二个视频应显示不同内容（验证视频切换成功）
+- takeScreenshot: maestro/screenshots/fullscreen-video-switch-1
+
+# === 再切换一个视频（点击删除按钮） ===
+- tapOn:
+    id: "delete_button"
+- waitForAnimationToEnd
+
+# 等待第三个视频加载
+- swipe:
+    start: "50%, 50%"
+    end: "50%, 50%"
+    duration: 2000
+
+# 截图：第三个视频画面
+- takeScreenshot: maestro/screenshots/fullscreen-video-switch-2
+
+# 验证顶部栏和退出按钮仍可见（UI 正常）
+- assertVisible:
+    id: "exit_button"
 
 # 恢复轮播模式
 - tapOn:

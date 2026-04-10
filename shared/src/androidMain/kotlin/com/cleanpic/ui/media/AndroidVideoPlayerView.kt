@@ -49,6 +49,9 @@ actual fun VideoPlayerView(
                 useController = false
             }
         },
+        update = { playerView ->
+            playerView.player = exoPlayer
+        },
         modifier = modifier
     )
 }

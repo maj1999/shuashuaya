@@ -11,25 +11,25 @@
 // 版本信息配置 — 发布新版本时更新此处
 const VERSION_CONFIG = {
   android: {
-    version: "1.2.5",
-    versionCode: 21,
+    version: "1.2.6",
+    versionCode: 22,
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "修复下载更新时屏幕闪烁问题；新增调试模式模拟下载功能",
+    changelog: "新增下载完成后安装状态提示，优化更新体验",
     downloadUrl: "" // 将在运行时生成
   },
   ios: {
-    version: "1.2.5",
+    version: "1.2.6",
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "修复下载更新时屏幕闪烁问题；新增调试模式模拟下载功能",
+    changelog: "新增下载完成后安装状态提示，优化更新体验",
     downloadUrl: ""
   },
   harmonyos: {
-    version: "1.2.5",
+    version: "1.2.6",
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "修复下载更新时屏幕闪烁问题；新增调试模式模拟下载功能",
+    changelog: "新增下载完成后安装状态提示，优化更新体验",
     downloadUrl: ""
   }
 };

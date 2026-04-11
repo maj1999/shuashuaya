@@ -20,10 +20,25 @@
 | L3 集成 | 各平台 MediaModule/权限/视频播放器是否正常工作 | L2 使用 Mock 数据，无法验证真实系统 API |
 | L4 E2E | 完整用户流程：首页→浏览→结果→删除→再来一轮 | L3 按模块测试，不覆盖跨页面流程和批量删除弹窗 |
 
-## 三、Mock 基础设施
+## 三、测试基础设施
+
+### Compose UI 测试（L2 组件层）
+
+Android 平台使用 Robolectric 运行 Compose UI 测试，无需真机/模拟器：
+
+| 依赖 | 版本 | 用途 |
+|------|------|------|
+| `compose.uiTest` | 跟随 Compose Multiplatform 1.7.3 | Compose UI 测试 API |
+| `org.robolectric:robolectric` | 4.16.1 | 在 JVM 上模拟 Android 框架 |
+
+- 源集：`shared/src/androidUnitTest/kotlin/`
+- Manifest：`shared/src/androidUnitTest/AndroidManifest.xml`（声明 `ComponentActivity`）
+- 运行：`./gradlew :shared:testDebugUnitTest`（与 L1 单元测试一起运行）
+
+### Mock 基础设施
 
 ```
-shared/test/
+shared/src/commonTest/kotlin/com/cleanpic/
 ├── mock/
 │   ├── MockMediaRepository.kt   — 内存中的假媒体列表
 │   ├── MockAppSettings.kt       — 内存中的假偏好存储

@@ -32,7 +32,7 @@ fun UpdateDialog(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black.copy(alpha = 0.5f))
-            .then(if (!isForceUpdate) Modifier.clickable(onClick = onDismiss) else Modifier),
+            .clickable(onClick = { if (!isForceUpdate) onDismiss() }),
         contentAlignment = Alignment.Center
     ) {
         // 弹窗卡片
@@ -132,7 +132,8 @@ fun DownloadProgressDialog(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.5f)),
+            .background(Color.Black.copy(alpha = 0.5f))
+            .clickable(onClick = {}),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -140,6 +141,7 @@ fun DownloadProgressDialog(
                 .widthIn(max = 280.dp)
                 .clip(RoundedCornerShape(theme.borderRadius.dp))
                 .background(Color(theme.colorSurface))
+                .clickable(enabled = false) {}
                 .padding(24.dp)
                 .testTag("download_progress_dialog"),
             horizontalAlignment = Alignment.CenterHorizontally

@@ -74,6 +74,15 @@ kotlin {
         }
     }
 
+    // androidUnitTest — Android Compose UI 测试（Robolectric）
+    val androidUnitTest by sourceSets.getting {
+        dependencies {
+            @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+            implementation(compose.uiTest)
+            implementation("org.robolectric:robolectric:4.16.1")
+        }
+    }
+
     // Android 平台
     val androidMain by sourceSets.getting {
         dependsOn(commonMain)
@@ -127,5 +136,8 @@ android {
     defaultConfig {
         minSdk = Versions.ANDROID_MIN_SDK
         targetSdk = Versions.ANDROID_TARGET_SDK
+    }
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
     }
 }

@@ -219,11 +219,24 @@ Maestro 测试使用本地 mock server（`scripts/mock-update-server.sh`），�
 5. 断言：重新开始下载
 ```
 
+### U-UPD-06 弹窗遮罩阻止背景点击
+
+**层级**：L2 组件测试（Compose UI Test + Robolectric）
+
+| 用例 | 弹窗类型 | 期望 |
+|------|---------|------|
+| 强制更新弹窗阻止穿透 | UpdateDialog (isForceUpdate=true) | 点击遮罩区域，背景按钮不响应 |
+| 可选更新弹窗阻止穿透 | UpdateDialog (isForceUpdate=false) | 点击遮罩区域，背景按钮不响应 |
+| 下载进度弹窗阻止穿透 | DownloadProgressDialog | 点击遮罩区域，背景按钮不响应 |
+| 下载失败弹窗阻止穿透 | UpdateFailedDialog | 点击遮罩区域，背景按钮不响应 |
+
+代码位置：`shared/src/androidUnitTest/kotlin/com/cleanpic/update/UpdateDialogOverlayTest.kt`
+
 ## 测试覆盖矩阵
 
-| User Story | L1 单元 | L4 E2E (Maestro) |
-|-----------|---------|-------------------|
-| US-CP-13 启动检查更新 | U-UPD-01~04 | E-UPD-01~04 |
-| US-CP-14 手动检查+红点 | U-UPD-04 | E-UPD-06~09 |
-| US-CP-15 下载安装 | — | E-UPD-10~11 |
-| US-CP-16 开关自动检查 | U-UPD-05 | E-UPD-05 |
+| User Story | L1 单元 | L2 组件 | L4 E2E (Maestro) |
+|-----------|---------|---------|-------------------|
+| US-CP-13 启动检查更新 | U-UPD-01~04 | U-UPD-06 | E-UPD-01~04 |
+| US-CP-14 手动检查+红点 | U-UPD-04 | — | E-UPD-06~09 |
+| US-CP-15 下载安装 | — | U-UPD-06 | E-UPD-10~11 |
+| US-CP-16 开关自动检查 | U-UPD-05 | — | E-UPD-05 |

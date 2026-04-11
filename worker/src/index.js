@@ -36,8 +36,8 @@ const VERSION_CONFIG = {
 
 // GitHub Release 资源文件名映射
 const ASSET_NAMES = {
-  android: "cleanpic.apk",
-  harmonyos: "cleanpic.hap"
+  android: "shuashuaya.apk",
+  harmonyos: "shuashuaya.hap"
 };
 
 export default {

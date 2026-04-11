@@ -6,11 +6,17 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 import com.cleanpic.di.ServiceLocator
 import com.cleanpic.media.AndroidMediaRepository
 import com.cleanpic.media.AndroidVideoPlayer
 import com.cleanpic.permission.AndroidPermission
 import com.cleanpic.settings.AndroidAppSettings
+import com.cleanpic.theme.isLightColor
 import com.cleanpic.ui.CleanPicApp
 import com.cleanpic.update.AndroidUpdateInstaller
 import com.cleanpic.update.UpdateChecker
@@ -59,6 +65,22 @@ class MainActivity : ComponentActivity() {
         )
 
         setContent {
+            val theme by ServiceLocator.themeManager.currentTheme.collectAsState()
+            // 在 composition 作用域内读取，确保主题切换时触发重组
+            val statusBarColor = theme.colorBackground.toInt()
+            val lightStatusBar = !isLightColor(theme.colorText)
+
+            val view = LocalView.current
+            if (!view.isInEditMode) {
+                SideEffect {
+                    val window = (view.context as Activity).window
+                    @Suppress("DEPRECATION")
+                    window.statusBarColor = statusBarColor
+                    WindowCompat.getInsetsController(window, view)
+                        .isAppearanceLightStatusBars = lightStatusBar
+                }
+            }
+
             CleanPicApp()
         }
     }

@@ -46,6 +46,16 @@ enum class IconStrokeCap { BUTT, ROUND, SQUARE }
 /**
  * 主题设计令牌 — 承载完整的主题视觉定义
  */
+/**
+ * 判断 ARGB 颜色是否为浅色（用于决定状态栏图标明暗）
+ */
+fun isLightColor(color: Long): Boolean {
+    val r = ((color shr 16) and 0xFF) / 255.0
+    val g = ((color shr 8) and 0xFF) / 255.0
+    val b = (color and 0xFF) / 255.0
+    return 0.299 * r + 0.587 * g + 0.114 * b > 0.5
+}
+
 data class ThemeTokens(
     val id: String,
     val name: String,

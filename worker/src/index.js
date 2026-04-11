@@ -36,8 +36,8 @@ const VERSION_CONFIG = {
 
 // GitHub Release 资源文件名映射
 const ASSET_NAMES = {
-  android: "刷刷鸭.apk",
-  harmonyos: "刷刷鸭.hap"
+  android: "cleanpic.apk",
+  harmonyos: "cleanpic.hap"
 };
 
 export default {
@@ -89,43 +89,27 @@ export default {
         });
       }
 
-      // 从 GitHub Release 获取资源下载 URL
-      const releaseUrl = `https://api.github.com/repos/${repo}/releases/tags/${tag}`;
-      const ghResponse = await fetch(releaseUrl, {
-        headers: {
-          "User-Agent": "CleanPic-Update-Worker",
-          "Accept": "application/vnd.github.v3+json"
-        }
+      // 直接构造 GitHub Release 下载 URL（无需调 API，避免速率限制）
+      const downloadUrl = `https://github.com/${repo}/releases/download/${tag}/${assetName}`;
+
+      // 代理下载（流式转发）
+      const assetResponse = await fetch(downloadUrl, {
+        headers: { "User-Agent": "CleanPic-Update-Worker" },
+        redirect: "follow"
       });
 
-      if (!ghResponse.ok) {
-        return new Response(JSON.stringify({ error: "未找到该版本" }), {
-          status: 404,
-          headers: { "Content-Type": "application/json", ...corsHeaders }
-        });
-      }
-
-      const release = await ghResponse.json();
-      const asset = release.assets?.find(a => a.name === assetName);
-
-      if (!asset) {
+      if (!assetResponse.ok) {
         return new Response(JSON.stringify({ error: "未找到安装包" }), {
           status: 404,
           headers: { "Content-Type": "application/json", ...corsHeaders }
         });
       }
 
-      // 代理下载（流式转发）
-      const assetResponse = await fetch(asset.browser_download_url, {
-        headers: { "User-Agent": "CleanPic-Update-Worker" },
-        redirect: "follow"
-      });
-
       return new Response(assetResponse.body, {
         headers: {
           "Content-Type": "application/octet-stream",
           "Content-Disposition": `attachment; filename="${assetName}"`,
-          "Content-Length": asset.size.toString(),
+          "Content-Length": assetResponse.headers.get("Content-Length") || "",
           ...corsHeaders
         }
       });

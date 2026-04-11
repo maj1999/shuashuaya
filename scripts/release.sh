@@ -97,7 +97,11 @@ git tag "$TAG"
 git push origin main
 git push origin "$TAG"
 
-gh release create "$TAG" "$APK_PATH" \
+# GitHub 不支持中文资产名，复制为 ASCII 文件名上传
+UPLOAD_APK="/tmp/cleanpic.apk"
+cp "$APK_PATH" "$UPLOAD_APK"
+
+gh release create "$TAG" "$UPLOAD_APK" \
     --title "v${VERSION}" \
     --notes "$CHANGELOG"
 echo "  ✅ GitHub Release 创建成功"

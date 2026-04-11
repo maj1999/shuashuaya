@@ -11,25 +11,25 @@
 // 版本信息配置 — 发布新版本时更新此处
 const VERSION_CONFIG = {
   android: {
-    version: "1.2.3",
-    versionCode: 18,
+    version: "1.2.4",
+    versionCode: 19,
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "修复更新弹窗可以点击背景按钮的问题",
+    changelog: "修复状态栏颜色不随主题切换的问题",
     downloadUrl: "" // 将在运行时生成
   },
   ios: {
-    version: "1.2.3",
+    version: "1.2.4",
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "修复更新弹窗可以点击背景按钮的问题",
+    changelog: "修复状态栏颜色不随主题切换的问题",
     downloadUrl: ""
   },
   harmonyos: {
-    version: "1.2.3",
+    version: "1.2.4",
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "修复更新弹窗可以点击背景按钮的问题",
+    changelog: "修复状态栏颜色不随主题切换的问题",
     downloadUrl: ""
   }
 };

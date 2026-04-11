@@ -191,6 +191,50 @@ fun DownloadProgressDialog(
 }
 
 @Composable
+fun InstallingDialog(theme: ThemeTokens) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.5f))
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() },
+                onClick = {}
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            modifier = Modifier
+                .widthIn(max = 280.dp)
+                .clip(RoundedCornerShape(theme.borderRadius.dp))
+                .background(Color(theme.colorSurface))
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() },
+                    enabled = false,
+                    onClick = {}
+                )
+                .padding(24.dp)
+                .testTag("installing_dialog"),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "正在准备安装...",
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Medium,
+                color = Color(theme.colorText)
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = "系统安装器即将启动",
+                fontSize = 13.sp,
+                color = Color(theme.colorTextSecondary)
+            )
+        }
+    }
+}
+
+@Composable
 fun UpdateFailedDialog(
     theme: ThemeTokens,
     onRetry: () -> Unit,

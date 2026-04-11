@@ -20,6 +20,7 @@ import com.cleanpic.ui.settings.SettingsScreen
 import com.cleanpic.theme.ThemeTokens
 import com.cleanpic.update.DownloadProgressDialog
 import com.cleanpic.update.DownloadState
+import com.cleanpic.update.InstallingDialog
 import com.cleanpic.update.UpdateDialog
 import com.cleanpic.update.UpdateFailedDialog
 import com.cleanpic.update.UpdateInstaller
@@ -99,6 +100,9 @@ private fun DownloadOverlay(installer: UpdateInstaller?, theme: ThemeTokens) {
                 theme = theme,
                 progress = downloadProgress
             )
+        }
+        DownloadState.INSTALLING -> {
+            InstallingDialog(theme = theme)
         }
         DownloadState.FAILED -> {
             val result = ServiceLocator.cachedUpdateResult.value

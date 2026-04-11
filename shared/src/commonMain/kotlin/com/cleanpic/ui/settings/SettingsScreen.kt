@@ -81,6 +81,10 @@ fun SettingsScreen(router: AppRouter, theme: ThemeTokens) {
             val result = manualCheckResult ?: ServiceLocator.cachedUpdateResult.value
             val info = result.updateInfo ?: return@SettingsScreenState
             ServiceLocator.updateInstaller?.startUpdate(info)
+        },
+        isDebugBuild = ServiceLocator.isDebugBuild,
+        onSimulateDownload = {
+            ServiceLocator.updateInstaller?.simulateDownload()
         }
     )
 

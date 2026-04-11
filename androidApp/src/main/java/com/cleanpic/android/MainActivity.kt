@@ -51,6 +51,8 @@ class MainActivity : ComponentActivity() {
             deleteLauncher.launch(request)
         }
 
+        ServiceLocator.isDebugBuild = BuildConfig.DEBUG
+
         ServiceLocator.initialize(
             mediaRepo = AndroidMediaRepository(applicationContext),
             settings = AndroidAppSettings(applicationContext),

@@ -17,10 +17,12 @@ import com.cleanpic.ui.home.HomeScreen
 import com.cleanpic.ui.viewer.ViewerScreen
 import com.cleanpic.ui.result.ResultScreen
 import com.cleanpic.ui.settings.SettingsScreen
+import com.cleanpic.theme.ThemeTokens
 import com.cleanpic.update.DownloadProgressDialog
 import com.cleanpic.update.DownloadState
 import com.cleanpic.update.UpdateDialog
 import com.cleanpic.update.UpdateFailedDialog
+import com.cleanpic.update.UpdateInstaller
 import com.cleanpic.update.UpdateStatus
 import com.cleanpic.viewmodel.ViewerViewModel
 
@@ -34,10 +36,7 @@ fun CleanPicApp() {
     var showUpdateDialog by remember { mutableStateOf(false) }
     var updateDialogShown by remember { mutableStateOf(false) }
 
-    // 监听下载状态
     val installer = ServiceLocator.updateInstaller
-    val downloadState = installer?.downloadState?.collectAsState()
-    val downloadProgress = installer?.downloadProgress?.collectAsState()
 
     Box(modifier = Modifier.fillMaxSize().semantics { testTagsAsResourceId = true }) {
         when (val route = router.currentRoute) {
@@ -78,30 +77,45 @@ fun CleanPicApp() {
             }
         }
 
-        // 下载进度弹窗
-        if (downloadState?.value == DownloadState.DOWNLOADING) {
+        // 下载相关弹窗（独立组合函数，隔离进度更新的重组范围）
+        DownloadOverlay(installer = installer, theme = theme)
+    }
+}
+
+/**
+ * 独立组合函数：将下载状态收集隔离在此作用域内，
+ * 避免进度更新导致 CleanPicApp 整棵组合树重组。
+ */
+@Composable
+private fun DownloadOverlay(installer: UpdateInstaller?, theme: ThemeTokens) {
+    if (installer == null) return
+
+    val downloadState by installer.downloadState.collectAsState()
+    val downloadProgress by installer.downloadProgress.collectAsState()
+
+    when (downloadState) {
+        DownloadState.DOWNLOADING -> {
             DownloadProgressDialog(
                 theme = theme,
-                progress = downloadProgress?.value ?: 0f
+                progress = downloadProgress
             )
         }
-
-        // 下载失败弹窗
-        if (downloadState?.value == DownloadState.FAILED) {
+        DownloadState.FAILED -> {
             val result = ServiceLocator.cachedUpdateResult.value
             val info = result.updateInfo
             UpdateFailedDialog(
                 theme = theme,
                 onRetry = {
-                    installer?.resetState()
+                    installer.resetState()
                     if (info != null) {
-                        installer?.startUpdate(info)
+                        installer.startUpdate(info)
                     }
                 },
                 onDismiss = {
-                    installer?.resetState()
+                    installer.resetState()
                 }
             )
         }
+        else -> {}
     }
 }

@@ -437,6 +437,27 @@ private fun UpdateSection(state: SettingsScreenState, theme: ThemeTokens, radius
                 )
             }
         }
+
+        // 调试按钮：模拟下载进度（仅 Debug 构建可见）
+        if (state.isDebugBuild) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(radius.dp))
+                    .background(Color(theme.colorTextSecondary).copy(alpha = 0.15f))
+                    .clickable(onClick = state.onSimulateDownload)
+                    .padding(vertical = 12.dp)
+                    .testTag("simulate_download_button"),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "模拟下载（调试）",
+                    fontSize = 13.sp,
+                    color = Color(theme.colorTextSecondary)
+                )
+            }
+        }
     }
 }
 

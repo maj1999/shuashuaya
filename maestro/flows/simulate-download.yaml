@@ -1,0 +1,52 @@
+# maestro/flows/simulate-download.yaml
+#
+# E2E: 模拟下载期间无屏幕闪烁 — 验证下载进度弹窗正常显示且 UI 可交互
+# 对应: Bug fix — 下载过程中点击 app 导致屏幕闪烁
+#
+appId: com.cleanpic.android
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 30000
+- waitForAnimationToEnd
+
+# 进入设置页
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+
+# 点击"模拟下载（调试）"按钮触发模拟下载（模拟持续 20 秒）
+- scrollUntilVisible:
+    element:
+      id: "simulate_download_button"
+    direction: DOWN
+    timeout: 5000
+- tapOn:
+    id: "simulate_download_button"
+
+# 验证下载进度弹窗出现
+# 注意：tapOn 会等 UI 稳定后才返回，所以用 extendedWaitUntil 给足超时
+- extendedWaitUntil:
+    visible:
+      id: "download_progress_dialog"
+    timeout: 15000
+
+# 截图记录下载进度弹窗
+- takeScreenshot: maestro/screenshots/simulate-download-progress
+
+# 等待模拟下载完成（20秒 + 缓冲）
+- extendedWaitUntil:
+    notVisible:
+      id: "download_progress_dialog"
+    timeout: 25000
+
+# 下载完成后验证设置页仍然正常显示
+- assertVisible:
+    id: "auto_check_update_toggle"
+- assertVisible:
+    id: "check_update_button"
+
+- takeScreenshot: maestro/screenshots/simulate-download-completed

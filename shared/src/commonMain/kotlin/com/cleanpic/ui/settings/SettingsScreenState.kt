@@ -22,5 +22,8 @@ data class SettingsScreenState(
     val onCheckUpdate: () -> Unit = {},
     val updateCheckResult: UpdateCheckResult? = null,
     val checkResultMessage: String? = null,
-    val onStartUpdate: () -> Unit = {}
+    val onStartUpdate: () -> Unit = {},
+    // 调试用
+    val isDebugBuild: Boolean = false,
+    val onSimulateDownload: () -> Unit = {}
 )

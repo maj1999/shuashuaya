@@ -122,7 +122,11 @@ class AndroidUpdateInstaller(private val context: Context) : UpdateInstaller {
                             val downloaded = cursor.getLong(bytesIndex)
                             val total = cursor.getLong(totalIndex)
                             if (total > 0) {
-                                _downloadProgress.value = (downloaded.toFloat() / total).coerceIn(0f, 1f)
+                                val newProgress = (downloaded.toFloat() / total).coerceIn(0f, 1f)
+                                // 仅当整数百分比变化时才发射，减少不必要的 UI 重组
+                                if ((newProgress * 100).toInt() != (_downloadProgress.value * 100).toInt()) {
+                                    _downloadProgress.value = newProgress
+                                }
                             }
                         }
                         cursor.close()
@@ -158,5 +162,26 @@ class AndroidUpdateInstaller(private val context: Context) : UpdateInstaller {
         progressJob?.cancel()
         _downloadState.value = DownloadState.IDLE
         _downloadProgress.value = 0f
+    }
+
+    override fun simulateDownload() {
+        if (_downloadState.value == DownloadState.DOWNLOADING) return
+        _downloadState.value = DownloadState.DOWNLOADING
+        _downloadProgress.value = 0f
+        progressJob?.cancel()
+        progressJob = scope.launch {
+            // 模拟 20 秒下载，每 100ms 更新一次进度（高频率以验证闪烁修复）
+            val totalSteps = 200
+            val stepDelay = 100L
+            for (i in 1..totalSteps) {
+                delay(stepDelay)
+                if (_downloadState.value != DownloadState.DOWNLOADING) break
+                _downloadProgress.value = (i.toFloat() / totalSteps).coerceIn(0f, 1f)
+            }
+            if (_downloadState.value == DownloadState.DOWNLOADING) {
+                _downloadProgress.value = 1f
+                _downloadState.value = DownloadState.IDLE
+            }
+        }
     }
 }

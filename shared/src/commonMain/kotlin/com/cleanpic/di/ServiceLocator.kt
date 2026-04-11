@@ -18,6 +18,9 @@ object ServiceLocator {
     lateinit var videoPlayer: VideoPlayer
     val themeManager: ThemeManager = ThemeManager()
 
+    // 调试标记（平台侧设置）
+    var isDebugBuild: Boolean = false
+
     // 自动升级
     var updateChecker: UpdateChecker? = null
     var updateInstaller: UpdateInstaller? = null

@@ -11,25 +11,25 @@
 // 版本信息配置 — 发布新版本时更新此处
 const VERSION_CONFIG = {
   android: {
-    version: "1.2.2",
-    versionCode: 16,
+    version: "1.2.3",
+    versionCode: 18,
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "修复应用更新功能无法正常工作的问题",
+    changelog: "修复更新弹窗可以点击背景按钮的问题",
     downloadUrl: "" // 将在运行时生成
   },
   ios: {
-    version: "1.2.2",
+    version: "1.2.3",
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "修复应用更新功能无法正常工作的问题",
+    changelog: "修复更新弹窗可以点击背景按钮的问题",
     downloadUrl: ""
   },
   harmonyos: {
-    version: "1.2.2",
+    version: "1.2.3",
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "修复应用更新功能无法正常工作的问题",
+    changelog: "修复更新弹窗可以点击背景按钮的问题",
     downloadUrl: ""
   }
 };

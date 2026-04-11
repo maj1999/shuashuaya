@@ -11,25 +11,25 @@
 // 版本信息配置 — 发布新版本时更新此处
 const VERSION_CONFIG = {
   android: {
-    version: "1.2.1",
-    versionCode: 15,
+    version: "1.2.2",
+    versionCode: 16,
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "修复全屏模式下视频切换不更新的问题",
+    changelog: "修复应用更新功能无法正常工作的问题",
     downloadUrl: "" // 将在运行时生成
   },
   ios: {
-    version: "1.2.1",
+    version: "1.2.2",
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "修复全屏模式下视频切换不更新的问题",
+    changelog: "修复应用更新功能无法正常工作的问题",
     downloadUrl: ""
   },
   harmonyos: {
-    version: "1.2.1",
+    version: "1.2.2",
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "修复全屏模式下视频切换不更新的问题",
+    changelog: "修复应用更新功能无法正常工作的问题",
     downloadUrl: ""
   }
 };

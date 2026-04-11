@@ -21,4 +21,9 @@ class IosUpdateInstaller : UpdateInstaller {
         }
         UIApplication.sharedApplication.openURL(url)
     }
+
+    override fun resetState() {
+        _downloadState.value = DownloadState.IDLE
+        _downloadProgress.value = 0f
+    }
 }

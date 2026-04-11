@@ -415,6 +415,28 @@ private fun UpdateSection(state: SettingsScreenState, theme: ThemeTokens, radius
                     .testTag("check_result_message")
             )
         }
+
+        // 发现新版本时显示"立即更新"按钮
+        if (hasNewVersion) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(radius.dp))
+                    .background(Color(theme.colorPrimary))
+                    .clickable(onClick = state.onStartUpdate)
+                    .padding(vertical = 12.dp)
+                    .testTag("settings_update_now_button"),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "立即更新",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.White
+                )
+            }
+        }
     }
 }
 

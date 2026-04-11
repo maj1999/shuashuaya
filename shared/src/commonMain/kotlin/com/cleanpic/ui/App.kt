@@ -20,6 +20,7 @@ import com.cleanpic.ui.settings.SettingsScreen
 import com.cleanpic.update.DownloadProgressDialog
 import com.cleanpic.update.DownloadState
 import com.cleanpic.update.UpdateDialog
+import com.cleanpic.update.UpdateFailedDialog
 import com.cleanpic.update.UpdateStatus
 import com.cleanpic.viewmodel.ViewerViewModel
 
@@ -82,6 +83,24 @@ fun CleanPicApp() {
             DownloadProgressDialog(
                 theme = theme,
                 progress = downloadProgress?.value ?: 0f
+            )
+        }
+
+        // 下载失败弹窗
+        if (downloadState?.value == DownloadState.FAILED) {
+            val result = ServiceLocator.cachedUpdateResult.value
+            val info = result.updateInfo
+            UpdateFailedDialog(
+                theme = theme,
+                onRetry = {
+                    installer?.resetState()
+                    if (info != null) {
+                        installer?.startUpdate(info)
+                    }
+                },
+                onDismiss = {
+                    installer?.resetState()
+                }
             )
         }
     }

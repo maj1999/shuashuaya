@@ -76,7 +76,12 @@ fun SettingsScreen(router: AppRouter, theme: ThemeTokens) {
         updateCheckResult = manualCheckResult ?: ServiceLocator.cachedUpdateResult.value.let {
             if (it.status != UpdateStatus.UP_TO_DATE) it else null
         },
-        checkResultMessage = checkResultMessage
+        checkResultMessage = checkResultMessage,
+        onStartUpdate = {
+            val result = manualCheckResult ?: ServiceLocator.cachedUpdateResult.value
+            val info = result.updateInfo ?: return@SettingsScreenState
+            ServiceLocator.updateInstaller?.startUpdate(info)
+        }
     )
 
     SharedSettingsLayout(state)

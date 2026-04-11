@@ -176,3 +176,71 @@ fun DownloadProgressDialog(
         }
     }
 }
+
+@Composable
+fun UpdateFailedDialog(
+    theme: ThemeTokens,
+    onRetry: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.5f))
+            .clickable(onClick = onDismiss),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            modifier = Modifier
+                .widthIn(max = 280.dp)
+                .clip(RoundedCornerShape(theme.borderRadius.dp))
+                .background(Color(theme.colorSurface))
+                .clickable(enabled = false) {}
+                .padding(24.dp)
+                .testTag("update_failed_dialog"),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "下载失败",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(theme.colorText)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "请检查网络连接后重试",
+                fontSize = 13.sp,
+                color = Color(theme.colorTextSecondary)
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(theme.borderRadius.dp))
+                    .background(Color(theme.colorPrimary))
+                    .clickable(onClick = onRetry)
+                    .padding(vertical = 12.dp)
+                    .testTag("update_retry_button"),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "重试",
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.White
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "取消",
+                fontSize = 14.sp,
+                color = Color(theme.colorTextSecondary),
+                modifier = Modifier
+                    .clickable(onClick = onDismiss)
+                    .padding(vertical = 8.dp)
+                    .testTag("update_cancel_button"),
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}

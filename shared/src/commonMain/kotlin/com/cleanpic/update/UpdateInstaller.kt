@@ -10,4 +10,5 @@ interface UpdateInstaller {
     val downloadProgress: StateFlow<Float>
     val downloadState: StateFlow<DownloadState>
     fun startUpdate(updateInfo: UpdateInfo)
+    fun resetState()
 }

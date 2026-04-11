@@ -21,5 +21,6 @@ data class SettingsScreenState(
     val isCheckingUpdate: Boolean = false,
     val onCheckUpdate: () -> Unit = {},
     val updateCheckResult: UpdateCheckResult? = null,
-    val checkResultMessage: String? = null
+    val checkResultMessage: String? = null,
+    val onStartUpdate: () -> Unit = {}
 )

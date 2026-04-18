@@ -16,6 +16,20 @@ android {
         versionName = AppConfig.VERSION_NAME
     }
 
+    flavorDimensions += "distribution"
+    productFlavors {
+        create("direct") {
+            dimension = "distribution"
+            buildConfigField("boolean", "UPDATE_ENABLED", "true")
+            buildConfigField("String", "UPDATE_API_URL", "\"${AppConfig.UPDATE_API_URL}\"")
+        }
+        create("store") {
+            dimension = "distribution"
+            buildConfigField("boolean", "UPDATE_ENABLED", "false")
+            buildConfigField("String", "UPDATE_API_URL", "\"\"")
+        }
+    }
+
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
@@ -37,13 +51,15 @@ android {
     applicationVariants.all {
         outputs.all {
             val output = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
-            output.outputFileName = "刷刷鸭.apk"
+            val flavorName = productFlavors.first().name
+            output.outputFileName = "刷刷鸭-${flavorName}.apk"
         }
     }
 }
 
 dependencies {
     implementation(project(":shared"))
+    "directImplementation"(project(":update"))
     implementation(Deps.ANDROIDX_APPCOMPAT)
     implementation(Deps.ANDROIDX_CORE_KTX)
     implementation(Deps.MATERIAL)

@@ -1,0 +1,33 @@
+# maestro/flows/direct/us-cp-17-direct-smoke.yaml
+#
+# E2E (E-UPD-15): direct flavor 升级 UI 完整可见，回归保障
+# 对应: US-CP-17 AC4（direct 版本保留 US-CP-13~16 全部升级行为）
+#
+appId: com.cleanpic.android
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 30000
+- waitForAnimationToEnd
+
+# 进入设置页
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+
+# 断言：升级相关元素均可见（与 store 反向）
+- assertVisible:
+    id: "auto_check_update_toggle"
+- assertVisible:
+    id: "check_update_button"
+
+# 截图
+- takeScreenshot: maestro/screenshots/direct-update-section-visible
+
+# 返回首页
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd

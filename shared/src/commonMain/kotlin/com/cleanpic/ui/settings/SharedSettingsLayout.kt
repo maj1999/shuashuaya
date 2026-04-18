@@ -330,7 +330,7 @@ private fun AboutSection(theme: ThemeTokens) {
     )
     Spacer(modifier = Modifier.height(4.dp))
     Text(
-        text = "除版本检查外纯本地处理，不收集任何数据",
+        text = "纯本地处理，不收集任何数据",
         fontSize = 12.sp,
         color = Color(theme.colorTextSecondary).copy(alpha = 0.6f)
     )

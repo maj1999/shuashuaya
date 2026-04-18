@@ -43,3 +43,4 @@
 - [x] `superpowers/plans/2026-04-04-ui-theme-redesign-plan-a-infrastructure.md` — Plan A 基础设施
 - [x] `superpowers/plans/2026-04-04-ui-theme-redesign-plan-b-warm-theme.md` — Plan B 温暖主题端到端
 - [x] `superpowers/plans/2026-04-04-ui-theme-redesign-plan-c-remaining-themes.md` — Plan C 剩余 4 主题
+- [x] `superpowers/plans/2026-04-18-update-flavor-split.md` — 升级模块分发渠道隔离

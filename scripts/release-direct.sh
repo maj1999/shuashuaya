@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-# 发布新版本：构建 Release APK → 创建 GitHub Release → 更新 Worker
+# 发布 direct flavor 新版本：构建 Release APK → 创建 GitHub Release → 更新 Worker
 #
 # 用法:
-#   ./scripts/release.sh 1.2.0 "修复了xxx，新增了xxx"
+#   ./scripts/release-direct.sh 1.2.0 "修复了xxx，新增了xxx"
 #
 # 参数:
 #   $1 — 版本号（如 1.2.0）
@@ -31,7 +31,7 @@ fi
 VERSION="$1"
 CHANGELOG="$2"
 TAG="v${VERSION}"
-APK_PATH="$PROJECT_ROOT/androidApp/build/outputs/apk/release/刷刷鸭.apk"
+APK_PATH="$PROJECT_ROOT/androidApp/build/outputs/apk/direct/release/刷刷鸭-direct.apk"
 WORKER_DIR="$PROJECT_ROOT/worker"
 WORKER_CONFIG="$WORKER_DIR/src/index.js"
 BUILD_CONFIG="$PROJECT_ROOT/buildSrc/src/main/kotlin/CleanPicBuildConfig.kt"
@@ -79,7 +79,7 @@ echo "  ✅ VERSION_NAME=$VERSION, VERSION_CODE=$NEW_CODE"
 echo ""
 echo "【4/6】构建 Release APK..."
 cd "$PROJECT_ROOT"
-./gradlew :androidApp:assembleRelease --quiet
+./gradlew :androidApp:assembleDirectRelease --quiet
 if [ ! -f "$APK_PATH" ]; then
     echo "❌ APK 未生成: $APK_PATH"
     exit 1
@@ -98,7 +98,7 @@ git push origin main
 git push origin "$TAG"
 
 # GitHub 不支持中文资产名，复制为 ASCII 文件名上传
-UPLOAD_APK="/tmp/shuashuaya.apk"
+UPLOAD_APK="/tmp/shuashuaya-direct.apk"
 cp "$APK_PATH" "$UPLOAD_APK"
 
 gh release create "$TAG" "$UPLOAD_APK" \

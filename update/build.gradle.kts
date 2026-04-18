@@ -30,10 +30,10 @@ kotlin {
     val commonMain by sourceSets.getting {
         dependencies {
             implementation(project(":shared"))
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.runtime)
-            implementation(compose.ui)
+            api(compose.foundation)
+            api(compose.material3)
+            api(compose.runtime)
+            api(compose.ui)
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
             implementation("io.ktor:ktor-client-core:${Versions.KTOR}")
             implementation("io.ktor:ktor-client-content-negotiation:${Versions.KTOR}")

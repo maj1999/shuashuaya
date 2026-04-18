@@ -144,6 +144,7 @@ private fun SettingsUpdateSection(
     var manualCheckResult by remember { mutableStateOf<UpdateCheckResult?>(null) }
     val scope = rememberCoroutineScope()
 
+    // 用 collectAsState 而非 .value 直读，确保启动期 onAppStart 异步写入缓存后设置页能立即重组
     val cachedResult by UpdateResultCache.value.collectAsState()
     val updateResult: UpdateCheckResult? = manualCheckResult
         ?: cachedResult.takeIf { it.status != UpdateStatus.UP_TO_DATE }

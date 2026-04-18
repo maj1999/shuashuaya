@@ -57,11 +57,6 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.animation)
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
-            // Network (版本检查)
-            implementation("io.ktor:ktor-client-core:${Versions.KTOR}")
-            implementation("io.ktor:ktor-client-content-negotiation:${Versions.KTOR}")
-            implementation("io.ktor:ktor-serialization-kotlinx-json:${Versions.KTOR}")
-            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.KOTLINX_SERIALIZATION}")
         }
     }
 
@@ -70,7 +65,6 @@ kotlin {
         dependencies {
             implementation(kotlin("test"))
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
-            implementation("io.ktor:ktor-client-mock:${Versions.KTOR}")
         }
     }
 
@@ -94,18 +88,12 @@ kotlin {
             // Media3 ExoPlayer: 视频播放
             implementation("androidx.media3:media3-exoplayer:${Versions.MEDIA3}")
             implementation("androidx.media3:media3-ui:${Versions.MEDIA3}")
-            // Ktor Android engine
-            implementation("io.ktor:ktor-client-okhttp:${Versions.KTOR}")
         }
     }
 
     // Apple 平台（iOS 共享）
     sourceSets.appleMain {
         dependsOn(commonMain)
-        dependencies {
-            // Ktor iOS engine
-            implementation("io.ktor:ktor-client-darwin:${Versions.KTOR}")
-        }
     }
 
     // 让各 iOS target 的 main sourceSet 继承 appleMain

@@ -133,10 +133,11 @@ echo "模拟器就绪"
 ### 第二步：构建 APK
 
 ```bash
-scripts/build-android.sh
+scripts/build-android.sh           # 默认 direct flavor
+scripts/build-android.sh store     # 显式 store flavor
 ```
 
-构建成功后，APK 输出路径：`androidApp/build/outputs/apk/debug/androidApp-debug.apk`
+构建成功后，APK 输出路径：`androidApp/build/outputs/apk/direct/debug/刷刷鸭-direct.apk`（store flavor 对应 `apk/store/debug/刷刷鸭-store.apk`）
 
 ### 第三步：安装并启动 App
 
@@ -151,7 +152,7 @@ scripts/test-android.sh deploy
 
 ```bash
 # 安装
-adb install -r androidApp/build/outputs/apk/debug/androidApp-debug.apk
+adb install -r androidApp/build/outputs/apk/direct/debug/刷刷鸭-direct.apk
 
 # 启动 App
 adb shell am start -n com.cleanpic.android/.MainActivity
@@ -187,18 +188,31 @@ scripts/generate-test-assets.sh
 ### 打包 Release APK
 
 ```bash
-./gradlew :androidApp:assembleRelease
-# 输出: androidApp/build/outputs/apk/release/刷刷鸭.apk
+./gradlew :androidApp:assembleDirectRelease
+# 输出: androidApp/build/outputs/apk/direct/release/刷刷鸭-direct.apk
 ```
 
-### 发布新版本（含自动更新）
+> 项目有 `direct` / `store` 两个 productFlavor：
+> - **direct** — 含应用内升级，用于 GitHub Release 渠道分发
+> - **store** — 编译期完全剥离应用内升级代码、URL、权限，用于上架各应用商店
+
+### 发布新版本（direct 渠道，含自动更新）
 
 ```bash
-# 一键发布：更新版本号 → 构建 APK → GitHub Release → 部署 Worker
-./scripts/release.sh 1.3.0 "更新说明"
+# 一键发布：更新版本号 → 构建 direct APK → GitHub Release → 部署 Worker
+./scripts/release-direct.sh 1.3.0 "更新说明"
 ```
 
 首次使用需要配置 Cloudflare Workers，详见 [自动更新部署指南](docs/deployment/auto-update-setup.md)。
+
+### 商店渠道构建
+
+```bash
+./scripts/build-store.sh 1.3.0
+# 输出: dist/刷刷鸭-store-v1.3.0.apk（已通过字节码扫描，确认无升级相关代码）
+```
+
+store flavor 编译期完全移除应用内升级代码、URL 与权限，符合应用商店审核要求。商店上架需各渠道独立签名与元数据，请手动处理。
 
 ## 测试覆盖
 
@@ -271,7 +285,7 @@ scripts/generate-test-assets.sh
 
 - [x] **自动更新系统** — Cloudflare Workers 版本检查 API + GitHub Release 下载代理，支持强制/可选更新
 - [x] **设置页更新入口** — 自动检查更新开关、手动检查按钮、红点提示新版本
-- [x] **一键发布脚本** — `scripts/release.sh` 自动完成版本号更新→构建→GitHub Release→Worker 部署
+- [x] **一键发布脚本** — `scripts/release-direct.sh` 自动完成版本号更新→构建→GitHub Release→Worker 部署
 - [ ] iOS 平台适配
 - [ ] 删除动画效果
 - [ ] 相册权限 LIMITED 模式下的增量授权引导

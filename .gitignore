@@ -51,3 +51,6 @@ test-assets/**/*.png
 test-assets/**/*.mp4
 !test-assets/**/.gitkeep
 .claude/settings.local.json
+
+# Store flavor 构建产出（手动上架渠道，不入版本控制）
+dist/

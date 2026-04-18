@@ -53,5 +53,4 @@ object AppConfig {
     const val VERSION_NAME = "1.2.6"
     const val VERSION_CODE = 22
     const val UPDATE_API_URL = "https://cleanpic-update.maj1946027533.workers.dev"
-    const val ENABLE_UPDATE_CHECK = true
 }

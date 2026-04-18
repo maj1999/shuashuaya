@@ -14,9 +14,6 @@ android {
         targetSdk = Versions.ANDROID_TARGET_SDK
         versionCode = AppConfig.VERSION_CODE
         versionName = AppConfig.VERSION_NAME
-
-        buildConfigField("boolean", "ENABLE_UPDATE_CHECK", "${AppConfig.ENABLE_UPDATE_CHECK}")
-        buildConfigField("String", "UPDATE_API_URL", "\"${AppConfig.UPDATE_API_URL}\"")
     }
 
     buildTypes {

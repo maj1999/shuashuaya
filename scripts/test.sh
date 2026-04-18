@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# 运行 shared 模块的全平台测试
+# 运行 shared + :update 模块的全平台测试
 #
 set -euo pipefail
 
@@ -10,9 +10,9 @@ LOG_FILE="$PROJECT_ROOT/logs/test-common.log"
 
 mkdir -p "$PROJECT_ROOT/logs"
 
-echo "=== CleanPic: 运行 shared 模块测试 ==="
+echo "=== CleanPic: 运行 shared + :update 模块测试 ==="
 
 cd "$PROJECT_ROOT"
-./gradlew :shared:allTests "$@" 2>&1 | tee "$LOG_FILE"
+./gradlew :shared:allTests :update:allTests "$@" 2>&1 | tee "$LOG_FILE"
 
 echo "=== 测试完成（日志: $LOG_FILE）==="

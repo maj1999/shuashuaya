@@ -31,13 +31,13 @@ fun CleanPicApp(hooks: AppHooks = AppHooks.Empty) {
             is Route.Splash -> SplashScreen(theme, hooks) {
                 router.navigate(Route.Home, clearBackStackUpTo = Route.Splash, inclusive = true)
             }
-            is Route.Home -> {
-                HomeScreen(router, theme, viewerViewModel)
-                hooks.HomeOverlay()
-            }
+            is Route.Home -> HomeScreen(router, theme, viewerViewModel)
             is Route.Viewer -> ViewerScreen(router, theme, viewerViewModel, route.type)
             is Route.Result -> ResultScreen(router, theme, viewerViewModel)
             is Route.Settings -> SettingsScreen(router, theme, hooks)
         }
+        // 跨路由 overlay（升级弹窗、下载进度等）——必须放在 when 之外，
+        // 这样从设置页触发的下载进度 dialog 在 Settings 路由也可见。
+        hooks.HomeOverlay()
     }
 }

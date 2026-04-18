@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,7 +26,6 @@ import com.cleanpic.icons.IconPainter
 import com.cleanpic.model.InteractionMode
 import com.cleanpic.theme.ThemeLayoutId
 import com.cleanpic.theme.ThemeTokens
-import com.cleanpic.update.UpdateStatus
 
 /**
  * 统一设置页布局 — 所有主题共享相同的文字大小、间距和内容结构。
@@ -116,10 +114,9 @@ fun SharedSettingsLayout(state: SettingsScreenState) {
                 Spacer(modifier = Modifier.height(32.dp))
             }
 
-            // 版本更新
+            // 宿主注入区块（如版本更新）
             item {
-                SectionTitle("版本更新", theme, titleFont)
-                UpdateSection(state, theme, theme.borderRadius)
+                state.extras()
                 Spacer(modifier = Modifier.height(28.dp))
             }
 
@@ -314,150 +311,6 @@ private fun CountChip(
             fontWeight = FontWeight.Medium,
             color = textColor
         )
-    }
-}
-
-// ── 版本更新 ──────────────────────────────────────────────
-
-@Composable
-private fun UpdateSection(state: SettingsScreenState, theme: ThemeTokens, radius: Float) {
-    val hasNewVersion = state.updateCheckResult?.status?.let {
-        it != UpdateStatus.UP_TO_DATE
-    } ?: false
-
-    Column(modifier = Modifier.fillMaxWidth()) {
-        // 自动检查更新开关
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(radius.dp))
-                .background(Color(theme.colorSurface))
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "自动检查更新",
-                fontSize = 14.sp,
-                color = Color(theme.colorText)
-            )
-            Box(
-                modifier = Modifier
-                    .size(width = 44.dp, height = 24.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(
-                        if (state.autoCheckUpdate) Color(theme.colorPrimary)
-                        else Color(theme.colorTextSecondary).copy(alpha = 0.3f)
-                    )
-                    .clickable { state.onAutoCheckUpdateChange(!state.autoCheckUpdate) }
-                    .testTag("auto_check_update_toggle"),
-                contentAlignment = if (state.autoCheckUpdate) Alignment.CenterEnd else Alignment.CenterStart
-            ) {
-                Box(
-                    modifier = Modifier
-                        .padding(2.dp)
-                        .size(20.dp)
-                        .clip(CircleShape)
-                        .background(Color.White)
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // 检查更新按钮
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(radius.dp))
-                .background(Color(theme.colorSurface))
-                .clickable(enabled = !state.isCheckingUpdate) { state.onCheckUpdate() }
-                .padding(horizontal = 16.dp, vertical = 12.dp)
-                .testTag("check_update_button"),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = if (state.isCheckingUpdate) "正在检查..." else "检查更新",
-                    fontSize = 14.sp,
-                    color = Color(theme.colorText)
-                )
-                if (hasNewVersion) {
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xFFFF3B30))
-                            .testTag("update_badge")
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "v${state.updateCheckResult?.updateInfo?.version} 可用",
-                        fontSize = 12.sp,
-                        color = Color(theme.colorPrimary),
-                        modifier = Modifier.testTag("update_version_hint")
-                    )
-                }
-            }
-        }
-
-        // 检查结果消息
-        state.checkResultMessage?.let { message ->
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = message,
-                fontSize = 12.sp,
-                color = Color(theme.colorTextSecondary),
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .testTag("check_result_message")
-            )
-        }
-
-        // 发现新版本时显示"立即更新"按钮
-        if (hasNewVersion) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(radius.dp))
-                    .background(Color(theme.colorPrimary))
-                    .clickable(onClick = state.onStartUpdate)
-                    .padding(vertical = 12.dp)
-                    .testTag("settings_update_now_button"),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "立即更新",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.White
-                )
-            }
-        }
-
-        // 调试按钮：模拟下载进度（仅 Debug 构建可见）
-        if (state.isDebugBuild) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(radius.dp))
-                    .background(Color(theme.colorTextSecondary).copy(alpha = 0.15f))
-                    .clickable(onClick = state.onSimulateDownload)
-                    .padding(vertical = 12.dp)
-                    .testTag("simulate_download_button"),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "模拟下载（调试）",
-                    fontSize = 13.sp,
-                    color = Color(theme.colorTextSecondary)
-                )
-            }
-        }
     }
 }
 

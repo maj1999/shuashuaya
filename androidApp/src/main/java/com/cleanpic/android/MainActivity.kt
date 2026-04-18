@@ -11,6 +11,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import com.cleanpic.android.wiring.UpdateWiring
 import com.cleanpic.di.ServiceLocator
 import com.cleanpic.media.AndroidMediaRepository
 import com.cleanpic.media.AndroidVideoPlayer
@@ -18,8 +19,6 @@ import com.cleanpic.permission.AndroidPermission
 import com.cleanpic.settings.AndroidAppSettings
 import com.cleanpic.theme.isLightColor
 import com.cleanpic.ui.CleanPicApp
-import com.cleanpic.update.AndroidUpdateInstaller
-import com.cleanpic.update.UpdateChecker
 
 class MainActivity : ComponentActivity() {
 
@@ -57,18 +56,13 @@ class MainActivity : ComponentActivity() {
             mediaRepo = AndroidMediaRepository(applicationContext),
             settings = AndroidAppSettings(applicationContext),
             permission = androidPermission,
-            player = AndroidVideoPlayer(),
-            updater = if (BuildConfig.ENABLE_UPDATE_CHECK) {
-                UpdateChecker(BuildConfig.UPDATE_API_URL)
-            } else null,
-            installer = if (BuildConfig.ENABLE_UPDATE_CHECK) {
-                AndroidUpdateInstaller(applicationContext)
-            } else null
+            player = AndroidVideoPlayer()
         )
+
+        val hooks = UpdateWiring.provideHooks(this)
 
         setContent {
             val theme by ServiceLocator.themeManager.currentTheme.collectAsState()
-            // 在 composition 作用域内读取，确保主题切换时触发重组
             val statusBarColor = theme.colorBackground.toInt()
             val lightStatusBar = !isLightColor(theme.colorText)
 
@@ -83,7 +77,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            CleanPicApp()
+            CleanPicApp(hooks = hooks)
         }
     }
 

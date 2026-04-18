@@ -64,4 +64,10 @@ dependencies {
     implementation(Deps.ANDROIDX_CORE_KTX)
     implementation(Deps.MATERIAL)
     implementation("androidx.activity:activity-compose:1.8.2")
+
+    // direct flavor 的 UpdateWiring 直接使用 Compose foundation/material3/ui，
+    // 因 :update 模块以 implementation 引入这些依赖不会传递到消费者，所以这里显式声明。
+    "directImplementation"("androidx.compose.foundation:foundation:1.7.6")
+    "directImplementation"("androidx.compose.material3:material3:1.3.1")
+    "directImplementation"("androidx.compose.ui:ui:1.7.6")
 }

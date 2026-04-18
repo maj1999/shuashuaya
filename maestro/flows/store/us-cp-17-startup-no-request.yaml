@@ -1,0 +1,36 @@
+# maestro/flows/store/us-cp-17-startup-no-request.yaml
+#
+# E2E (E-UPD-14): store flavor 启动正常，无升级行为副作用
+# 对应: US-CP-17 AC2（行为层；流量层由 B-UPD-01 字节码扫描承担）
+#
+appId: com.cleanpic.android
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 30000
+- waitForAnimationToEnd
+
+# 首页正常渲染
+- assertVisible:
+    id: "settings_button"
+
+# 无升级弹窗
+- assertNotVisible:
+    id: "update_dialog"
+- assertNotVisible:
+    id: "download_progress_dialog"
+
+# 进入设置页确认无升级元素
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+- assertNotVisible:
+    id: "auto_check_update_toggle"
+
+# 返回首页
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd

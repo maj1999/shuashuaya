@@ -1,0 +1,37 @@
+# maestro/flows/store/us-cp-17-settings-no-update.yaml
+#
+# E2E (E-UPD-12): store flavor 设置页不显示任何升级相关 UI
+# 对应: US-CP-17 AC1
+#
+appId: com.cleanpic.android
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 30000
+- waitForAnimationToEnd
+
+# 进入设置页
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+
+# 断言：升级相关元素均不存在
+- assertNotVisible:
+    id: "auto_check_update_toggle"
+- assertNotVisible:
+    id: "check_update_button"
+- assertNotVisible:
+    id: "start_update_button"
+- assertNotVisible:
+    id: "check_result_message"
+
+# 截图作为证据
+- takeScreenshot: maestro/screenshots/store-settings-no-update
+
+# 返回首页
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd

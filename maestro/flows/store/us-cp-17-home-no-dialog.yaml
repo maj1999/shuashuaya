@@ -1,0 +1,29 @@
+# maestro/flows/store/us-cp-17-home-no-dialog.yaml
+#
+# E2E (E-UPD-13): store flavor 启动后不弹任何升级弹窗
+# 对应: US-CP-17 AC3
+#
+appId: com.cleanpic.android
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 30000
+- waitForAnimationToEnd
+
+# 进入首页后立即检查升级弹窗均不存在
+- assertNotVisible:
+    id: "update_dialog"
+- assertNotVisible:
+    id: "download_progress_dialog"
+- assertNotVisible:
+    id: "installing_dialog"
+- assertNotVisible:
+    id: "update_failed_dialog"
+
+# 等待动画结束后再次检查（防止异步弹出）
+- waitForAnimationToEnd
+- assertNotVisible:
+    id: "update_dialog"

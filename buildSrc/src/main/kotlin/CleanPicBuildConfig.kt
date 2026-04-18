@@ -50,7 +50,7 @@ object Deps {
 object AppConfig {
     const val APPLICATION_ID = "com.cleanpic.android"
     const val GROUP = "com.cleanpic"
-    const val VERSION_NAME = "1.2.6"
-    const val VERSION_CODE = 22
+    const val VERSION_NAME = "1.2.7"
+    const val VERSION_CODE = 23
     const val UPDATE_API_URL = "https://cleanpic-update.maj1946027533.workers.dev"
 }

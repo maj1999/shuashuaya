@@ -77,20 +77,26 @@ Kotlin Multiplatform + Compose Multiplatform 的照片/视频随机清理 App。
 
 ### 版本号修改位置
 
-升级版本号时需同步修改以下文件（`scripts/release.sh` 会自动处理）：
+升级版本号时需同步修改以下文件（`scripts/release-direct.sh` 会自动处理）：
 - `buildSrc/src/main/kotlin/CleanPicBuildConfig.kt` — `VERSION_NAME` + `VERSION_CODE`（+1）
 - `shared/src/commonMain/kotlin/com/cleanpic/AppInfo.kt` — `VERSION`
 
 ### 发布流程
 
+App 拆分为两个 flavor：
+- **direct flavor**（GitHub Release 通道）：通过 `scripts/release-direct.sh` 一键发布，支持 App 内自动检测更新
+- **store flavor**（应用商店通道）：通过 `scripts/build-store.sh <版本号>` 构建产物，需手动上架到各应用商店，不走 GitHub Release，App 内不提示自动更新
+
 **每次升级版本号后，必须询问用户：**
 
-> "版本号已升级到 x.y.z，是否需要发布 Release？发布后用户将可以自动检测到新版本并升级。"
+> "版本号已升级到 x.y.z，是否需要发布 Release？发布后 direct 渠道用户将可以自动检测到新版本并升级。"
 
-如果用户确认发布，执行 `scripts/release.sh <版本号> "<更新说明>"` 完成：
-1. 构建 Release APK
+如果用户确认发布，执行 `scripts/release-direct.sh <版本号> "<更新说明>"` 完成：
+1. 构建 direct flavor Release APK
 2. 创建 GitHub Release（附带 APK）
-3. 更新 Cloudflare Worker 版本信息（触发客户端自动更新检测）
+3. 更新 Cloudflare Worker 版本信息（触发 direct 渠道客户端自动更新检测）
+
+如需同步发布到应用商店，另行执行 `scripts/build-store.sh <版本号>` 生成 store flavor APK 并手动上架。
 
 ### 完整提交检查清单
 

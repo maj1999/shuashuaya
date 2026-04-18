@@ -1,6 +1,6 @@
-# CleanPic — 领域模型（术语 SSOT）
+# 刷刷鸭 — 领域模型（术语 SSOT）
 
-|文档状态| 初稿 | 2026-03-28 |
+|文档状态| 更新 | 2026-04-12 |
 
 ## 术语映射
 
@@ -31,6 +31,9 @@
 | 下载安装 | UpdateInstaller.startUpdate() | 各平台独立实现的更新包下载与安装 |
 | 版本 API | Cloudflare Workers /api/version | 返回各平台最新版本信息的远程接口 |
 | 下载代理 | Cloudflare Workers /download/ | 代理 GitHub Release 资源下载，解决国内访问 |
+| 分发渠道 | Distribution Channel / productFlavor | 区分构建版本面向的用户群的维度，决定是否包含应用内升级 |
+| 直装版 | Direct Build（`direct` flavor） | 通过 GitHub Release 分发的 APK，包含完整应用内升级能力 |
+| 商店版 | Store Build（`store` flavor） | 通过应用商店分发的 APK，编译期完全移除升级相关代码与网络请求，升级由商店负责 |
 
 ## 核心数据模型
 

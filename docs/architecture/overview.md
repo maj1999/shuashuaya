@@ -17,12 +17,15 @@
 ```mermaid
 graph TB
     subgraph "shared/ (Kotlin Multiplatform)"
-        UI["ui/<br/>Splash / Home / Viewer<br/>Result / Settings"]
+        UI["ui/<br/>Splash / Home / Viewer<br/>Result / Settings<br/>(AppHooks slot)"]
         Theme["theme/<br/>ThemeManager<br/>5 套 ThemeTokens + AppIcons"]
         Interaction["interaction/<br/>Carousel / SwipeCard<br/>Fullscreen"]
         Media["media/<br/>MediaRepository<br/>RandomPicker"]
         Settings["settings/<br/>AppSettings"]
-        Update["update/<br/>UpdateChecker<br/>UpdateInstaller"]
+    end
+
+    subgraph "update/ (独立 KMP 模块，仅 direct flavor 链接)"
+        Update["UpdateChecker<br/>UpdateInstaller<br/>UpdateDialog"]
     end
 
     subgraph "android/"
@@ -50,7 +53,7 @@ graph TB
     UI --> Interaction
     UI --> Media
     UI --> Settings
-    UI --> Update
+    Update -.注入 AppHooks.-> UI
     Media --> A_Media & I_Media & H_Media
     Settings --> A_Store & I_Store & H_Store
 ```
@@ -71,8 +74,9 @@ graph TB
 | RandomPicker | 随机不重复选取 + 会话级去重 | shared |
 | AppSettings | 偏好持久化的跨平台抽象 (expect/actual) | shared + 各平台 |
 | VideoPlayer | 视频播放的跨平台抽象 (expect/actual) | shared + 各平台 |
-| UpdateChecker | 版本检查逻辑（调用远程 API，比较版本号） | shared |
-| UpdateInstaller | 下载安装更新的跨平台抽象 (expect/actual) | shared + 各平台 |
+| AppHooks | shared 对外的插槽接口，宿主通过它注入升级 UI 与回调 | shared |
+| UpdateChecker | 版本检查逻辑（调用远程 API，比较版本号） | :update（仅 direct flavor） |
+| UpdateInstaller | 下载安装更新的跨平台抽象 (expect/actual) | :update + 各平台（仅 direct flavor） |
 
 ## 子文档导航
 
@@ -82,6 +86,7 @@ graph TB
 | 主题系统 | [cleanpic/theme-system.md](cleanpic/theme-system.md) | Token 定义（v2：含布局标识+图标参数）、5 套新主题、矢量图标系统、页面分发架构 |
 | 原生 Module | [cleanpic/native-modules.md](cleanpic/native-modules.md) | MediaModule/PermissionModule/VideoPlayer 各平台实现 |
 | 自动升级 | [cleanpic/auto-update.md](cleanpic/auto-update.md) | UpdateChecker/UpdateInstaller + Cloudflare Workers 后端 |
+| 升级的分发隔离 | [cleanpic/auto-update-distribution.md](cleanpic/auto-update-distribution.md) | `:update` 独立模块、shared 脱钩、direct/store flavor、iOS 预留方案 |
 | 技术栈选型 | [tech-stack.md](tech-stack.md) | 框架选型对比与最终决策 |
 | 领域模型 | [domain-model.md](domain-model.md) | 业务术语 <-> 技术术语映射 SSOT |
 

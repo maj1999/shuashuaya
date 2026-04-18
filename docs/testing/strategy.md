@@ -69,10 +69,11 @@ shared/src/commonTest/kotlin/com/cleanpic/
 | US-CP-10 每轮数量 | U12-U14 | E17 | — | E17 |
 | US-CP-11 权限引导 | — | — | P01-P06 | P01-P06 |
 | US-CP-12 中途退出浏览 | — | — | — | E19a,E19b,E19c |
-| US-CP-13 启动检查更新 | U-UPD-01~04 | — | — | E-UPD-01~04 |
-| US-CP-14 手动检查+红点 | U-UPD-04 | — | — | E-UPD-06~09 |
-| US-CP-15 下载安装 | — | — | — | E-UPD-10~11 |
-| US-CP-16 开关自动检查 | U-UPD-05 | — | — | E-UPD-05 |
+| US-CP-13 启动检查更新 | U-UPD-01~04 | — | — | E-UPD-01~04（direct） |
+| US-CP-14 手动检查+红点 | U-UPD-04 | — | — | E-UPD-06~09（direct） |
+| US-CP-15 下载安装 | — | — | — | E-UPD-10~11（direct） |
+| US-CP-16 开关自动检查 | U-UPD-05 | — | — | E-UPD-05（direct） |
+| US-CP-17 商店版无应用内升级 | U-UPD-07 | — | B-UPD-01~03（APK 字节码/权限/Manifest 扫描） | E-UPD-12~15 |
 | NFR-01~10 | — | — | F01-F08 | F01-F08 |
 
 ## 五、质量门禁
@@ -92,5 +93,5 @@ shared/src/commonTest/kotlin/com/cleanpic/
 | [scenarios/ep2-video-cleanup.md](scenarios/ep2-video-cleanup.md) | EP2 视频清理 | E07-E09 |
 | [scenarios/ep3-theme-interaction.md](scenarios/ep3-theme-interaction.md) | EP3 主题与交互 | E10-E18 |
 | [scenarios/ep5-browsing-enhancement.md](scenarios/ep5-browsing-enhancement.md) | EP5 浏览体验增强 | E19a-E19c |
-| [scenarios/ep6-auto-update.md](scenarios/ep6-auto-update.md) | EP6 自动升级 | U-UPD-01~05, E-UPD-01~11 |
+| [scenarios/ep6-auto-update.md](scenarios/ep6-auto-update.md) | EP6 自动升级 | U-UPD-01~07, B-UPD-01~03（构建产物扫描）, E-UPD-01~15 |
 | [scenarios/tech-nfr.md](scenarios/tech-nfr.md) | NFR + 权限 + 兼容性 | P01-P06, F01-F08, 兼容性矩阵 |

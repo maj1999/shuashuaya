@@ -9,6 +9,7 @@
 | 主题系统 | [theme-system.md](theme-system.md) | Token 定义与 5 套主题 |
 | 原生 Module | [native-modules.md](native-modules.md) | 各平台 MediaModule/权限/视频播放 |
 | 自动升级 | [auto-update.md](auto-update.md) | UpdateChecker/UpdateInstaller + Cloudflare Workers |
+| 升级的分发隔离 | [auto-update-distribution.md](auto-update-distribution.md) | `:update` 独立模块 + `direct`/`store` flavor + shared AppHooks slot |
 
 ## 数据流
 

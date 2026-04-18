@@ -12,12 +12,13 @@
 | 分平台安装策略 | Android/HarmonyOS 应用内下载安装，iOS 跳转浏览器 |
 | 强制/可选更新 | 后端可标记某版本为强制更新，App 根据标记决定弹窗行为 |
 | 国内外可达 | Cloudflare 全球 CDN + Workers 代理 GitHub Release 下载 |
+| 分渠道分发 | 直装版含应用内升级；商店版编译期移除升级代码 |
 
 ## 架构概览
 
 ```
 ┌─────────────────────────────────────────────────┐
-│  shared/commonMain                              │
+│  :update（独立 KMP 模块，direct flavor 链接）    │
 │  ┌───────────────┐  ┌────────────────────────┐  │
 │  │ UpdateChecker  │  │ UpdateDialog (Compose) │  │
 │  │ (版本检查)     │  │ (更新弹窗 UI)          │  │
@@ -35,6 +36,14 @@
 │  │ + Intent 安装    │ Safari   │ HAP 安装  │    │
 │  └──────────────────┴──────────┴───────────┘    │
 └─────────────────────────────────────────────────┘
+            │                    ▲
+            │ 通过 AppHooks slot  │ direct flavor 注入
+            ▼                    │
+┌─────────────────────────────────────────────────┐
+│  shared（KMP 模块，完全不感知升级）              │
+│  UI 通过 hooks.onAppStart / HomeOverlay /       │
+│  SettingsExtras 接收外部注入                     │
+└─────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────┐
 │  Cloudflare Workers (后端)                       │
@@ -44,6 +53,8 @@
 │  └──────────────┘  └──────────────────────────┘ │
 └─────────────────────────────────────────────────┘
 ```
+
+分发渠道与 shared 脱钩的具体方案详见 [auto-update-distribution.md](auto-update-distribution.md)。
 
 ## 后端设计：Cloudflare Workers
 
@@ -94,9 +105,13 @@
 
 ## App 端设计
 
-### 新增依赖
+### 模块归属
 
-在 `shared/build.gradle.kts` 的 commonMain 中添加 Ktor Client（KMP HTTP 客户端）：
+升级相关代码统一归属 `:update` 独立 Gradle 模块（KMP），不再放在 `shared` 模块中。`shared` 通过 `AppHooks` slot 接口接收外部注入，自身不依赖 `:update`。具体模块拆分方案详见 [auto-update-distribution.md](auto-update-distribution.md)。
+
+### 依赖
+
+在 `update/build.gradle.kts` 的 commonMain 中添加 Ktor Client（KMP HTTP 客户端）：
 
 ```kotlin
 // commonMain
@@ -114,7 +129,7 @@ implementation("io.ktor:ktor-client-darwin:3.1.1")
 ### 数据模型
 
 ```kotlin
-// shared/commonMain — update/UpdateInfo.kt
+// :update — commonMain — UpdateInfo.kt
 data class UpdateInfo(
     val version: String,         // 最新版本号
     val versionCode: Int? = null,// Android 版本号
@@ -136,10 +151,10 @@ data class UpdateCheckResult(
 )
 ```
 
-### UpdateChecker（commonMain 共享逻辑）
+### UpdateChecker（`:update` commonMain 共享逻辑）
 
 ```kotlin
-// shared/commonMain — update/UpdateChecker.kt
+// :update — commonMain — UpdateChecker.kt
 class UpdateChecker(private val httpClient: HttpClient) {
 
     suspend fun checkForUpdate(
@@ -160,7 +175,7 @@ class UpdateChecker(private val httpClient: HttpClient) {
 ### UpdateInstaller（expect/actual 跨平台抽象）
 
 ```kotlin
-// shared/commonMain — update/UpdateInstaller.kt
+// :update — commonMain — UpdateInstaller.kt
 expect class UpdateInstaller {
     // 开始下载并安装更新
     fun startUpdate(updateInfo: UpdateInfo)
@@ -183,21 +198,15 @@ enum class DownloadState {
 | iOS | `UIApplication.shared.open(url)` 跳转 Safari |
 | HarmonyOS | 下载 HAP → 系统安装接口 |
 
-### ServiceLocator 扩展
+### 依赖注入（AppHooks slot 模式）
 
-```kotlin
-object ServiceLocator {
-    // 新增
-    lateinit var updateChecker: UpdateChecker
-    lateinit var updateInstaller: UpdateInstaller
-}
-```
+`shared` 不再持有 `UpdateChecker` / `UpdateInstaller`。`:update` 模块提供一个实现了 `AppHooks` 的对象，由 `direct` flavor 的 `MainActivity` 在启动时注入 `CleanPicApp(hooks = updateHooks)`。`store` flavor 注入 `AppHooks.Empty`，整个升级模块不被链接进 APK。
 
-在各平台入口（如 Android `MainActivity.onCreate()`）初始化。
+具体 slot 接口与注入方式详见 [auto-update-distribution.md](auto-update-distribution.md)。
 
 ### UI 层
 
-#### UpdateDialog（commonMain 共享 Compose）
+#### UpdateDialog（`:update` commonMain 共享 Compose）
 
 两种弹窗样式：
 - **可选更新弹窗**：显示版本号 + 更新日志 + "立即更新" / "稍后提醒"
@@ -205,65 +214,56 @@ object ServiceLocator {
 
 弹窗样式跟随当前主题 Token。
 
-#### SettingsScreen 修改
+#### SettingsScreen 插入升级区块
 
-在现有设置页中添加：
-- "检查更新"按钮，点击手动检查
-- 有新版本时显示红点标记 + 新版本号
-- 更新状态信息来自 `UpdateCheckResult` 缓存
+`shared` 的设置页通过 `hooks.SettingsExtras()` slot 渲染外部内容：
+- direct flavor 下，`:update` 提供的 hooks 渲染出"自动检查更新"开关、"检查更新"按钮、"有新版本"提示等
+- store flavor 下，slot 为空，设置页无任何升级相关 UI
 
 ### 触发时机
 
-1. **启动检查**：在 `SplashScreen` 的 `LaunchedEffect` 中后台调用 `UpdateChecker.checkForUpdate()`，结果缓存到内存。Splash 结束进入 Home 后，若有更新则弹窗。
-2. **手动检查**：设置页"检查更新"按钮触发，实时调用并展示结果。
+1. **启动检查**：`SplashScreen` 通过 `hooks.onAppStart()` 触发。direct flavor 下钩子内部调用 `UpdateChecker.checkForUpdate()` 并缓存结果；store flavor 下为空操作。
+2. **手动检查**：设置页 `hooks.SettingsExtras()` 渲染的"检查更新"按钮触发（仅 direct flavor 存在）。
 
 ### 状态管理
 
 | 状态 | 生命周期 | 存储位置 |
 |------|---------|---------|
-| UpdateCheckResult | 会话级 | ServiceLocator 内存缓存 |
+| UpdateCheckResult | 会话级 | `:update` 模块内部（非 `shared/ServiceLocator`） |
 | DownloadProgress | 下载期间 | UpdateInstaller.downloadProgress |
-| hasNewVersion | 会话级 | 内存，供设置页红点展示 |
-| autoCheckUpdate | 持久化 | AppSettings（默认 true） |
+| hasNewVersion | 会话级 | `:update` 模块内部，供设置页红点展示 |
+| autoCheckUpdate | 持久化 | AppSettings（默认 true，仅 direct flavor 有 UI 控制） |
 
 ### 开源项目适配
 
 作为开源项目，自动升级功能需要对自编译用户友好：
 
-1. **用户可关闭**：设置页提供"自动检查更新"开关，关闭后启动时不请求网络，手动检查仍可用
-2. **API 地址可配置**：版本检查 URL 定义在 `BuildConfig` 中，Fork 项目可指向自己的后端或留空禁用
-3. **构建时可禁用**：`CleanPicBuildConfig` 中添加 `ENABLE_UPDATE_CHECK` 标志，设为 `false` 则编译时完全移除更新相关 UI 和网络代码
+1. **用户可关闭**：direct flavor 设置页提供"自动检查更新"开关，关闭后启动时不请求网络，手动检查仍可用
+2. **API 地址可配置**：版本检查 URL 定义在 `BuildConfig.UPDATE_API_URL` 中，Fork 项目可指向自己的后端
+3. **构建时可禁用**：使用 `store` flavor 构建，编译期完全移除升级相关 UI 和网络代码（详见 [auto-update-distribution.md](auto-update-distribution.md)）
 4. **无网络降级**：版本检查失败不影响任何核心功能
 
 ## 安全与隐私影响
 
-本模块是 App 中 **唯一的网络请求模块**，需更新架构总览中"纯本地"的描述：
+本模块是 App 中 **唯一的网络请求模块**（且仅在 `direct` flavor 存在），需更新架构总览中"纯本地"的描述：
 
-- 仅请求版本检查 API，不传输任何用户数据
+- 仅 direct flavor 请求版本检查 API，不传输任何用户数据
+- store flavor 完全无网络请求
 - 请求内容：当前版本号 + 平台标识（无设备 ID、无用户信息）
 - 下载通过 HTTPS，Cloudflare Workers 代理 GitHub Release
 - 无网络时静默失败，不影响核心功能
 
-## 文件变更清单
+## 分发渠道与编译期隔离
 
-| 位置 | 文件 | 操作 |
-|------|------|------|
-| commonMain | `update/UpdateInfo.kt` | 新增 |
-| commonMain | `update/UpdateChecker.kt` | 新增 |
-| commonMain | `update/UpdateInstaller.kt` | 新增（expect） |
-| commonMain | `update/UpdateDialog.kt` | 新增 |
-| commonMain | `ui/splash/SplashScreen.kt` | 修改（添加版本检查） |
-| commonMain | `ui/settings/SettingsScreen.kt` | 修改（添加检查更新按钮+红点） |
-| commonMain | `di/ServiceLocator.kt` | 修改（添加 updateChecker/updateInstaller） |
-| commonMain | `AppInfo.kt` | 修改（确保版本号与 build 版本一致） |
-| androidMain | `update/AndroidUpdateInstaller.kt` | 新增（actual） |
-| appleMain | `update/IosUpdateInstaller.kt` | 新增（actual） |
-| ohosArm64Main | `update/HarmonyUpdateInstaller.kt` | 新增（actual） |
-| androidApp | `MainActivity.kt` | 修改（初始化 UpdateInstaller） |
-| build.gradle | `shared/build.gradle.kts` | 修改（添加 Ktor 依赖） |
-| cloudflare | `worker/` | 新增（Workers 脚本 + wrangler 配置） |
-| docs | `architecture/overview.md` | 修改（更新"纯本地"描述） |
-| docs | `architecture/domain-model.md` | 修改（添加更新相关术语） |
+升级功能支持双分发渠道（GitHub 直装 / 应用商店），商店版在编译期完全移除升级代码以符合商店审核要求。
+
+详见 [auto-update-distribution.md](auto-update-distribution.md)，包含：
+- `:update` 独立 Gradle 模块的拆分与 `shared` 脱钩（AppHooks slot 接口）
+- Android `direct` / `store` productFlavor 配置
+- iOS 未来 Xcode Build Configuration 方案（本次仅预留，不落地）
+- 编译产物差异对照表与字节码扫描验证手段
+- `scripts/release-direct.sh` / `scripts/build-store.sh` 脚本拆分方案
+- 本次分发渠道重构的文件变更清单
 
 ## 部署与配置
 

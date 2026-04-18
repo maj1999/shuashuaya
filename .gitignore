@@ -30,6 +30,7 @@ node_modules/
 
 # Superpowers / Claude
 .superpowers/
+.worktrees/
 
 # Kotlin/Native
 *.klib

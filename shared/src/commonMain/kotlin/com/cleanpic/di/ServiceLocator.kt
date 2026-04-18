@@ -5,11 +5,6 @@ import com.cleanpic.media.VideoPlayer
 import com.cleanpic.permission.PermissionManager
 import com.cleanpic.settings.AppSettings
 import com.cleanpic.theme.ThemeManager
-import com.cleanpic.update.UpdateCheckResult
-import com.cleanpic.update.UpdateChecker
-import com.cleanpic.update.UpdateInstaller
-import com.cleanpic.update.UpdateStatus
-import kotlinx.coroutines.flow.MutableStateFlow
 
 object ServiceLocator {
     lateinit var mediaRepository: MediaRepository
@@ -21,25 +16,16 @@ object ServiceLocator {
     // 调试标记（平台侧设置）
     var isDebugBuild: Boolean = false
 
-    // 自动升级
-    var updateChecker: UpdateChecker? = null
-    var updateInstaller: UpdateInstaller? = null
-    val cachedUpdateResult = MutableStateFlow(UpdateCheckResult(UpdateStatus.UP_TO_DATE))
-
     fun initialize(
         mediaRepo: MediaRepository,
         settings: AppSettings,
         permission: PermissionManager,
-        player: VideoPlayer,
-        updater: UpdateChecker? = null,
-        installer: UpdateInstaller? = null
+        player: VideoPlayer
     ) {
         mediaRepository = mediaRepo
         appSettings = settings
         permissionManager = permission
         videoPlayer = player
-        updateChecker = updater
-        updateInstaller = installer
         themeManager.switchTheme(settings.theme)
     }
 }

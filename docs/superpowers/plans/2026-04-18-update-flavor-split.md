@@ -29,7 +29,7 @@
 | `update/src/commonMain/kotlin/com/cleanpic/update/UpdateChecker.kt` | 从 shared 迁移 |
 | `update/src/commonMain/kotlin/com/cleanpic/update/UpdateInstaller.kt` | 从 shared 迁移 |
 | `update/src/commonMain/kotlin/com/cleanpic/update/UpdateDialog.kt` | 从 shared 迁移（4 个 Composable） |
-| `update/src/commonMain/kotlin/com/cleanpic/update/UpdateState.kt` | 升级会话级状态单例（取代 ServiceLocator.cachedUpdateResult） |
+| `update/src/commonMain/kotlin/com/cleanpic/update/UpdateResultCache.kt` | 升级会话级状态单例（取代 ServiceLocator.cachedUpdateResult） |
 | `update/src/androidMain/AndroidManifest.xml` | `:update` 模块自有 Manifest（占位空 application） |
 | `update/src/androidMain/kotlin/com/cleanpic/update/AndroidUpdateInstaller.kt` | 从 shared 迁移 |
 | `update/src/appleMain/kotlin/com/cleanpic/update/IosUpdateInstaller.kt` | 从 shared 迁移 |
@@ -576,24 +576,31 @@ git rm shared/src/androidUnitTest/kotlin/com/cleanpic/update/UpdateDialogOverlay
 git commit -m "refactor(update): move update Compose UI tests to :update module"
 ```
 
-### 任务 1.8：抽取 UpdateState 单例（取代 ServiceLocator.cachedUpdateResult）
+### 任务 1.8：抽取 UpdateResultCache 单例（取代 ServiceLocator.cachedUpdateResult）
 
 **文件：**
-- 创建：`update/src/commonMain/kotlin/com/cleanpic/update/UpdateState.kt`
+- 创建：`update/src/commonMain/kotlin/com/cleanpic/update/UpdateResultCache.kt`
 
-- [ ] **步骤 1：写 UpdateState 单例**
+- [ ] **步骤 1：写 UpdateResultCache 单例**
 
 ```kotlin
 package com.cleanpic.update
 
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 /**
- * 升级模块会话级状态。
+ * 升级模块会话级缓存：最近一次升级检查结果。
  * 取代原 ServiceLocator.cachedUpdateResult，使 shared 不再持有升级相关状态。
  */
-object UpdateState {
-    val cachedResult = MutableStateFlow(UpdateCheckResult(UpdateStatus.UP_TO_DATE))
+object UpdateResultCache {
+    private val _value = MutableStateFlow(UpdateCheckResult(UpdateStatus.UP_TO_DATE))
+    val value: StateFlow<UpdateCheckResult> = _value.asStateFlow()
+
+    fun update(result: UpdateCheckResult) {
+        _value.value = result
+    }
 }
 ```
 
@@ -608,8 +615,8 @@ cd /Users/mark/Projects/shuashuaya && ./gradlew :update:compileKotlinMetadata
 - [ ] **步骤 3：commit**
 
 ```bash
-git add update/src/commonMain/kotlin/com/cleanpic/update/UpdateState.kt
-git commit -m "feat(update): add UpdateState singleton for session-level cache"
+git add update/src/commonMain/kotlin/com/cleanpic/update/UpdateResultCache.kt
+git commit -m "feat(update): add UpdateResultCache singleton for session-level cache"
 ```
 
 ### 任务 1.9：清理 shared 的 Ktor 依赖
@@ -1447,7 +1454,7 @@ import com.cleanpic.update.UpdateChecker
 import com.cleanpic.update.UpdateCheckResult
 import com.cleanpic.update.UpdateDialog
 import com.cleanpic.update.UpdateFailedDialog
-import com.cleanpic.update.UpdateState
+import com.cleanpic.update.UpdateResultCache
 import com.cleanpic.update.UpdateStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -1483,7 +1490,7 @@ object UpdateWiring {
             if (!ServiceLocator.appSettings.autoCheckUpdate) return
             updateScope.launch {
                 runCatching {
-                    UpdateState.cachedResult.value = checker.checkForUpdate()
+                    UpdateResultCache.update(checker.checkForUpdate())
                 }
             }
         }
@@ -1506,7 +1513,7 @@ private fun HomeUpdateOverlay(
     installer: AndroidUpdateInstaller
 ) {
     val theme by ServiceLocator.themeManager.currentTheme.collectAsState()
-    val updateResult by UpdateState.cachedResult.collectAsState()
+    val updateResult by UpdateResultCache.value.collectAsState()
     var dialogShown by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
 
@@ -1613,7 +1620,7 @@ private fun SettingsUpdateSection(
     var manualCheckResult by remember { mutableStateOf<UpdateCheckResult?>(null) }
     val scope = rememberCoroutineScope()
 
-    val updateResult: UpdateCheckResult? = manualCheckResult ?: UpdateState.cachedResult.value.let {
+    val updateResult: UpdateCheckResult? = manualCheckResult ?: UpdateResultCache.value.value.let {
         if (it.status != UpdateStatus.UP_TO_DATE) it else null
     }
 
@@ -1631,7 +1638,7 @@ private fun SettingsUpdateSection(
                 checkResultMessage = null
                 runCatching {
                     val result = checker.checkForUpdate()
-                    UpdateState.cachedResult.value = result
+                    UpdateResultCache.update(result)
                     manualCheckResult = result
                     checkResultMessage = when (result.status) {
                         UpdateStatus.UP_TO_DATE -> "已是最新版本"
@@ -1936,7 +1943,10 @@ check_string "UpdateInstaller" "升级安装类名"
 check_string "UpdateDialog" "升级弹窗类名"
 check_string "workers.dev" "升级 API 域名"
 check_string "releases/download" "GitHub Release 下载 URL"
-check_string "com/cleanpic/update" "升级模块包名"
+check_string "Lcom/cleanpic/update/" "升级模块类引用"
+# 注意：用 DEX 字节码中的类引用前缀 `Lcom/cleanpic/update/`（如 `Lcom/cleanpic/update/UpdateChecker;`）
+# 而非裸 `com/cleanpic/update`，避免误命中 SharedPreferences key 字面量 `auto_check_update`
+# （来自 AndroidAppSettings.kt 中保留的 autoCheckUpdate 字段）。
 
 rm -rf "$TMPDIR"
 
@@ -2766,7 +2776,7 @@ git commit -m "chore: bump version to 1.2.7"
 - [x] AppHooks.Empty 在所有引用处一致
 - [x] `BuildConfig.UPDATE_ENABLED` 与 `BuildConfig.UPDATE_API_URL` 在 androidApp/build.gradle.kts 与 UpdateWiring.kt 一致
 - [x] `productFlavors { create("direct") }` 与 `directImplementation(...)` flavor 名一致
-- [x] `UpdateState.cachedResult` 在 UpdateState.kt 定义、UpdateWiring.kt 使用一致
+- [x] `UpdateResultCache` 在 UpdateResultCache.kt 定义、UpdateWiring.kt 使用一致（读：`UpdateResultCache.value`，写：`UpdateResultCache.update(...)`）
 
 ---
 

@@ -1,0 +1,64 @@
+# maestro/flows/photo-thumbnail.yaml
+#
+# E12: 照片缩略图展示验证（轮播模式）
+# 进入照片浏览 → 截图验证缩略图已加载（非 emoji 占位符）→ 切换多张验证
+#
+appId: com.cleanpic.android
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 30000
+- waitForAnimationToEnd
+
+# 确保轮播模式
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+- tapOn: "轮播相册"
+- waitForAnimationToEnd
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd
+
+# 进入照片浏览
+- tapOn:
+    id: "start_photo"
+- waitForAnimationToEnd
+- tapOn:
+    text: "授权"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Allow"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    id: "start_photo"
+    optional: true
+- waitForAnimationToEnd
+
+# 等待进入 viewer
+- assertVisible:
+    text: ".*\\d+ / \\d+.*"
+
+# 截图：第 1 张照片缩略图
+- takeScreenshot: maestro/screenshots/photo-thumbnail-1
+
+# 保留并切到下一张
+- tapOn:
+    id: "keep_button"
+- waitForAnimationToEnd
+
+# 截图：第 2 张照片缩略图
+- takeScreenshot: maestro/screenshots/photo-thumbnail-2
+
+# 再切一张
+- tapOn:
+    id: "keep_button"
+- waitForAnimationToEnd
+
+# 截图：第 3 张照片缩略图
+- takeScreenshot: maestro/screenshots/photo-thumbnail-3

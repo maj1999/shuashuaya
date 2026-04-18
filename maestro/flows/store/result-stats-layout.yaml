@@ -1,0 +1,72 @@
+# maestro/flows/result-stats-layout.yaml
+#
+# E16: 结果页统计卡片布局验证
+# 混合保留/删除 → 结果页 → 验证三个统计卡片值和单位完整显示
+#
+appId: com.cleanpic.android
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 30000
+- waitForAnimationToEnd
+
+# 确保轮播模式
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+- tapOn: "轮播相册"
+- waitForAnimationToEnd
+- tapOn: "5"
+- waitForAnimationToEnd
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd
+
+# 进入照片浏览
+- tapOn:
+    id: "start_photo"
+- waitForAnimationToEnd
+- tapOn:
+    text: "授权"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Allow"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    id: "start_photo"
+    optional: true
+- waitForAnimationToEnd
+
+# 混合操作：3 删除 + 2 保留（确保释放值有单位）
+- tapOn:
+    id: "delete_button"
+- waitForAnimationToEnd
+- tapOn:
+    id: "delete_button"
+- waitForAnimationToEnd
+- tapOn:
+    id: "delete_button"
+- waitForAnimationToEnd
+- tapOn:
+    id: "keep_button"
+- waitForAnimationToEnd
+- tapOn:
+    id: "keep_button"
+- waitForAnimationToEnd
+
+# 验证结果页三个统计卡片
+- assertVisible: "删除"
+- assertVisible: "保留"
+- assertVisible: "释放"
+
+# 验证释放值包含单位（KB 或 MB）
+- assertVisible:
+    text: ".*(KB|MB|GB|B).*"
+
+# 截图验证卡片等高布局
+- takeScreenshot: maestro/screenshots/result-stats-layout

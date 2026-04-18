@@ -1,0 +1,77 @@
+# maestro/flows/swipecard-video-playback.yaml
+#
+# E08b: 卡片模式视频播放+静音验证
+# 卡片模式 → 视频浏览 → 点击播放 → 验证静音按钮
+#
+appId: com.cleanpic.android
+---
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 10000
+- waitForAnimationToEnd
+
+# 切换到卡片模式
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+- tapOn: "卡片左右"
+- waitForAnimationToEnd
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd
+
+# 进入视频浏览
+- tapOn:
+    id: "start_video"
+- waitForAnimationToEnd
+- tapOn:
+    text: "授权"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Allow"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    id: "start_video"
+    optional: true
+- waitForAnimationToEnd
+
+# 截图：视频缩略图 + 播放图标应可见
+- takeScreenshot: maestro/screenshots/swipecard-video-thumbnail
+
+# 点击播放图标
+- tapOn:
+    id: "play_button"
+- waitForAnimationToEnd
+
+# 等待视频加载播放
+- swipe:
+    start: "50%, 50%"
+    end: "50%, 50%"
+    duration: 1500
+
+# 验证静音按钮可见
+- assertVisible:
+    id: "mute_button"
+- takeScreenshot: maestro/screenshots/swipecard-video-playing
+
+# 点击静音按钮切换声音
+- tapOn:
+    id: "mute_button"
+- waitForAnimationToEnd
+- assertVisible:
+    id: "mute_button"
+- takeScreenshot: maestro/screenshots/swipecard-video-unmuted
+
+# 退出并恢复轮播模式
+- tapOn:
+    id: "exit_button"
+- waitForAnimationToEnd
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+- tapOn: "轮播相册"
+- waitForAnimationToEnd

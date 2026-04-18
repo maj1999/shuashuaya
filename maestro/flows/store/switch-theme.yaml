@@ -1,0 +1,70 @@
+# maestro/flows/switch-theme.yaml
+#
+# E2E: 首页 → 设置 → 切换 5 个主题 → 切回默认主题 warm
+#
+appId: com.cleanpic.android
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 30000
+- waitForAnimationToEnd
+
+# 进入设置
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+- takeScreenshot: maestro/screenshots/theme-settings-default-warm
+
+# --- 切换到"大胆几何" ---
+- tapOn:
+    id: "theme_geometric"
+- waitForAnimationToEnd
+- takeScreenshot: maestro/screenshots/theme-geometric
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+
+# --- 切换到"克制极简" ---
+- tapOn:
+    id: "theme_minimal"
+- waitForAnimationToEnd
+- takeScreenshot: maestro/screenshots/theme-minimal
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+
+# --- 切换到"活泼精致" ---
+- tapOn:
+    id: "theme_playful"
+- waitForAnimationToEnd
+- takeScreenshot: maestro/screenshots/theme-playful
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+
+# --- 切换到"杂志排版" ---
+- tapOn:
+    id: "theme_editorial"
+- waitForAnimationToEnd
+- takeScreenshot: maestro/screenshots/theme-editorial
+
+# --- 切回"温暖手工感" ---
+- tapOn:
+    id: "theme_warm"
+- waitForAnimationToEnd
+- takeScreenshot: maestro/screenshots/theme-warm-restored
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd

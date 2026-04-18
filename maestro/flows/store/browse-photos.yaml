@@ -1,0 +1,71 @@
+# maestro/flows/browse-photos.yaml
+#
+# E01: 完整照片清理流程（轮播模式）
+# 设置轮播模式 → 首页 → viewer → 标记保留/删除 → 结果页验证
+#
+appId: com.cleanpic.android
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 30000
+- waitForAnimationToEnd
+
+# 进入设置，确保轮播模式
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+- tapOn: "轮播相册"
+- waitForAnimationToEnd
+- tapOn: "5"
+- waitForAnimationToEnd
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd
+
+# 进入照片浏览
+- tapOn:
+    id: "start_photo"
+- waitForAnimationToEnd
+
+# 处理权限（首次运行）
+- tapOn:
+    text: "授权"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Allow"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    id: "start_photo"
+    optional: true
+- waitForAnimationToEnd
+
+# 验证进入 viewer（进度 N / M）
+- takeScreenshot: maestro/screenshots/browse-photos-viewer
+
+# 操作 5 张：交替删除和保留
+- tapOn:
+    id: "delete_button"
+- waitForAnimationToEnd
+- tapOn:
+    id: "keep_button"
+- waitForAnimationToEnd
+- tapOn:
+    id: "delete_button"
+- waitForAnimationToEnd
+- tapOn:
+    id: "keep_button"
+- waitForAnimationToEnd
+- tapOn:
+    id: "keep_button"
+- waitForAnimationToEnd
+
+# 验证到达结果页
+- assertVisible: "删除"
+- assertVisible: "保留"
+- assertVisible: "释放"
+- takeScreenshot: maestro/screenshots/browse-photos-result

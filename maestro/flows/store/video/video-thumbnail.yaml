@@ -1,0 +1,47 @@
+# maestro/flows/video-thumbnail.yaml
+#
+# E13: 视频缩略图展示验证（轮播模式）
+# 进入视频浏览 → 截图验证视频缩略图和时长角标
+#
+appId: com.cleanpic.android
+---
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 10000
+- waitForAnimationToEnd
+
+# 确保轮播模式
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+- tapOn: "轮播相册"
+- waitForAnimationToEnd
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd
+
+# 进入视频浏览
+- tapOn:
+    id: "start_video"
+- waitForAnimationToEnd
+- tapOn:
+    text: "授权"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Allow"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    id: "start_video"
+    optional: true
+- waitForAnimationToEnd
+
+# 等待进入 viewer
+- assertVisible:
+    text: ".*\\d+ / \\d+.*"
+
+# 截图：视频缩略图（应显示视频首帧，而非 emoji）
+- takeScreenshot: maestro/screenshots/video-thumbnail-carousel

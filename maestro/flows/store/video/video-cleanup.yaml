@@ -1,0 +1,54 @@
+# maestro/flows/video-cleanup.yaml
+#
+# E07: 视频清理流程（轮播模式）
+#
+appId: com.cleanpic.android
+---
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 10000
+- waitForAnimationToEnd
+
+# 确保轮播模式
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+- tapOn: "轮播相册"
+- waitForAnimationToEnd
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd
+
+# 进入视频浏览
+- tapOn:
+    id: "start_video"
+- waitForAnimationToEnd
+- tapOn:
+    text: "授权"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Allow"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    id: "start_video"
+    optional: true
+- waitForAnimationToEnd
+
+# 截图验证（可能进入 viewer 或空状态）
+- takeScreenshot: maestro/screenshots/video-cleanup-viewer
+
+# 如果有视频，操作（2 个视频，全部保留）
+- tapOn:
+    id: "keep_button"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    id: "keep_button"
+    optional: true
+- waitForAnimationToEnd
+
+- takeScreenshot: maestro/screenshots/video-cleanup-result

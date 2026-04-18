@@ -1,0 +1,93 @@
+# maestro/flows/delete-confirm.yaml
+#
+# E04: 全部删除 → 结果页确认删除（轮播模式）
+# 设置轮播模式 → viewer → 全部标记删除 → 结果页 → 确认删除
+# 验证：确认后待删除项目和确认按钮消失
+#
+appId: com.cleanpic.android
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 30000
+- waitForAnimationToEnd
+
+# 进入设置，确保轮播模式
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+- tapOn: "轮播相册"
+- waitForAnimationToEnd
+- tapOn: "5"
+- waitForAnimationToEnd
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd
+
+# 进入照片浏览
+- tapOn:
+    id: "start_photo"
+- waitForAnimationToEnd
+
+# 处理权限
+- tapOn:
+    text: "授权"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Allow"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    id: "start_photo"
+    optional: true
+- waitForAnimationToEnd
+
+# 全部标记删除（连续点 5 次删除按钮）
+- tapOn:
+    id: "delete_button"
+- waitForAnimationToEnd
+- tapOn:
+    id: "delete_button"
+- waitForAnimationToEnd
+- tapOn:
+    id: "delete_button"
+- waitForAnimationToEnd
+- tapOn:
+    id: "delete_button"
+- waitForAnimationToEnd
+- tapOn:
+    id: "delete_button"
+- waitForAnimationToEnd
+
+# 验证结果页显示删除统计
+- assertVisible: "删除"
+- assertVisible: "保留"
+- assertVisible: "释放"
+
+# 确认删除前：验证待删除区域和确认按钮可见
+- assertVisible: "待删除项目"
+- assertVisible: ".*确认删除.*"
+- takeScreenshot: maestro/screenshots/delete-confirm-before
+
+# 点击确认删除
+- tapOn: ".*确认删除.*"
+- waitForAnimationToEnd
+
+# 系统删除确认弹窗（Android API 30+ createDeleteRequest）
+- tapOn:
+    text: "Allow"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Delete"
+    optional: true
+- waitForAnimationToEnd
+
+# 确认删除后：验证待删除区域和确认按钮已消失
+- assertNotVisible: "待删除项目"
+- assertNotVisible: ".*确认删除.*"
+- assertVisible: ".*已成功删除.*"
+- takeScreenshot: maestro/screenshots/delete-confirm-after

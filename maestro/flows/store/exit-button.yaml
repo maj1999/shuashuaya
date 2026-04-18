@@ -1,0 +1,123 @@
+# maestro/flows/exit-button.yaml
+#
+# E19: 中途退出浏览验证（三种模式）
+# 轮播模式退出 → 卡片模式退出 → 全屏模式退出
+#
+appId: com.cleanpic.android
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 30000
+- waitForAnimationToEnd
+
+# ===== E19a: 轮播模式退出 =====
+
+# 确保轮播模式
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+- tapOn: "轮播相册"
+- waitForAnimationToEnd
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd
+
+# 进入照片浏览
+- tapOn:
+    id: "start_photo"
+- waitForAnimationToEnd
+- tapOn:
+    text: "授权"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Allow"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    id: "start_photo"
+    optional: true
+- waitForAnimationToEnd
+
+# 操作 1 张后点退出
+- tapOn:
+    id: "keep_button"
+- waitForAnimationToEnd
+- assertVisible:
+    id: "exit_button"
+- tapOn:
+    id: "exit_button"
+- waitForAnimationToEnd
+
+# 验证回到首页
+- assertVisible:
+    id: "start_photo"
+- takeScreenshot: maestro/screenshots/exit-carousel-back-home
+
+# ===== E19b: 卡片模式退出 =====
+
+# 切换到卡片模式
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+- tapOn: "卡片左右"
+- waitForAnimationToEnd
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd
+
+# 进入照片浏览
+- tapOn:
+    id: "start_photo"
+- waitForAnimationToEnd
+
+# 验证退出按钮可见
+- assertVisible:
+    id: "exit_button"
+- tapOn:
+    id: "exit_button"
+- waitForAnimationToEnd
+
+# 验证回到首页
+- assertVisible:
+    id: "start_photo"
+- takeScreenshot: maestro/screenshots/exit-swipecard-back-home
+
+# ===== E19c: 全屏模式退出 =====
+
+# 切换到全屏模式
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+- tapOn: "全屏上下"
+- waitForAnimationToEnd
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd
+
+# 进入照片浏览
+- tapOn:
+    id: "start_photo"
+- waitForAnimationToEnd
+
+# 验证退出按钮可见（全屏模式已有）
+- assertVisible:
+    id: "exit_button"
+- tapOn:
+    id: "exit_button"
+- waitForAnimationToEnd
+
+# 验证回到首页
+- assertVisible:
+    id: "start_photo"
+- takeScreenshot: maestro/screenshots/exit-fullscreen-back-home
+
+# 恢复轮播模式
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+- tapOn: "轮播相册"
+- waitForAnimationToEnd

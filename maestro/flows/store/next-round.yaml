@@ -1,0 +1,66 @@
+# maestro/flows/next-round.yaml
+#
+# E02: 再来一轮（验证可开启新一轮）
+#
+appId: com.cleanpic.android
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 30000
+- waitForAnimationToEnd
+
+# 确保轮播模式
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+- tapOn: "轮播相册"
+- waitForAnimationToEnd
+- tapOn: "5"
+- waitForAnimationToEnd
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd
+
+# 第一轮：全部保留快速通过
+- tapOn:
+    id: "start_photo"
+- waitForAnimationToEnd
+- tapOn:
+    text: "授权"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Allow"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    id: "start_photo"
+    optional: true
+- waitForAnimationToEnd
+
+- tapOn:
+    id: "keep_button"
+- waitForAnimationToEnd
+- tapOn:
+    id: "keep_button"
+- waitForAnimationToEnd
+- tapOn:
+    id: "keep_button"
+- waitForAnimationToEnd
+- tapOn:
+    id: "keep_button"
+- waitForAnimationToEnd
+- tapOn:
+    id: "keep_button"
+- waitForAnimationToEnd
+
+# 到达结果页，点击再来一轮
+- assertVisible: ".*再来一轮"
+- tapOn: ".*再来一轮"
+- waitForAnimationToEnd
+
+# 验证进入新一轮 viewer
+- takeScreenshot: maestro/screenshots/next-round-viewer

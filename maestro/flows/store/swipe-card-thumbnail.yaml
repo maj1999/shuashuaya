@@ -1,0 +1,104 @@
+# maestro/flows/swipe-card-thumbnail.yaml
+#
+# E15: 卡片模式缩略图展示验证
+# 切换到卡片模式 → 进入照片浏览 → 截图验证缩略图 → 滑动后截图验证
+#
+appId: com.cleanpic.android
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 30000
+- waitForAnimationToEnd
+
+# 切换到卡片滑动模式
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+- tapOn: "卡片左右"
+- waitForAnimationToEnd
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd
+
+# 进入照片浏览
+- tapOn:
+    id: "start_photo"
+- waitForAnimationToEnd
+- tapOn:
+    text: "授权"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Allow"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    id: "start_photo"
+    optional: true
+- waitForAnimationToEnd
+
+# 验证卡片模式
+- assertVisible: ".*左滑删除.*"
+
+# 截图：卡片模式下的照片缩略图
+- takeScreenshot: maestro/screenshots/swipe-card-thumbnail-1
+
+# 右滑保留，查看下一张
+- swipe:
+    start: "20%, 50%"
+    end: "90%, 50%"
+    duration: 300
+- waitForAnimationToEnd
+
+# 截图：第 2 张照片
+- takeScreenshot: maestro/screenshots/swipe-card-thumbnail-2
+
+# 恢复轮播模式
+- swipe:
+    start: "20%, 50%"
+    end: "90%, 50%"
+    duration: 300
+- waitForAnimationToEnd
+- swipe:
+    start: "20%, 50%"
+    end: "90%, 50%"
+    duration: 300
+- waitForAnimationToEnd
+- swipe:
+    start: "20%, 50%"
+    end: "90%, 50%"
+    duration: 300
+- waitForAnimationToEnd
+- swipe:
+    start: "20%, 50%"
+    end: "90%, 50%"
+    duration: 300
+- waitForAnimationToEnd
+- swipe:
+    start: "20%, 50%"
+    end: "90%, 50%"
+    duration: 300
+- waitForAnimationToEnd
+- swipe:
+    start: "20%, 50%"
+    end: "90%, 50%"
+    duration: 300
+- waitForAnimationToEnd
+- swipe:
+    start: "20%, 50%"
+    end: "90%, 50%"
+    duration: 300
+- waitForAnimationToEnd
+- swipe:
+    start: "20%, 50%"
+    end: "90%, 50%"
+    duration: 300
+- waitForAnimationToEnd
+- swipe:
+    start: "20%, 50%"
+    end: "90%, 50%"
+    duration: 300
+- waitForAnimationToEnd

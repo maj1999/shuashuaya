@@ -1,0 +1,65 @@
+# maestro/flows/keep-all.yaml
+#
+# E03: 全部保留 → 结果页无确认删除按钮
+#
+appId: com.cleanpic.android
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 30000
+- waitForAnimationToEnd
+
+# 确保轮播模式
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+- tapOn: "轮播相册"
+- waitForAnimationToEnd
+- tapOn: "5"
+- waitForAnimationToEnd
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd
+
+# 进入照片浏览
+- tapOn:
+    id: "start_photo"
+- waitForAnimationToEnd
+- tapOn:
+    text: "授权"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Allow"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    id: "start_photo"
+    optional: true
+- waitForAnimationToEnd
+
+# 全部保留（连续点 5 次保留按钮）
+- tapOn:
+    id: "keep_button"
+- waitForAnimationToEnd
+- tapOn:
+    id: "keep_button"
+- waitForAnimationToEnd
+- tapOn:
+    id: "keep_button"
+- waitForAnimationToEnd
+- tapOn:
+    id: "keep_button"
+- waitForAnimationToEnd
+- tapOn:
+    id: "keep_button"
+- waitForAnimationToEnd
+
+# 验证结果页：删除 0，保留 5
+- assertVisible: "保留"
+- assertVisible: "释放"
+- assertVisible: ".*再来一轮"
+- takeScreenshot: maestro/screenshots/keep-all-result

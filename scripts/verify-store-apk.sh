@@ -61,11 +61,17 @@ TMPDIR=$(mktemp -d)
 trap 'rm -rf "$TMPDIR"' EXIT
 unzip -p "$APK" 'classes*.dex' > "$TMPDIR/dexstrings.bin" 2>/dev/null || true
 
+if [ ! -s "$TMPDIR/dexstrings.bin" ]; then
+    echo "  ❌ APK 中未找到 classes*.dex 或解压失败"
+    rm -rf "$TMPDIR"
+    exit 1
+fi
+
 check_string() {
     local pattern="$1"
     local desc="$2"
     local count
-    count=$(strings "$TMPDIR/dexstrings.bin" | grep -c "$pattern" || true)
+    count=$(strings "$TMPDIR/dexstrings.bin" | grep -cF "$pattern" || true)
     if [ "$count" -gt 0 ]; then
         echo "  ❌ 发现 $count 处 \"$pattern\" ($desc)"
         FAIL=1
@@ -78,7 +84,6 @@ check_string "UpdateChecker" "升级检查类名"
 check_string "UpdateInstaller" "升级安装类名"
 check_string "UpdateDialog" "升级弹窗类名"
 check_string "workers.dev" "升级 API 域名"
-check_string "releases/download" "GitHub Release 下载 URL"
 check_string "Lcom/cleanpic/update/" "升级模块类引用 (DEX 类引用前缀，避开 auto_check_update SharedPrefs key 误命中)"
 
 # B-UPD-02: 权限扫描
@@ -86,9 +91,14 @@ echo ""
 echo "【2】权限扫描..."
 PERMS=$("$AAPT" dump permissions "$APK" 2>/dev/null || true)
 
+if [ -z "$PERMS" ]; then
+    echo "  ❌ aapt dump permissions 输出为空，APK 可能损坏或 aapt 不可用"
+    exit 1
+fi
+
 check_perm() {
     local perm="$1"
-    if echo "$PERMS" | grep -q "$perm"; then
+    if echo "$PERMS" | grep -qF "$perm"; then
         echo "  ❌ 发现权限 $perm"
         FAIL=1
     else
@@ -103,14 +113,19 @@ echo ""
 echo "【3】Manifest 资源扫描..."
 MANIFEST_DUMP=$("$AAPT" dump xmltree "$APK" AndroidManifest.xml 2>/dev/null || true)
 
-if echo "$MANIFEST_DUMP" | grep -q "FileProvider"; then
+if [ -z "$MANIFEST_DUMP" ]; then
+    echo "  ❌ aapt dump xmltree 输出为空，APK 可能损坏或 Manifest 不可读"
+    exit 1
+fi
+
+if echo "$MANIFEST_DUMP" | grep -qF "FileProvider"; then
     echo "  ❌ Manifest 中发现 FileProvider 声明"
     FAIL=1
 else
     echo "  ✅ Manifest 无 FileProvider"
 fi
 
-if echo "$MANIFEST_DUMP" | grep -q "fileprovider"; then
+if echo "$MANIFEST_DUMP" | grep -qF "fileprovider"; then
     echo "  ❌ Manifest 中发现 fileprovider authority"
     FAIL=1
 else

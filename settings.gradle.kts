@@ -24,4 +24,5 @@ dependencyResolutionManagement {
 rootProject.name = "CleanPic"
 
 include(":shared")
+include(":update")
 include(":androidApp")

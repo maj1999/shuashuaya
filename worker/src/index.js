@@ -11,25 +11,25 @@
 // 版本信息配置 — 发布新版本时更新此处
 const VERSION_CONFIG = {
   android: {
-    version: "1.2.6",
-    versionCode: 22,
+    version: "1.2.7",
+    versionCode: 24,
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "新增下载完成后安装状态提示，优化更新体验",
+    changelog: "重构升级模块为独立 :update 模块；新增商店渠道构建（store flavor 编译期完全移除应用内升级代码，符合应用商店审核要求）",
     downloadUrl: "" // 将在运行时生成
   },
   ios: {
-    version: "1.2.6",
+    version: "1.2.7",
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "新增下载完成后安装状态提示，优化更新体验",
+    changelog: "重构升级模块为独立 :update 模块；新增商店渠道构建（store flavor 编译期完全移除应用内升级代码，符合应用商店审核要求）",
     downloadUrl: ""
   },
   harmonyos: {
-    version: "1.2.6",
+    version: "1.2.7",
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "新增下载完成后安装状态提示，优化更新体验",
+    changelog: "重构升级模块为独立 :update 模块；新增商店渠道构建（store flavor 编译期完全移除应用内升级代码，符合应用商店审核要求）",
     downloadUrl: ""
   }
 };

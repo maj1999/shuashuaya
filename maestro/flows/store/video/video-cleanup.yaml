@@ -17,6 +17,8 @@ appId: com.cleanpic.android
 - waitForAnimationToEnd
 - tapOn: "轮播相册"
 - waitForAnimationToEnd
+- tapOn: "5"
+- waitForAnimationToEnd
 - tapOn:
     id: "back_button"
 - waitForAnimationToEnd
@@ -41,14 +43,17 @@ appId: com.cleanpic.android
 # 截图验证（可能进入 viewer 或空状态）
 - takeScreenshot: maestro/screenshots/video-cleanup-viewer
 
-# 如果有视频，操作（2 个视频，全部保留）
-- tapOn:
-    id: "keep_button"
-    optional: true
-- waitForAnimationToEnd
-- tapOn:
-    id: "keep_button"
-    optional: true
-- waitForAnimationToEnd
+# 全部保留（roundCount=5，逐个点保留，optional 容错实际视频数量）
+- repeat:
+    times: 6
+    commands:
+      - tapOn:
+          id: "keep_button"
+          optional: true
+      - waitForAnimationToEnd
 
+# 全保留无待删除 → 结果页直接进入完成态
+- extendedWaitUntil:
+    visible: ".*本轮清理完成.*"
+    timeout: 10000
 - takeScreenshot: maestro/screenshots/video-cleanup-result

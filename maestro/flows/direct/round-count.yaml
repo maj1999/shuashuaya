@@ -63,7 +63,7 @@ appId: com.cleanpic.android
 - waitForAnimationToEnd
 
 # 验证结果页
-- assertVisible: "保留"
+- assertVisible: ".*保留.*"
 - takeScreenshot: maestro/screenshots/round-count-result
 
 # 恢复默认数量 10

@@ -27,8 +27,13 @@ fun ResultScreen(
     val keptCount = items.count { it.state == OperationState.KEPT }
     val releasedBytes = pendingDeletes.sumOf { it.media.size }
 
+    val phase = resolveResultPhase(pendingDeletes.size, deleteConfirmed)
+
     val state = ResultScreenState(
         theme = theme,
+        phase = phase,
+        confirmTitle = "即将删除 ${pendingDeletes.size} 项",
+        irreversibleHint = "删除后不可在 App 内撤销",
         deletedCount = pendingDeletes.size,
         keptCount = keptCount,
         freedSpace = formatBytes(releasedBytes),

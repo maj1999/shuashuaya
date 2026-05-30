@@ -104,8 +104,8 @@ appId: com.cleanpic.android
 - waitForAnimationToEnd
 
 # 验证结果页
-- assertVisible: "删除"
-- assertVisible: "保留"
+- assertVisible: ".*删除.*"
+- assertVisible: ".*保留.*"
 - takeScreenshot: maestro/screenshots/swipe-card-result
 
 # 恢复轮播模式

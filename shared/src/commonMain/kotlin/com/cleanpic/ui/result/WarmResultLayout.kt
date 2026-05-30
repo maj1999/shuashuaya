@@ -27,6 +27,12 @@ import com.cleanpic.ui.media.MediaImage
 @Composable
 fun WarmResultLayout(state: ResultScreenState) {
     val theme = state.theme
+    val confirm = state.phase == ResultPhase.CONFIRM
+    val title = if (confirm) state.confirmTitle else "本轮清理完成！"
+    val subtitle = if (confirm) state.irreversibleHint else "干得漂亮！"
+    val delLabel = if (confirm) "待删除" else "已删除"
+    val keepLabel = if (confirm) "拟保留" else "已保留"
+    val freeLabel = if (confirm) "可释放" else "已释放"
 
     LazyColumn(
         modifier = Modifier
@@ -65,18 +71,18 @@ fun WarmResultLayout(state: ResultScreenState) {
 
             // 衬线字体标题
             Text(
-                text = "本轮清理完成！",
+                text = title,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(theme.colorText)
             )
             Spacer(modifier = Modifier.height(4.dp))
-            // 斜体鼓励语
+            // 斜体鼓励语 / 待确认态不可撤销提示
             Text(
-                text = "干得漂亮！",
+                text = subtitle,
                 fontSize = 15.sp,
                 fontStyle = FontStyle.Italic,
-                color = Color(theme.colorTextSecondary)
+                color = if (confirm) Color(theme.colorDanger) else Color(theme.colorTextSecondary)
             )
             Spacer(modifier = Modifier.height(28.dp))
         }
@@ -90,21 +96,21 @@ fun WarmResultLayout(state: ResultScreenState) {
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 WarmStatCard(
-                    label = "删除",
+                    label = delLabel,
                     value = "${state.deletedCount}",
                     valueColor = Color(theme.colorDanger),
                     theme = theme,
                     modifier = Modifier.weight(1f)
                 )
                 WarmStatCard(
-                    label = "保留",
+                    label = keepLabel,
                     value = "${state.keptCount}",
                     valueColor = Color(theme.colorSuccess),
                     theme = theme,
                     modifier = Modifier.weight(1f)
                 )
                 WarmStatCard(
-                    label = "释放",
+                    label = freeLabel,
                     value = state.freedSpace,
                     valueColor = Color(0xFF8D6E63),
                     theme = theme,

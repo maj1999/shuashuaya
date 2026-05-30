@@ -29,6 +29,11 @@ fun PlayfulResultLayout(state: ResultScreenState) {
     val gradientBrush = Brush.verticalGradient(
         listOf(Color(0xFF667EEA), Color(0xFF764BA2))
     )
+    val confirm = state.phase == ResultPhase.CONFIRM
+    val title = if (confirm) state.confirmTitle else "本轮清理完成"
+    val delLabel = if (confirm) "待删除" else "已删除"
+    val keepLabel = if (confirm) "拟保留" else "已保留"
+    val freeLabel = if (confirm) "可释放" else "已释放"
 
     Box(
         modifier = Modifier
@@ -65,11 +70,20 @@ fun PlayfulResultLayout(state: ResultScreenState) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "清理完成！",
+                    text = title,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
                 )
+
+                if (confirm) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = state.irreversibleHint,
+                        fontSize = 13.sp,
+                        color = Color(0xFFFFD4D4)
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(28.dp))
             }
@@ -83,19 +97,19 @@ fun PlayfulResultLayout(state: ResultScreenState) {
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     PlayfulStatCard(
-                        label = "删除",
+                        label = delLabel,
                         value = "${state.deletedCount}",
                         valueColor = Color(0xFFFF8A80),
                         modifier = Modifier.weight(1f)
                     )
                     PlayfulStatCard(
-                        label = "保留",
+                        label = keepLabel,
                         value = "${state.keptCount}",
                         valueColor = Color(0xFF80FFB4),
                         modifier = Modifier.weight(1f)
                     )
                     PlayfulStatCard(
-                        label = "释放",
+                        label = freeLabel,
                         value = state.freedSpace,
                         valueColor = Color(0xFFE0D0FF),
                         modifier = Modifier.weight(1f)

@@ -8,6 +8,12 @@ import com.cleanpic.theme.ThemeTokens
  */
 data class ResultScreenState(
     val theme: ThemeTokens,
+    /** 结果页当前阶段：CONFIRM=待确认（删除前），DONE=完成（删除后/无待删除） */
+    val phase: ResultPhase,
+    /** 待确认态标题，如"即将删除 4 项" */
+    val confirmTitle: String,
+    /** 待确认态的不可撤销提示文案 */
+    val irreversibleHint: String,
     val deletedCount: Int,
     val keptCount: Int,
     val freedSpace: String,

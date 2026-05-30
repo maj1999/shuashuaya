@@ -28,6 +28,11 @@ import com.cleanpic.ui.media.MediaImage
 @Composable
 fun MinimalResultLayout(state: ResultScreenState) {
     val theme = state.theme
+    val confirm = state.phase == ResultPhase.CONFIRM
+    val title = if (confirm) state.confirmTitle else "本轮清理完成"
+    val delLabel = if (confirm) "待删除" else "已删除"
+    val keepLabel = if (confirm) "拟保留" else "已保留"
+    val freeLabel = if (confirm) "可释放" else "已释放"
 
     LazyColumn(
         modifier = Modifier
@@ -42,10 +47,10 @@ fun MinimalResultLayout(state: ResultScreenState) {
 
             // 小字英文标签
             Text(
-                text = "COMPLETE",
+                text = if (confirm) "CONFIRM" else "COMPLETE",
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Normal,
-                color = Color(0xFF999999),
+                color = if (confirm) Color(0xFFCC3333) else Color(0xFF999999),
                 letterSpacing = 2.sp
             )
 
@@ -53,11 +58,21 @@ fun MinimalResultLayout(state: ResultScreenState) {
 
             // 标题：细字
             Text(
-                text = "本轮清理完成",
+                text = title,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Light,
                 color = Color(0xFF333333)
             )
+
+            if (confirm) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = state.irreversibleHint,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = Color(0xFFCC3333)
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -74,11 +89,11 @@ fun MinimalResultLayout(state: ResultScreenState) {
 
         // 统计行
         item {
-            MinimalStatRow(label = "删除", value = "${state.deletedCount}", valueColor = Color(0xFFCC3333))
+            MinimalStatRow(label = delLabel, value = "${state.deletedCount}", valueColor = Color(0xFFCC3333))
             MinimalDivider()
-            MinimalStatRow(label = "保留", value = "${state.keptCount}", valueColor = Color(0xFF333333))
+            MinimalStatRow(label = keepLabel, value = "${state.keptCount}", valueColor = Color(0xFF333333))
             MinimalDivider()
-            MinimalStatRow(label = "释放空间", value = state.freedSpace, valueColor = Color(0xFF666666))
+            MinimalStatRow(label = freeLabel, value = state.freedSpace, valueColor = Color(0xFF666666))
             MinimalDivider()
 
             Spacer(modifier = Modifier.height(32.dp))

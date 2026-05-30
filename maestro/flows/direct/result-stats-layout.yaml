@@ -60,9 +60,9 @@ appId: com.cleanpic.android
 - waitForAnimationToEnd
 
 # 验证结果页三个统计卡片
-- assertVisible: "删除"
-- assertVisible: "保留"
-- assertVisible: "释放"
+- assertVisible: ".*删除.*"
+- assertVisible: ".*保留.*"
+- assertVisible: ".*释放.*"
 
 # 验证释放值包含单位（KB 或 MB）
 - assertVisible:

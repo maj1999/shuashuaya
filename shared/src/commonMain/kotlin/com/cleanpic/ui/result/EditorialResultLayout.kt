@@ -33,6 +33,8 @@ private val EditorialDanger = Color(0xFFCC3333)
 @Composable
 fun EditorialResultLayout(state: ResultScreenState) {
     val theme = state.theme
+    val confirm = state.phase == ResultPhase.CONFIRM
+    val title = if (confirm) state.confirmTitle else "本轮清理完成"
 
     LazyColumn(
         modifier = Modifier
@@ -46,10 +48,10 @@ fun EditorialResultLayout(state: ResultScreenState) {
             Spacer(modifier = Modifier.height(48.dp))
 
             Text(
-                text = "SUMMARY",
+                text = if (confirm) "REVIEW" else "SUMMARY",
                 fontSize = 9.sp,
                 fontFamily = FontFamily.Serif,
-                color = EditorialSecondary,
+                color = if (confirm) EditorialDanger else EditorialSecondary,
                 letterSpacing = 3.sp,
                 textAlign = TextAlign.Center
             )
@@ -57,13 +59,24 @@ fun EditorialResultLayout(state: ResultScreenState) {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "清理报告",
+                text = title,
                 fontSize = 22.sp,
                 fontFamily = FontFamily.Serif,
                 fontWeight = FontWeight.Normal,
                 color = EditorialText,
                 textAlign = TextAlign.Center
             )
+
+            if (confirm) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = state.irreversibleHint,
+                    fontSize = 11.sp,
+                    fontFamily = FontFamily.Serif,
+                    color = EditorialDanger,
+                    textAlign = TextAlign.Center
+                )
+            }
 
             Spacer(modifier = Modifier.height(12.dp))
 

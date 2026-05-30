@@ -65,7 +65,7 @@ appId: com.cleanpic.android
 - waitForAnimationToEnd
 
 # 验证到达结果页
-- assertVisible: "删除"
-- assertVisible: "保留"
-- assertVisible: "释放"
+- assertVisible: ".*删除.*"
+- assertVisible: ".*保留.*"
+- assertVisible: ".*释放.*"
 - takeScreenshot: maestro/screenshots/browse-photos-result

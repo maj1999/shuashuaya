@@ -14,6 +14,9 @@
 | 保留 | OperationState.KEPT | 用户决定不删除该媒体 |
 | 标记删除 | OperationState.PENDING_DELETE | 浏览阶段的删除意图标记，尚未执行 |
 | 确认删除 | MediaModule.deleteMedia(ids) | 结果页用户确认后，批量调用系统删除 API |
+| 结果页阶段 | ResultPhase (CONFIRM/DONE) | 结果页的两个语义状态，由 resolveResultPhase() 派生 |
+| 待确认态 | ResultPhase.CONFIRM | 删除前：有待删除项且尚未删除成功，标题"即将删除 N 项"，展示确认按钮 |
+| 完成态 | ResultPhase.DONE | 删除成功后、或本轮无待删除项，标题"本轮清理完成" |
 | 系统回收站 | 系统 Trash / Recently Deleted | 各平台系统级回收站，通常保留 30 天 |
 | 主题 | Theme (ThemeTokens) | 一组语义化 UI Token 的集合，包含视觉参数 + 布局标识 |
 | 主题布局 | ThemeLayoutId | 主题绑定的布局标识枚举（MINIMAL/GEOMETRIC/WARM/PLAYFUL/EDITORIAL） |

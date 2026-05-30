@@ -26,6 +26,8 @@ import com.cleanpic.ui.media.MediaImage
 @Composable
 fun GeometricResultLayout(state: ResultScreenState) {
     val theme = state.theme
+    val confirm = state.phase == ResultPhase.CONFIRM
+    val title = if (confirm) state.confirmTitle else "本轮清理完成"
 
     LazyColumn(
         modifier = Modifier
@@ -49,11 +51,21 @@ fun GeometricResultLayout(state: ResultScreenState) {
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "清理完成",
+                text = title,
                 fontSize = 18.sp,
                 fontWeight = FontWeight(800),
                 color = Color.White
             )
+
+            if (confirm) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = state.irreversibleHint,
+                    fontSize = 12.sp,
+                    color = Color(0xFFFF8A80)
+                )
+            }
+
             Spacer(modifier = Modifier.height(8.dp))
 
             // 渐变分割线

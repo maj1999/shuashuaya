@@ -36,7 +36,7 @@ const VERSION_CONFIG = {
 
 // GitHub Release 资源文件名映射
 const ASSET_NAMES = {
-  android: "shuashuaya.apk",
+  android: "shuashuaya-direct.apk",
   harmonyos: "shuashuaya.hap"
 };
 

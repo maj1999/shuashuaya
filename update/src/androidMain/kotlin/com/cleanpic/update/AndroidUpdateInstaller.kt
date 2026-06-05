@@ -71,11 +71,19 @@ class AndroidUpdateInstaller(private val context: Context) : UpdateInstaller {
                         val statusIndex = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)
                         val status = cursor.getInt(statusIndex)
                         if (status == DownloadManager.STATUS_SUCCESSFUL) {
-                            _downloadProgress.value = 1f
-                            _downloadState.value = DownloadState.DOWNLOADED
                             val uriIndex = cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI)
                             val localUri = cursor.getString(uriIndex)
-                            installApk(localUri)
+                            val file = localUri?.let {
+                                runCatching { File(Uri.parse(it).path!!) }.getOrNull()
+                            }
+                            // 完整性校验：挡住 Gitee 防盗链/风控返回的 HTML 伪装包，避免装坏包（F1）
+                            if (file != null && ApkIntegrity.verify(file, updateInfo.sha256, updateInfo.size)) {
+                                _downloadProgress.value = 1f
+                                _downloadState.value = DownloadState.DOWNLOADED
+                                installApk(localUri)
+                            } else {
+                                _downloadState.value = DownloadState.FAILED
+                            }
                         } else {
                             _downloadState.value = DownloadState.FAILED
                         }

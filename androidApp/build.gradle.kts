@@ -22,11 +22,13 @@ android {
             dimension = "distribution"
             buildConfigField("boolean", "UPDATE_ENABLED", "true")
             buildConfigField("String", "UPDATE_API_URL", "\"${AppConfig.UPDATE_API_URL}\"")
+            buildConfigField("String", "UPDATE_API_URL_CN", "\"${AppConfig.UPDATE_API_URL_CN}\"")
         }
         create("store") {
             dimension = "distribution"
             buildConfigField("boolean", "UPDATE_ENABLED", "false")
             buildConfigField("String", "UPDATE_API_URL", "\"\"")
+            buildConfigField("String", "UPDATE_API_URL_CN", "\"\"")
         }
     }
 

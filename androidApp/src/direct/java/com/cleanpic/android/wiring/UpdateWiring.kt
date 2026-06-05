@@ -49,7 +49,12 @@ object UpdateWiring {
 
     fun provideHooks(context: Context): AppHooks {
         if (!BuildConfig.UPDATE_ENABLED) return AppHooks.Empty
-        checker = UpdateChecker(BuildConfig.UPDATE_API_URL)
+        // 双端点：国内主走 Gitee raw version.json，失败/超时回退海外 Worker /api/version。
+        val endpoints = buildList {
+            if (BuildConfig.UPDATE_API_URL_CN.isNotBlank()) add(BuildConfig.UPDATE_API_URL_CN)
+            if (BuildConfig.UPDATE_API_URL.isNotBlank()) add("${BuildConfig.UPDATE_API_URL}/api/version")
+        }
+        checker = UpdateChecker(endpoints)
         installer = AndroidUpdateInstaller(context.applicationContext)
         return DirectAppHooks(checker!!, installer!!)
     }

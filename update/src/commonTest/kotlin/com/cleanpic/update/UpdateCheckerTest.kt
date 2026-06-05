@@ -4,6 +4,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.test.assertFalse
+import kotlinx.serialization.json.Json
 
 class UpdateCheckerTest {
 
@@ -152,5 +153,60 @@ class UpdateCheckerTest {
         val response = VersionResponse(ios = UpdateInfo(version = "1.2.0"))
         val result = UpdateChecker.evaluateResponse(response, "1.1.0", "Android")
         assertEquals(UpdateStatus.UP_TO_DATE, result.status)
+    }
+
+    // ── U-UPD-09 versionCode 优先比较 ──
+
+    @Test fun same_version_name_but_code_bumped_is_newer() {
+        // 同 version 名仅 bump versionCode 的热修，应判为有新版
+        assertTrue(UpdateChecker.isNewer("1.6.0", "1.6.0", currentVersionCode = 29, remoteVersionCode = 30))
+    }
+
+    @Test fun version_name_newer_still_detected() {
+        assertTrue(UpdateChecker.isNewer("1.5.0", "1.6.0", currentVersionCode = 29, remoteVersionCode = 30))
+    }
+
+    @Test fun equal_version_and_code_not_newer() {
+        assertFalse(UpdateChecker.isNewer("1.6.0", "1.6.0", currentVersionCode = 30, remoteVersionCode = 30))
+    }
+
+    @Test fun lower_remote_code_not_newer() {
+        assertFalse(UpdateChecker.isNewer("1.6.0", "1.6.0", currentVersionCode = 30, remoteVersionCode = 29))
+    }
+
+    @Test fun falls_back_to_version_string_when_code_missing() {
+        // remote 无 versionCode（旧响应）→ 回退 version 字符串比较
+        assertTrue(UpdateChecker.isNewer("1.5.0", "1.6.0", currentVersionCode = 30, remoteVersionCode = null))
+        assertFalse(UpdateChecker.isNewer("1.6.0", "1.6.0", currentVersionCode = 30, remoteVersionCode = null))
+    }
+
+    @Test fun evaluate_uses_versioncode_for_hotfix() {
+        val response = VersionResponse(
+            android = UpdateInfo(version = "1.6.0", versionCode = 31, minVersion = "1.0.0")
+        )
+        // 本地 1.6.0/code30，远端 1.6.0/code31 → 同名但 code 更新 → OPTIONAL
+        val result = UpdateChecker.evaluateResponse(response, "1.6.0", "Android", currentVersionCode = 30)
+        assertEquals(UpdateStatus.OPTIONAL_UPDATE, result.status)
+    }
+
+    // ── U-UPD-11 version.json schema（含完整性字段）反序列化 ──
+
+    @Test fun version_json_with_integrity_fields_parses() {
+        val raw = """
+            {"android":{"version":"1.7.0","versionCode":31,"forceUpdate":false,
+            "minVersion":"1.0.0","changelog":"x","downloadUrl":"https://gitee.com/o/r/releases/download/v1.7.0/a.apk",
+            "sha256":"abc123","size":14016754}}
+        """.trimIndent()
+        val resp = Json { ignoreUnknownKeys = true }.decodeFromString(VersionResponse.serializer(), raw)
+        assertEquals("abc123", resp.android?.sha256)
+        assertEquals(14016754L, resp.android?.size)
+        assertEquals(31, resp.android?.versionCode)
+    }
+
+    @Test fun version_json_without_integrity_fields_defaults() {
+        val raw = """{"android":{"version":"1.7.0"}}"""
+        val resp = Json { ignoreUnknownKeys = true }.decodeFromString(VersionResponse.serializer(), raw)
+        assertEquals("", resp.android?.sha256)
+        assertEquals(0L, resp.android?.size)
     }
 }

@@ -9,7 +9,10 @@ data class UpdateInfo(
     val forceUpdate: Boolean = false,
     val minVersion: String = "0.0.0",
     val changelog: String = "",
-    val downloadUrl: String = ""
+    val downloadUrl: String = "",
+    // 安装包完整性校验：下载后比对，防止 Gitee 防盗链/风控返回的 HTML 伪装包被当成 APK 安装（方案 §12 #2）
+    val sha256: String = "",
+    val size: Long = 0
 )
 
 enum class UpdateStatus {

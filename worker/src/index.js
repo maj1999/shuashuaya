@@ -11,25 +11,25 @@
 // 版本信息配置 — 发布新版本时更新此处
 const VERSION_CONFIG = {
   android: {
-    version: "1.5.0",
-    versionCode: 28,
+    version: "1.6.0",
+    versionCode: 30,
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "全屏查看照片和视频时支持双击放大、双指捏合缩放、放大后拖动查看细节。",
+    changelog: "轮播相册模式支持左右滑动翻看：左滑看下一张、右滑看上一张，自由前后浏览；滑过未决定的照片默认保留，已选择的保持不变。",
     downloadUrl: "" // 将在运行时生成
   },
   ios: {
-    version: "1.5.0",
+    version: "1.6.0",
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "全屏查看照片和视频时支持双击放大、双指捏合缩放、放大后拖动查看细节。",
+    changelog: "轮播相册模式支持左右滑动翻看：左滑看下一张、右滑看上一张，自由前后浏览；滑过未决定的照片默认保留，已选择的保持不变。",
     downloadUrl: ""
   },
   harmonyos: {
-    version: "1.5.0",
+    version: "1.6.0",
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "全屏查看照片和视频时支持双击放大、双指捏合缩放、放大后拖动查看细节。",
+    changelog: "轮播相册模式支持左右滑动翻看：左滑看下一张、右滑看上一张，自由前后浏览；滑过未决定的照片默认保留，已选择的保持不变。",
     downloadUrl: ""
   }
 };

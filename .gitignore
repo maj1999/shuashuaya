@@ -35,6 +35,9 @@ node_modules/
 # Kotlin/Native
 *.klib
 
+# Kotlin 构建会话缓存
+.kotlin/
+
 # Android
 androidApp/libs/
 

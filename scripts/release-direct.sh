@@ -36,6 +36,20 @@ WORKER_DIR="$PROJECT_ROOT/worker"
 WORKER_CONFIG="$WORKER_DIR/src/index.js"
 BUILD_CONFIG="$PROJECT_ROOT/buildSrc/src/main/kotlin/CleanPicBuildConfig.kt"
 
+# 网络操作重试包装：最多 3 次、间隔 3 秒，应对 GitHub/Cloudflare 偶发的 SSL/EOF 抖动
+retry() {
+    local n=1 max=3
+    until "$@"; do
+        if [ $n -ge $max ]; then
+            echo "  ❌ 命令失败（已重试 $max 次）: $*"
+            return 1
+        fi
+        echo "  ⚠️  网络操作失败，第 $n/$max 次重试中..."
+        n=$((n + 1))
+        sleep 3
+    done
+}
+
 echo "══════════════════════════════════════"
 echo "  刷刷鸭 v${VERSION} 发布流程"
 echo "══════════════════════════════════════"
@@ -94,14 +108,14 @@ cd "$PROJECT_ROOT"
 git add "$BUILD_CONFIG" "$PROJECT_ROOT/shared/src/commonMain/kotlin/com/cleanpic/AppInfo.kt"
 git commit -m "chore: bump version to ${VERSION}"
 git tag "$TAG"
-git push origin main
-git push origin "$TAG"
+retry git push origin main
+retry git push origin "$TAG"
 
 # GitHub 不支持中文资产名，复制为 ASCII 文件名上传
 UPLOAD_APK="/tmp/shuashuaya-direct.apk"
 cp "$APK_PATH" "$UPLOAD_APK"
 
-gh release create "$TAG" "$UPLOAD_APK" \
+retry gh release create "$TAG" "$UPLOAD_APK" \
     --title "v${VERSION}" \
     --notes "$CHANGELOG"
 echo "  ✅ GitHub Release 创建成功"
@@ -111,8 +125,9 @@ echo ""
 echo "【6/6】更新 Cloudflare Worker..."
 
 # 更新 worker/src/index.js 中的版本号和 changelog（JS 对象 key 无引号）
+# changelog 经环境变量传入 perl 按字面量替换，避免内容含 / | & 等字符破坏替换命令
 sed -i '' "s/version: \"[^\"]*\"/version: \"${VERSION}\"/g" "$WORKER_CONFIG"
-sed -i '' "s/changelog: \"[^\"]*\"/changelog: \"${CHANGELOG}\"/g" "$WORKER_CONFIG"
+NEW_CHANGELOG="$CHANGELOG" perl -i -pe 's/(changelog: ")[^"]*(")/$1 . $ENV{NEW_CHANGELOG} . $2/ge' "$WORKER_CONFIG"
 sed -i '' "s/versionCode: [0-9]*/versionCode: ${NEW_CODE}/" "$WORKER_CONFIG"
 
 cd "$WORKER_DIR"
@@ -120,7 +135,7 @@ if [ -z "${CLOUDFLARE_API_TOKEN:-}" ]; then
     echo "  ⚠️  未设置 CLOUDFLARE_API_TOKEN，跳过自动部署"
     echo "  请手动运行: cd worker && CLOUDFLARE_API_TOKEN=你的token npx wrangler deploy"
 else
-    npx wrangler deploy
+    retry npx wrangler deploy
     echo "  ✅ Worker 部署成功"
 fi
 
@@ -128,7 +143,7 @@ fi
 cd "$PROJECT_ROOT"
 git add "$WORKER_CONFIG"
 git commit -m "chore: update worker version to ${VERSION}"
-git push origin main
+retry git push origin main
 
 echo ""
 echo "══════════════════════════════════════"

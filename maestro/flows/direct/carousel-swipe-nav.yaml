@@ -1,0 +1,126 @@
+# maestro/flows/direct/carousel-swipe-nav.yaml
+#
+# US-CP-21 轮播相册模式左右滑动切换前后媒体
+# E24 轮播滑动导航：左滑切下一张（未决策默认保留）/ 右滑切回上一张（保持原决策）
+#
+appId: com.cleanpic.android
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 30000
+- waitForAnimationToEnd
+
+# 确保轮播模式 + 5 张一轮
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+- tapOn: "轮播相册"
+- waitForAnimationToEnd
+- tapOn: "5"
+- waitForAnimationToEnd
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd
+
+# 进入照片浏览
+- tapOn:
+    id: "start_photo"
+- waitForAnimationToEnd
+- tapOn:
+    text: "授权"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Allow"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    id: "start_photo"
+    optional: true
+- waitForAnimationToEnd
+
+# 初始在第 1 张
+- assertVisible: "1 / 5"
+- takeScreenshot: maestro/screenshots/carousel-nav-1
+
+# 第 1 张标记删除 → 自动前进到第 2 张
+- tapOn:
+    id: "delete_button"
+- waitForAnimationToEnd
+- assertVisible: "2 / 5"
+
+# 左滑：切到第 3 张（第 2 张未决策，默认保留）
+- swipe:
+    start: "80%, 40%"
+    end: "15%, 40%"
+    duration: 300
+- waitForAnimationToEnd
+- assertVisible: "3 / 5"
+
+# 右滑：切回第 2 张
+- swipe:
+    start: "15%, 40%"
+    end: "80%, 40%"
+    duration: 300
+- waitForAnimationToEnd
+- assertVisible: "2 / 5"
+
+# 右滑：切回第 1 张（之前已删除，决策仍保留为删除）
+- swipe:
+    start: "15%, 40%"
+    end: "80%, 40%"
+    duration: 300
+- waitForAnimationToEnd
+- assertVisible: "1 / 5"
+- takeScreenshot: maestro/screenshots/carousel-nav-back-to-1
+
+# 在第 1 张继续右滑：已是首张，无副作用（仍停在 1 / 5）
+- swipe:
+    start: "15%, 40%"
+    end: "80%, 40%"
+    duration: 300
+- waitForAnimationToEnd
+- assertVisible: "1 / 5"
+
+# 连续左滑滑到底 → 越过最后一张触发完成，进入结果页
+- swipe:
+    start: "80%, 40%"
+    end: "15%, 40%"
+    duration: 300
+- waitForAnimationToEnd
+- swipe:
+    start: "80%, 40%"
+    end: "15%, 40%"
+    duration: 300
+- waitForAnimationToEnd
+- swipe:
+    start: "80%, 40%"
+    end: "15%, 40%"
+    duration: 300
+- waitForAnimationToEnd
+- swipe:
+    start: "80%, 40%"
+    end: "15%, 40%"
+    duration: 300
+- waitForAnimationToEnd
+- swipe:
+    start: "80%, 40%"
+    end: "15%, 40%"
+    duration: 300
+- waitForAnimationToEnd
+
+# 到达结果页：第 1 张删除 + 其余默认保留
+- extendedWaitUntil:
+    visible:
+      text: ".*返回首页"
+    timeout: 30000
+- assertVisible: ".*删除.*"
+- assertVisible: ".*保留.*"
+- takeScreenshot: maestro/screenshots/carousel-nav-result
+
+# 恢复轮播默认设置
+- tapOn: ".*返回首页"
+- waitForAnimationToEnd

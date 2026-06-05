@@ -6,5 +6,5 @@
 | US-CP-04 ~ 06 | EP2: 视频清理 | cleanpic | [cleanpic.md](cleanpic.md) | ✅ 已实现 |
 | US-CP-07, 07a, 08, 09 | EP3: 主题与个性化 | cleanpic | [cleanpic.md](cleanpic.md) | ⚙️ 进行中 |
 | US-CP-10 ~ 11 | EP4: 设置与偏好 | cleanpic | [cleanpic.md](cleanpic.md) | 待开始 |
-| US-CP-12, 18, 19, 20 | EP5: 浏览体验增强 | cleanpic | [cleanpic.md](cleanpic.md) | ⚙️ 进行中 |
+| US-CP-12, 18, 19, 20, 21 | EP5: 浏览体验增强 | cleanpic | [cleanpic.md](cleanpic.md) | ⚙️ 进行中 |
 | US-CP-13 ~ 17 | EP6: 自动升级 | cleanpic | [cleanpic.md](cleanpic.md) | 待开始 |

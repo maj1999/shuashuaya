@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,6 +31,9 @@ import com.cleanpic.theme.ThemeTokens
 import com.cleanpic.ui.media.MediaImage
 import com.cleanpic.ui.media.VideoPlayerView
 import com.cleanpic.viewmodel.ViewerViewModel
+
+// 左右滑动切换前后媒体的触发阈值
+private const val CAROUSEL_SWIPE_THRESHOLD_DP = 72
 
 @Composable
 fun CarouselMode(
@@ -46,9 +50,13 @@ fun CarouselMode(
     val animatedOffset by animateFloatAsState(targetValue = offsetX)
     var isPlaying by remember { mutableStateOf(false) }
     var isMuted by remember { mutableStateOf(true) }
+    val thresholdPx = with(LocalDensity.current) { CAROUSEL_SWIPE_THRESHOLD_DP.dp.toPx() }
 
-    // 切换到下一项时重置播放状态
-    LaunchedEffect(currentIndex) { isPlaying = false }
+    // 切换到下一项时重置偏移与播放状态
+    LaunchedEffect(currentIndex) {
+        offsetX = 0f
+        isPlaying = false
+    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -60,9 +68,18 @@ fun CarouselMode(
                 .weight(1f)
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp)
-                .pointerInput(currentIndex) {
+                .pointerInput(currentIndex, items.size) {
                     detectHorizontalDragGestures(
-                        onDragEnd = { offsetX = 0f },
+                        onDragEnd = {
+                            when {
+                                // 向左滑：切到下一个媒体（未决策默认保留，已决策保持原样）
+                                offsetX <= -thresholdPx -> viewerViewModel.goNext()
+                                // 向右滑：切到上一个媒体，复查时保持各自原有决策
+                                offsetX >= thresholdPx && currentIndex > 0 -> viewerViewModel.goPrevious()
+                                // 未达阈值或已到首张：回弹复位
+                                else -> offsetX = 0f
+                            }
+                        },
                         onDragCancel = { offsetX = 0f }
                     ) { _, dragAmount -> offsetX += dragAmount }
                 },

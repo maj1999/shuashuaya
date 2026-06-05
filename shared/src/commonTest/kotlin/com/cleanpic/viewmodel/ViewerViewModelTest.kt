@@ -296,4 +296,102 @@ class ViewerViewModelTest {
         assertEquals(OperationState.PENDING, vm.items.value[0].state)
         assertEquals(0, vm.deletedCount)
     }
+
+    // ===== US-CP-21 轮播模式左右滑动切换前后媒体 =====
+
+    @Test
+    fun nav_01_goNext_pending_defaults_to_kept_and_advances() = runTest {
+        vm.loadMedia(MediaType.PHOTO)
+        // item0 尚未决策
+        vm.goNext()
+        assertEquals(OperationState.KEPT, vm.items.value[0].state)  // 默认保留
+        assertEquals(1, vm.currentIndex.value)
+    }
+
+    @Test
+    fun nav_02_goNext_preserves_existing_delete() = runTest {
+        vm.loadMedia(MediaType.PHOTO)
+        vm.markDelete()          // item0 → PENDING_DELETE, index→1
+        vm.goPrevious()          // 回到 item0
+        assertEquals(OperationState.PENDING_DELETE, vm.items.value[0].state)
+        vm.goNext()              // 再次离开 item0，删除决策应保持，不被改成保留
+        assertEquals(OperationState.PENDING_DELETE, vm.items.value[0].state)
+        assertEquals(1, vm.currentIndex.value)
+    }
+
+    @Test
+    fun nav_03_goNext_preserves_existing_kept() = runTest {
+        vm.loadMedia(MediaType.PHOTO)
+        vm.markKept()            // item0 → KEPT, index→1
+        vm.goPrevious()          // 回到 item0
+        vm.goNext()              // 再次离开，仍是保留
+        assertEquals(OperationState.KEPT, vm.items.value[0].state)
+        assertEquals(1, vm.currentIndex.value)
+    }
+
+    @Test
+    fun nav_04_goPrevious_navigates_back_without_changing_state() = runTest {
+        vm.loadMedia(MediaType.PHOTO)
+        vm.markKept()            // item0 KEPT, index→1
+        vm.markDelete()          // item1 DELETE, index→2
+        vm.goPrevious()          // 回到 item1
+        assertEquals(1, vm.currentIndex.value)
+        assertEquals(OperationState.PENDING_DELETE, vm.items.value[1].state)
+        assertEquals(OperationState.KEPT, vm.items.value[0].state)
+    }
+
+    @Test
+    fun nav_05_goPrevious_no_effect_at_first() = runTest {
+        vm.loadMedia(MediaType.PHOTO)
+        vm.goPrevious()
+        assertEquals(0, vm.currentIndex.value)
+        assertEquals(OperationState.PENDING, vm.items.value[0].state)
+    }
+
+    @Test
+    fun nav_06_goNext_past_last_completes_round() = runTest {
+        vm.loadMedia(MediaType.PHOTO)   // 10 items
+        repeat(9) { vm.goNext() }       // 到达最后一个 index 9
+        assertEquals(9, vm.currentIndex.value)
+        assertFalse(vm.isComplete)
+        vm.goNext()                     // 越过最后一个 → 完成
+        assertTrue(vm.isComplete)
+    }
+
+    @Test
+    fun nav_07_goNext_then_undo_reverts_default_keep() = runTest {
+        vm.loadMedia(MediaType.PHOTO)
+        vm.goNext()                     // item0 默认保留, index→1
+        assertEquals(OperationState.KEPT, vm.items.value[0].state)
+        assertTrue(vm.canUndo.value)
+        vm.undo()
+        assertEquals(0, vm.currentIndex.value)
+        assertEquals(OperationState.PENDING, vm.items.value[0].state)
+    }
+
+    @Test
+    fun nav_08_back_and_forth_preserves_all_decisions() = runTest {
+        vm.loadMedia(MediaType.PHOTO)
+        vm.markDelete()                 // item0 DELETE, index→1
+        vm.markKept()                   // item1 KEPT, index→2
+        vm.goPrevious()                 // index→1
+        vm.goPrevious()                 // index→0
+        assertEquals(OperationState.PENDING_DELETE, vm.items.value[0].state)
+        assertEquals(OperationState.KEPT, vm.items.value[1].state)
+        vm.goNext()                     // 离开 item0（已删除，保持）
+        assertEquals(OperationState.PENDING_DELETE, vm.items.value[0].state)
+        vm.goNext()                     // 离开 item1（已保留，保持）
+        assertEquals(OperationState.KEPT, vm.items.value[1].state)
+        assertEquals(2, vm.currentIndex.value)
+    }
+
+    @Test
+    fun nav_09_goPrevious_then_redecide_via_buttons() = runTest {
+        vm.loadMedia(MediaType.PHOTO)
+        vm.goNext()                     // item0 默认保留, index→1
+        vm.goPrevious()                 // 回到 item0 复查
+        assertEquals(OperationState.KEPT, vm.items.value[0].state)
+        vm.markDelete()                 // 改判为删除
+        assertEquals(OperationState.PENDING_DELETE, vm.items.value[0].state)
+    }
 }

@@ -60,6 +60,35 @@ class ViewerViewModel {
     fun markDelete() { updateCurrent(OperationState.PENDING_DELETE); advance() }
 
     /**
+     * 轮播模式：向后切换到下一个媒体（左滑）。
+     * 离开当前媒体时，若仍未决策（PENDING）则默认标记为保留（KEPT）；
+     * 若之前已选择过删除或保留，则保持原有决策不变。
+     * 越过最后一个媒体即触发本轮完成。
+     */
+    fun goNext() {
+        val idx = _currentIndex.value
+        if (idx >= _items.value.size) return
+        val list = _items.value.toMutableList()
+        if (list[idx].state == OperationState.PENDING) {
+            list[idx] = list[idx].copy(state = OperationState.KEPT)
+            _items.value = list
+        }
+        _currentIndex.value = idx + 1
+        refreshCanUndo()
+    }
+
+    /**
+     * 轮播模式：向前切换到上一个媒体（右滑），仅移动位置，
+     * 各媒体保持原有决策不变。已在第一个时无副作用。
+     */
+    fun goPrevious() {
+        val idx = _currentIndex.value
+        if (idx <= 0) return
+        _currentIndex.value = idx - 1
+        refreshCanUndo()
+    }
+
+    /**
      * 回退到上一个媒体并恢复其待决策态，可连续回退直至第一个媒体。
      * 已位于第一个（index 0）时无副作用。
      */

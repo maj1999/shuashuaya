@@ -97,9 +97,10 @@ NEW_CODE=$((CURRENT_CODE + 1))
 sed -i '' "s/const val VERSION_NAME = \".*\"/const val VERSION_NAME = \"${VERSION}\"/" "$BUILD_CONFIG"
 sed -i '' "s/const val VERSION_CODE = [0-9]*/const val VERSION_CODE = ${NEW_CODE}/" "$BUILD_CONFIG"
 
-# 更新 AppInfo.kt
-sed -i '' "s/const val VERSION = \".*\"/const val VERSION = \"${VERSION}\"/" \
-    "$PROJECT_ROOT/shared/src/commonMain/kotlin/com/cleanpic/AppInfo.kt"
+# 更新 AppInfo.kt（VERSION 名 + VERSION_CODE，供客户端 versionCode 比较，需与 BUILD_CONFIG 一致）
+APPINFO="$PROJECT_ROOT/shared/src/commonMain/kotlin/com/cleanpic/AppInfo.kt"
+sed -i '' "s/const val VERSION = \".*\"/const val VERSION = \"${VERSION}\"/" "$APPINFO"
+sed -i '' "s/const val VERSION_CODE = [0-9]*/const val VERSION_CODE = ${NEW_CODE}/" "$APPINFO"
 
 echo "  ✅ VERSION_NAME=$VERSION, VERSION_CODE=$NEW_CODE"
 
@@ -114,6 +115,13 @@ if [ ! -f "$APK_PATH" ]; then
 fi
 APK_SIZE=$(du -h "$APK_PATH" | cut -f1)
 echo "  ✅ APK 构建成功 ($APK_SIZE)"
+
+# Step 4.5: 发布到 Gitee 国内分发渠道（门禁式：上传 + 匿名下载校验通过才更新 version.json）
+# 必须在改 Worker / 发 GitHub 之前完成——Worker 的 android downloadUrl 按 version 确定性指向 Gitee，
+# 若 Gitee 无对应 Release 则存量 app 下载 404，故 Gitee 先行且带下载门禁。
+echo ""
+echo "【国内渠道】发布到 Gitee ..."
+"$SCRIPT_DIR/gitee-publish.sh" "$VERSION" "$APK_PATH" "$NEW_CODE" "$CHANGELOG"
 
 # Step 5: 提交版本号变更 + 打 Tag + 创建 GitHub Release
 echo ""

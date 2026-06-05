@@ -16,7 +16,7 @@ const VERSION_CONFIG = {
     forceUpdate: false,
     minVersion: "1.0.0",
     changelog: "轮播相册模式支持左右滑动翻看：左滑看下一张、右滑看上一张，自由前后浏览；滑过未决定的照片默认保留，已选择的保持不变。",
-    downloadUrl: "" // 将在运行时生成
+    downloadUrl: "" // 运行时按 version 确定性构造 Gitee 直链（见 GITEE_DIST）
   },
   ios: {
     version: "1.6.0",
@@ -40,6 +40,16 @@ const ASSET_NAMES = {
   harmonyos: "shuashuaya.hap"
 };
 
+// 国内分发：Gitee 公开分发仓库。downloadUrl 按 version 确定性构造（稳定 URL 格式已验证可匿名下载）。
+const GITEE_DIST = {
+  owner: "ma_mark",
+  repo: "shuashuaya-dist",
+  asset: "shuashuaya-direct.apk"
+};
+function giteeDownloadUrl(version) {
+  return `https://gitee.com/${GITEE_DIST.owner}/${GITEE_DIST.repo}/releases/download/v${version}/${GITEE_DIST.asset}`;
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -59,12 +69,13 @@ export default {
     // GET /api/version
     if (url.pathname === "/api/version") {
       const config = structuredClone(VERSION_CONFIG);
-      // 为 Android 和 HarmonyOS 生成代理下载链接
-      for (const platform of ["android", "harmonyos"]) {
-        if (config[platform]) {
-          config[platform].downloadUrl =
-            `${workerUrl}/download/${platform}/v${config[platform].version}`;
-        }
+      // android：国内走 Gitee 直链（国内可达），按 version 确定性构造 → 存量 app 检查更新即从 Gitee 下载完成迁移。
+      if (config.android) {
+        config.android.downloadUrl = giteeDownloadUrl(config.android.version);
+      }
+      // harmonyos：暂无国内产物，仍回退 workers.dev 代理。
+      if (config.harmonyos && !config.harmonyos.downloadUrl) {
+        config.harmonyos.downloadUrl = `${workerUrl}/download/harmonyos/v${config.harmonyos.version}`;
       }
       return new Response(JSON.stringify(config), {
         headers: {

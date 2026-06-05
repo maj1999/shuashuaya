@@ -79,7 +79,7 @@ if git -C "$PROJECT_ROOT" rev-parse -q --verify "refs/tags/${PRE_TAG}" >/dev/nul
     echo "  ⚠️  tag $PRE_TAG 已存在，跳过创建"
 else
     git -C "$PROJECT_ROOT" tag "$PRE_TAG"
-    echo "  ✅ 已创建 $PRE_TAG（指向 $(git -C "$PROJECT_ROOT" rev-parse --short HEAD)）"
+    echo "  ✅ 已创建 ${PRE_TAG}（指向 $(git -C "$PROJECT_ROOT" rev-parse --short HEAD)）"
 fi
 retry git -C "$PROJECT_ROOT" push origin "$PRE_TAG" \
     && echo "  ✅ $PRE_TAG 已推送到远程" \

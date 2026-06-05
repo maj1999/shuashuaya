@@ -11,25 +11,25 @@
 // 版本信息配置 — 发布新版本时更新此处
 const VERSION_CONFIG = {
   android: {
-    version: "1.4.1",
-    versionCode: 27,
+    version: "1.5.0",
+    versionCode: 28,
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "优化撤销功能：现在可连续撤销，一路回退到本轮第一个媒体重新决定去留。",
+    changelog: "全屏查看照片和视频时支持双击放大、双指捏合缩放、放大后拖动查看细节。",
     downloadUrl: "" // 将在运行时生成
   },
   ios: {
-    version: "1.4.1",
+    version: "1.5.0",
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "优化撤销功能：现在可连续撤销，一路回退到本轮第一个媒体重新决定去留。",
+    changelog: "全屏查看照片和视频时支持双击放大、双指捏合缩放、放大后拖动查看细节。",
     downloadUrl: ""
   },
   harmonyos: {
-    version: "1.4.1",
+    version: "1.5.0",
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "优化撤销功能：现在可连续撤销，一路回退到本轮第一个媒体重新决定去留。",
+    changelog: "全屏查看照片和视频时支持双击放大、双指捏合缩放、放大后拖动查看细节。",
     downloadUrl: ""
   }
 };

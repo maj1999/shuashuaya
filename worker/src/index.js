@@ -11,25 +11,25 @@
 // 版本信息配置 — 发布新版本时更新此处
 const VERSION_CONFIG = {
   android: {
-    version: "1.6.0",
-    versionCode: 30,
+    version: "1.7.0",
+    versionCode: 31,
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "轮播相册模式支持左右滑动翻看：左滑看下一张、右滑看上一张，自由前后浏览；滑过未决定的照片默认保留，已选择的保持不变。",
+    changelog: "优化国内自动升级：升级包改由国内渠道分发，无需代理即可下载安装；新增下载完整性校验，升级更稳更安全。",
     downloadUrl: "" // 运行时按 version 确定性构造 Gitee 直链（见 GITEE_DIST）
   },
   ios: {
-    version: "1.6.0",
+    version: "1.7.0",
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "轮播相册模式支持左右滑动翻看：左滑看下一张、右滑看上一张，自由前后浏览；滑过未决定的照片默认保留，已选择的保持不变。",
+    changelog: "优化国内自动升级：升级包改由国内渠道分发，无需代理即可下载安装；新增下载完整性校验，升级更稳更安全。",
     downloadUrl: ""
   },
   harmonyos: {
-    version: "1.6.0",
+    version: "1.7.0",
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "轮播相册模式支持左右滑动翻看：左滑看下一张、右滑看上一张，自由前后浏览；滑过未决定的照片默认保留，已选择的保持不变。",
+    changelog: "优化国内自动升级：升级包改由国内渠道分发，无需代理即可下载安装；新增下载完整性校验，升级更稳更安全。",
     downloadUrl: ""
   }
 };

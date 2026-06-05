@@ -11,25 +11,25 @@
 // 版本信息配置 — 发布新版本时更新此处
 const VERSION_CONFIG = {
   android: {
-    version: "1.4.0",
-    versionCode: 26,
+    version: "1.4.1",
+    versionCode: 27,
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "新增：清理照片和视频时可点击放大全屏查看细节；支持撤销上一步，回到上一个媒体重新决定删除或保留。",
+    changelog: "优化撤销功能：现在可连续撤销，一路回退到本轮第一个媒体重新决定去留。",
     downloadUrl: "" // 将在运行时生成
   },
   ios: {
-    version: "1.4.0",
+    version: "1.4.1",
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "新增：清理照片和视频时可点击放大全屏查看细节；支持撤销上一步，回到上一个媒体重新决定删除或保留。",
+    changelog: "优化撤销功能：现在可连续撤销，一路回退到本轮第一个媒体重新决定去留。",
     downloadUrl: ""
   },
   harmonyos: {
-    version: "1.4.0",
+    version: "1.4.1",
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "新增：清理照片和视频时可点击放大全屏查看细节；支持撤销上一步，回到上一个媒体重新决定删除或保留。",
+    changelog: "优化撤销功能：现在可连续撤销，一路回退到本轮第一个媒体重新决定去留。",
     downloadUrl: ""
   }
 };

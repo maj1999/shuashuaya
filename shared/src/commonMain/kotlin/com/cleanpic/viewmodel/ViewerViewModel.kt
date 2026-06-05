@@ -24,7 +24,6 @@ class ViewerViewModel {
 
     private val _canUndo = MutableStateFlow(false)
     val canUndo: StateFlow<Boolean> = _canUndo
-    private var lastDecisionIndex: Int? = null
 
     private val _shownIds = mutableSetOf<String>()
 
@@ -57,28 +56,30 @@ class ViewerViewModel {
         resetUndo()
     }
 
-    fun markKept() { recordDecision(); updateCurrent(OperationState.KEPT); advance() }
-    fun markDelete() { recordDecision(); updateCurrent(OperationState.PENDING_DELETE); advance() }
+    fun markKept() { updateCurrent(OperationState.KEPT); advance() }
+    fun markDelete() { updateCurrent(OperationState.PENDING_DELETE); advance() }
 
-    /** 撤销上一次删/留决策：回到该项并清除其标记，恢复待决策态（单步，不累积）。 */
+    /**
+     * 回退到上一个媒体并恢复其待决策态，可连续回退直至第一个媒体。
+     * 已位于第一个（index 0）时无副作用。
+     */
     fun undo() {
-        val idx = lastDecisionIndex ?: return
+        val idx = _currentIndex.value
+        if (idx <= 0) return
+        val prev = idx - 1
         val list = _items.value.toMutableList()
-        if (idx < list.size) {
-            list[idx] = list[idx].copy(state = OperationState.PENDING)
-            _items.value = list
-            _currentIndex.value = idx
-        }
-        resetUndo()
+        list[prev] = list[prev].copy(state = OperationState.PENDING)
+        _items.value = list
+        _currentIndex.value = prev
+        refreshCanUndo()
     }
 
-    private fun recordDecision() {
-        lastDecisionIndex = _currentIndex.value
-        _canUndo.value = true
+    /** 只要当前不在第一个媒体，就还能继续回退。 */
+    private fun refreshCanUndo() {
+        _canUndo.value = _currentIndex.value > 0
     }
 
     private fun resetUndo() {
-        lastDecisionIndex = null
         _canUndo.value = false
     }
 
@@ -105,5 +106,6 @@ class ViewerViewModel {
 
     private fun advance() {
         if (_currentIndex.value < _items.value.size) _currentIndex.value++
+        refreshCanUndo()
     }
 }

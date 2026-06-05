@@ -230,16 +230,61 @@ class ViewerViewModelTest {
     }
 
     @Test
-    fun undo_06_single_step_redecide_then_undo_again() = runTest {
+    fun undo_06_multi_step_back_to_first() = runTest {
         vm.loadMedia(MediaType.PHOTO)
-        vm.markKept()                   // index→1
-        vm.undo()                       // 回到 0，canUndo=false
-        assertFalse(vm.canUndo.value)
-        vm.markDelete()                 // 重新决策 item0，index→1
+        vm.markKept()                   // item0 KEPT, index→1
+        vm.markDelete()                 // item1 DELETE, index→2
+        vm.markKept()                   // item2 KEPT, index→3
+        assertEquals(3, vm.currentIndex.value)
         assertTrue(vm.canUndo.value)
-        vm.undo()                       // 再次可撤回到 0
+
+        vm.undo()                       // 回到 item2
+        assertEquals(2, vm.currentIndex.value)
+        assertEquals(OperationState.PENDING, vm.items.value[2].state)
+        assertTrue(vm.canUndo.value)    // 仍可继续回退
+
+        vm.undo()                       // 回到 item1
+        assertEquals(1, vm.currentIndex.value)
+        assertEquals(OperationState.PENDING, vm.items.value[1].state)
+        assertTrue(vm.canUndo.value)
+
+        vm.undo()                       // 回到 item0（第一个）
         assertEquals(0, vm.currentIndex.value)
         assertEquals(OperationState.PENDING, vm.items.value[0].state)
+        assertFalse(vm.canUndo.value)   // 已到第一个，不可再撤
+
+        vm.undo()                       // 越界无副作用
+        assertEquals(0, vm.currentIndex.value)
+    }
+
+    @Test
+    fun undo_08_canUndo_true_until_reaching_first() = runTest {
+        vm.loadMedia(MediaType.PHOTO)
+        repeat(5) { vm.markKept() }     // index→5
+        repeat(5) {
+            assertTrue(vm.canUndo.value)  // 每次回退前都应可撤
+            vm.undo()
+        }
+        assertEquals(0, vm.currentIndex.value)
+        assertFalse(vm.canUndo.value)
+        // 前 5 项全部恢复待决策态
+        assertTrue(vm.items.value.take(5).all { it.state == OperationState.PENDING })
+    }
+
+    @Test
+    fun undo_09_redecide_after_partial_undo() = runTest {
+        vm.loadMedia(MediaType.PHOTO)
+        vm.markKept()                   // item0, index→1
+        vm.markKept()                   // item1, index→2
+        vm.undo()                       // 回到 item1
+        vm.markDelete()                 // 重新决策 item1 为删除, index→2
+        assertEquals(OperationState.PENDING_DELETE, vm.items.value[1].state)
+        assertEquals(2, vm.currentIndex.value)
+        vm.undo()                       // 回到 item1
+        vm.undo()                       // 继续回到 item0
+        assertEquals(0, vm.currentIndex.value)
+        assertEquals(OperationState.PENDING, vm.items.value[0].state)
+        assertFalse(vm.canUndo.value)
     }
 
     @Test

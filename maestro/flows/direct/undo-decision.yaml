@@ -45,17 +45,33 @@ appId: com.cleanpic.android
     id: "undo_button"
 - takeScreenshot: maestro/screenshots/undo-before
 
-# 做一次保留决策（推进到下一项）
+# 连续做 3 次决策（推进 3 项）
+- tapOn:
+    id: "keep_button"
+- waitForAnimationToEnd
+- tapOn:
+    id: "delete_button"
+- waitForAnimationToEnd
 - tapOn:
     id: "keep_button"
 - waitForAnimationToEnd
 
-# 点击撤销，回到上一项
+# 连续撤销 3 次，一路回退到第一个媒体（验证多步回退）
+- tapOn:
+    id: "undo_button"
+- waitForAnimationToEnd
+- assertVisible:
+    id: "keep_button"
+- tapOn:
+    id: "undo_button"
+- waitForAnimationToEnd
+- assertVisible:
+    id: "keep_button"
 - tapOn:
     id: "undo_button"
 - waitForAnimationToEnd
 
-# 浏览页仍正常（删/留按钮可见，未跳到结果页）
+# 仍在浏览页（删/留按钮可见，未跳到结果页），已回退到第一个
 - assertVisible:
     id: "keep_button"
 - assertVisible:

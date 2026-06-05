@@ -2,6 +2,6 @@ package com.cleanpic
 
 object AppInfo {
     const val APP_NAME = "刷刷鸭"
-    const val VERSION = "1.4.1"
+    const val VERSION = "1.5.0"
     val displayVersion: String get() = "$APP_NAME v$VERSION"
 }

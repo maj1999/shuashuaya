@@ -71,6 +71,20 @@ if [ -n "$(git -C "$PROJECT_ROOT" status --porcelain)" ]; then
 fi
 echo "  ✅ 工作区干净"
 
+# Step 2.5: 发布前快照 —— 给当前 git 记录打 tag release-<版本号>，作为本次发布的回滚点
+PRE_TAG="release-${VERSION}"
+echo ""
+echo "【发布前快照】打 tag: $PRE_TAG ..."
+if git -C "$PROJECT_ROOT" rev-parse -q --verify "refs/tags/${PRE_TAG}" >/dev/null; then
+    echo "  ⚠️  tag $PRE_TAG 已存在，跳过创建"
+else
+    git -C "$PROJECT_ROOT" tag "$PRE_TAG"
+    echo "  ✅ 已创建 $PRE_TAG（指向 $(git -C "$PROJECT_ROOT" rev-parse --short HEAD)）"
+fi
+retry git -C "$PROJECT_ROOT" push origin "$PRE_TAG" \
+    && echo "  ✅ $PRE_TAG 已推送到远程" \
+    || echo "  ⚠️  $PRE_TAG 推送失败，但本地 tag 已存在（回滚点已保留）"
+
 # Step 3: 更新版本号
 echo ""
 echo "【3/6】更新版本号..."

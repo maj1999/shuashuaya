@@ -57,6 +57,8 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.animation)
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
+            // 全屏查看缩放（双击 + 双指捏合），2.7.0 编译于 Compose 1.7.3，与本项目精确匹配
+            implementation("net.engawapg.lib:zoomable:2.7.0")
         }
     }
 

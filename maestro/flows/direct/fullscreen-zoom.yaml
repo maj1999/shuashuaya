@@ -1,0 +1,70 @@
+# maestro/flows/direct/fullscreen-zoom.yaml
+#
+# US-CP-20 放大查看照片与视频
+# 验证：进全屏 → 双击放大 → 再双击还原（双指捏合 Maestro 不支持，需真机手动验证）
+#
+appId: com.cleanpic.android
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 30000
+- waitForAnimationToEnd
+
+# 确保轮播模式
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+- tapOn: "轮播相册"
+- waitForAnimationToEnd
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd
+
+# 进入照片浏览
+- tapOn:
+    id: "start_photo"
+- waitForAnimationToEnd
+- tapOn:
+    text: "授权"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Allow"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    id: "start_photo"
+    optional: true
+- waitForAnimationToEnd
+
+# 点击进入全屏
+- tapOn:
+    id: "media_card"
+- waitForAnimationToEnd
+- assertVisible:
+    id: "fullscreen_viewer"
+- takeScreenshot: maestro/screenshots/zoom-before
+
+# 双击放大（在内容区中部，避开右侧操作按钮）
+- doubleTapOn:
+    point: "50%,40%"
+- waitForAnimationToEnd
+- takeScreenshot: maestro/screenshots/zoom-in
+
+# 再次双击还原
+- doubleTapOn:
+    point: "50%,40%"
+- waitForAnimationToEnd
+- takeScreenshot: maestro/screenshots/zoom-restored
+
+# 仍在全屏、可正常退出
+- assertVisible:
+    id: "fullscreen_viewer"
+- tapOn:
+    id: "exit_button"
+- waitForAnimationToEnd
+- assertNotVisible:
+    id: "fullscreen_viewer"

@@ -2,6 +2,7 @@ package com.cleanpic.ui.media
 
 import android.content.ContentUris
 import android.provider.MediaStore
+import android.view.LayoutInflater
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -13,6 +14,7 @@ import androidx.media3.common.MediaItem as ExoMediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import com.cleanpic.model.MediaItem
+import com.cleanpic.shared.R
 
 @Composable
 actual fun VideoPlayerView(
@@ -44,10 +46,12 @@ actual fun VideoPlayerView(
 
     AndroidView(
         factory = { ctx ->
-            PlayerView(ctx).apply {
-                player = exoPlayer
-                useController = false
-            }
+            // 从 XML inflate，使用 TextureView surface（见 cleanpic_video_player.xml），
+            // 以便全屏缩放时视频画面随变换平滑渲染
+            val playerView = LayoutInflater.from(ctx)
+                .inflate(R.layout.cleanpic_video_player, null) as PlayerView
+            playerView.player = exoPlayer
+            playerView
         },
         update = { playerView ->
             playerView.player = exoPlayer

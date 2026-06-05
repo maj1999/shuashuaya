@@ -22,6 +22,7 @@
 - [x] `architecture/cleanpic/auto-update.md` — 自动升级模块设计
 - [x] `architecture/cleanpic/auto-update-distribution.md` — 升级功能的分发渠道与编译期隔离
 - [ ] `architecture/cleanpic/viewer-fullscreen-undo.md` — 浏览页点击全屏 + 撤销上一步（US-CP-18/19）
+- [ ] `architecture/cleanpic/viewer-zoom.md` — 全屏查看缩放：双击 + 双指捏合（US-CP-20）
 
 ## 部署层
 

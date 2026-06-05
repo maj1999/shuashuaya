@@ -11,25 +11,25 @@
 // 版本信息配置 — 发布新版本时更新此处
 const VERSION_CONFIG = {
   android: {
-    version: "1.3.0",
-    versionCode: 25,
+    version: "1.4.0",
+    versionCode: 26,
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "清理结果页新增删除前确认中间态：标记完照片与视频后先进入待确认界面（标题「即将删除 N 项」并提示删除后不可在 App 内撤销），确认删除成功后才显示「本轮清理完成」，避免一进入就误以为已清理完成。",
+    changelog: "新增：清理照片和视频时可点击放大全屏查看细节；支持撤销上一步，回到上一个媒体重新决定删除或保留。",
     downloadUrl: "" // 将在运行时生成
   },
   ios: {
-    version: "1.3.0",
+    version: "1.4.0",
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "清理结果页新增删除前确认中间态：标记完照片与视频后先进入待确认界面（标题「即将删除 N 项」并提示删除后不可在 App 内撤销），确认删除成功后才显示「本轮清理完成」，避免一进入就误以为已清理完成。",
+    changelog: "新增：清理照片和视频时可点击放大全屏查看细节；支持撤销上一步，回到上一个媒体重新决定删除或保留。",
     downloadUrl: ""
   },
   harmonyos: {
-    version: "1.3.0",
+    version: "1.4.0",
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "清理结果页新增删除前确认中间态：标记完照片与视频后先进入待确认界面（标题「即将删除 N 项」并提示删除后不可在 App 内撤销），确认删除成功后才显示「本轮清理完成」，避免一进入就误以为已清理完成。",
+    changelog: "新增：清理照片和视频时可点击放大全屏查看细节；支持撤销上一步，回到上一个媒体重新决定删除或保留。",
     downloadUrl: ""
   }
 };

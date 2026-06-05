@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -33,7 +34,8 @@ fun ThemedActionButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     size: Dp = 64.dp,
-    testTag: String = ""
+    testTag: String = "",
+    enabled: Boolean = true
 ) {
     val shape = when (theme.buttonStyle) {
         ButtonStyle.OUTLINED -> if (theme.layoutId == ThemeLayoutId.MINIMAL) RoundedCornerShape(0.dp) else CircleShape
@@ -47,9 +49,10 @@ fun ThemedActionButton(
         modifier = modifier
             .size(size)
             .testTag(testTag)
+            .alpha(if (enabled) 1f else 0.4f)
             .clip(shape)
             .then(buttonBackground(theme.buttonStyle, color, theme))
-            .clickable(onClick = onClick),
+            .clickable(enabled = enabled, onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
         IconPainter(

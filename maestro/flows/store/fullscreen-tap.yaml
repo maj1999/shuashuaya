@@ -1,0 +1,73 @@
+# maestro/flows/direct/fullscreen-tap.yaml
+#
+# US-CP-18 点击全屏查看媒体
+# E22a 轮播点击照片进全屏 → E22c 全屏内保留后回原模式并推进 → E22d 全屏内返回不改标记
+#
+appId: com.cleanpic.android
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 30000
+- waitForAnimationToEnd
+
+# 确保轮播模式
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+- tapOn: "轮播相册"
+- waitForAnimationToEnd
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd
+
+# 进入照片浏览
+- tapOn:
+    id: "start_photo"
+- waitForAnimationToEnd
+- tapOn:
+    text: "授权"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Allow"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    id: "start_photo"
+    optional: true
+- waitForAnimationToEnd
+
+# ===== E22a: 点击媒体进入全屏 =====
+- tapOn:
+    id: "media_card"
+- waitForAnimationToEnd
+- assertVisible:
+    id: "fullscreen_viewer"
+- takeScreenshot: maestro/screenshots/fullscreen-tap-opened
+
+# ===== E22d: 全屏内点返回，不改标记，回到轮播 =====
+- tapOn:
+    id: "exit_button"
+- waitForAnimationToEnd
+- assertNotVisible:
+    id: "fullscreen_viewer"
+- assertVisible:
+    id: "keep_button"
+
+# ===== E22c: 再次进全屏，点保留后回原模式并推进 =====
+- tapOn:
+    id: "media_card"
+- waitForAnimationToEnd
+- assertVisible:
+    id: "fullscreen_viewer"
+- tapOn:
+    id: "keep_button"
+- waitForAnimationToEnd
+- assertNotVisible:
+    id: "fullscreen_viewer"
+- assertVisible:
+    id: "keep_button"
+- takeScreenshot: maestro/screenshots/fullscreen-tap-keep-back

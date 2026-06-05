@@ -4,6 +4,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -16,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,7 +33,11 @@ private const val SWIPE_THRESHOLD_DP = 150
 private const val DISMISS_TARGET = 1000f
 
 @Composable
-fun SwipeCardMode(theme: ThemeTokens, viewerViewModel: ViewerViewModel) {
+fun SwipeCardMode(
+    theme: ThemeTokens,
+    viewerViewModel: ViewerViewModel,
+    onMediaClick: () -> Unit = {}
+) {
     val items by viewerViewModel.items.collectAsState()
     val currentIndex by viewerViewModel.currentIndex.collectAsState()
     if (items.isEmpty() || currentIndex >= items.size) return
@@ -41,10 +47,11 @@ fun SwipeCardMode(theme: ThemeTokens, viewerViewModel: ViewerViewModel) {
     val density = LocalDensity.current
     val thresholdPx = with(density) { SWIPE_THRESHOLD_DP.dp.toPx() }
 
+    val canUndo by viewerViewModel.canUndo.collectAsState()
     var isPlaying by remember { mutableStateOf(false) }
     var isMuted by remember { mutableStateOf(true) }
 
-    // 每次 index 变化时重置偏移和播放状态
+    // 每次 index 变化时重置偏移与播放状态
     LaunchedEffect(currentIndex) {
         offsetX.snapTo(0f)
         isPlaying = false
@@ -62,13 +69,28 @@ fun SwipeCardMode(theme: ThemeTokens, viewerViewModel: ViewerViewModel) {
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // 提示文案
-        Text(
-            text = "← 左滑删除 · 右滑保留 →",
-            fontSize = 13.sp,
-            color = Color(theme.colorTextSecondary),
-            modifier = Modifier.padding(top = 8.dp)
-        )
+        // 提示文案 + 撤销按钮
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp, start = 16.dp, end = 16.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            ThemedActionButton(
+                iconName = "undo",
+                color = theme.colorTextSecondary,
+                theme = theme,
+                onClick = { viewerViewModel.undo() },
+                size = 40.dp,
+                testTag = "undo_button",
+                enabled = canUndo
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Text(
+                text = "← 左滑删除 · 右滑保留 →",
+                fontSize = 13.sp,
+                color = Color(theme.colorTextSecondary)
+            )
+        }
 
         // 卡片堆叠区
         Box(
@@ -123,10 +145,14 @@ fun SwipeCardMode(theme: ThemeTokens, viewerViewModel: ViewerViewModel) {
                 modifier = Modifier
                     .fillMaxHeight(0.8f)
                     .fillMaxWidth(0.85f)
+                    .testTag("media_card")
                     .graphicsLayer {
                         translationX = offsetX.value
                         rotationZ = rotation
                         alpha = cardAlpha
+                    }
+                    .pointerInput(currentIndex) {
+                        detectTapGestures(onTap = { onMediaClick() })
                     }
                     .pointerInput(currentIndex) {
                         detectHorizontalDragGestures(

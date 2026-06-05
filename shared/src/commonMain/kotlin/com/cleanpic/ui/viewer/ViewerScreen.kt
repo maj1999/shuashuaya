@@ -52,31 +52,56 @@ fun ViewerScreen(
             val mode = InteractionMode.fromId(
                 ServiceLocator.appSettings.interactionMode
             )
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color(theme.colorBackground))
-            ) {
-                if (mode != InteractionMode.FULLSCREEN) {
-                    ProgressHeader(
+            val canUndo by viewerViewModel.canUndo.collectAsState()
+            // 轮播/卡片模式下点击媒体进入的全屏叠层；全屏上下滑模式本就全屏，不使用
+            var showFullscreen by remember { mutableStateOf(false) }
+            LaunchedEffect(currentIndex) { showFullscreen = false }
+
+            Box(modifier = Modifier.fillMaxSize()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color(theme.colorBackground))
+                ) {
+                    if (mode != InteractionMode.FULLSCREEN) {
+                        ProgressHeader(
+                            theme = theme,
+                            current = currentIndex + 1,
+                            total = items.size,
+                            onExit = { router.popBackStack() }
+                        )
+                    }
+                    Box(modifier = Modifier.weight(1f)) {
+                        when (mode) {
+                            InteractionMode.CAROUSEL -> CarouselMode(
+                                theme, viewerViewModel,
+                                onMediaClick = { showFullscreen = true }
+                            )
+                            InteractionMode.SWIPE_CARD -> SwipeCardMode(
+                                theme, viewerViewModel,
+                                onMediaClick = { showFullscreen = true }
+                            )
+                            InteractionMode.FULLSCREEN -> FullscreenMode(
+                                theme, viewerViewModel, router
+                            )
+                        }
+                    }
+                }
+
+                // 点击进入全屏查看（盖住整屏，含 ProgressHeader）
+                if (showFullscreen && currentIndex < items.size) {
+                    FullscreenViewer(
+                        item = items[currentIndex],
                         theme = theme,
                         current = currentIndex + 1,
                         total = items.size,
-                        onExit = { router.popBackStack() }
+                        canUndo = canUndo,
+                        onUndo = { viewerViewModel.undo(); showFullscreen = false },
+                        onDelete = { viewerViewModel.markDelete(); showFullscreen = false },
+                        onKeep = { viewerViewModel.markKept(); showFullscreen = false },
+                        onBack = { showFullscreen = false },
+                        backLabel = "返回"
                     )
-                }
-                Box(modifier = Modifier.weight(1f)) {
-                    when (mode) {
-                        InteractionMode.CAROUSEL -> CarouselMode(
-                            theme, viewerViewModel
-                        )
-                        InteractionMode.SWIPE_CARD -> SwipeCardMode(
-                            theme, viewerViewModel
-                        )
-                        InteractionMode.FULLSCREEN -> FullscreenMode(
-                            theme, viewerViewModel, router
-                        )
-                    }
                 }
             }
         }

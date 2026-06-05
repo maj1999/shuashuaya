@@ -22,6 +22,10 @@ class ViewerViewModel {
     private val _isEmpty = MutableStateFlow(false)
     val isEmpty: StateFlow<Boolean> = _isEmpty
 
+    private val _canUndo = MutableStateFlow(false)
+    val canUndo: StateFlow<Boolean> = _canUndo
+    private var lastDecisionIndex: Int? = null
+
     private val _shownIds = mutableSetOf<String>()
 
     val totalCount: Int get() = _items.value.size
@@ -50,10 +54,33 @@ class ViewerViewModel {
         _items.value = picked.map { ViewerItem(it) }
         _currentIndex.value = 0
         _isLoading.value = false
+        resetUndo()
     }
 
-    fun markKept() { updateCurrent(OperationState.KEPT); advance() }
-    fun markDelete() { updateCurrent(OperationState.PENDING_DELETE); advance() }
+    fun markKept() { recordDecision(); updateCurrent(OperationState.KEPT); advance() }
+    fun markDelete() { recordDecision(); updateCurrent(OperationState.PENDING_DELETE); advance() }
+
+    /** 撤销上一次删/留决策：回到该项并清除其标记，恢复待决策态（单步，不累积）。 */
+    fun undo() {
+        val idx = lastDecisionIndex ?: return
+        val list = _items.value.toMutableList()
+        if (idx < list.size) {
+            list[idx] = list[idx].copy(state = OperationState.PENDING)
+            _items.value = list
+            _currentIndex.value = idx
+        }
+        resetUndo()
+    }
+
+    private fun recordDecision() {
+        lastDecisionIndex = _currentIndex.value
+        _canUndo.value = true
+    }
+
+    private fun resetUndo() {
+        lastDecisionIndex = null
+        _canUndo.value = false
+    }
 
     fun cancelDelete(id: String) {
         _items.value = _items.value.map {
@@ -67,7 +94,7 @@ class ViewerViewModel {
         return repo.deleteMediaItems(items)
     }
 
-    fun resetForNextRound() { _currentIndex.value = 0 }
+    fun resetForNextRound() { _currentIndex.value = 0; resetUndo() }
     fun clearSession() { _shownIds.clear() }
 
     private fun updateCurrent(state: OperationState) {

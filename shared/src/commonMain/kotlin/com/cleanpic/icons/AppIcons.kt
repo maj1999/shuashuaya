@@ -35,7 +35,9 @@ object AppIcons {
         "refresh" to "M23 4v6h-6M1 20v-6h6M20.49 9A9 9 0 005.64 5.64L1 10M22.99 14l-4.64 4.36A9 9 0 013.51 15",
         "home" to "M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z",
         "warning" to "M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0zM12 9v4M12 17h.01",
-        "close" to "M18 6L6 18M6 6l12 12"
+        "close" to "M18 6L6 18M6 6l12 12",
+        "undo" to "M1 4v6h6M3.51 15a9 9 0 102.13-9.36L1 10",
+        "fullscreen" to "M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"
     )
 
     fun get(name: String, theme: ThemeTokens): IconDef {

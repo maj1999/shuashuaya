@@ -1,0 +1,63 @@
+# maestro/flows/direct/undo-decision.yaml
+#
+# US-CP-19 撤销上一步重新决策
+# E23a 轮播模式撤销：决策后回退上一项，撤销按钮可用性
+#
+appId: com.cleanpic.android
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 30000
+- waitForAnimationToEnd
+
+# 确保轮播模式
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+- tapOn: "轮播相册"
+- waitForAnimationToEnd
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd
+
+# 进入照片浏览
+- tapOn:
+    id: "start_photo"
+- waitForAnimationToEnd
+- tapOn:
+    text: "授权"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Allow"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    id: "start_photo"
+    optional: true
+- waitForAnimationToEnd
+
+# 撤销按钮初始可见（未决策时禁用，但仍渲染）
+- assertVisible:
+    id: "undo_button"
+- takeScreenshot: maestro/screenshots/undo-before
+
+# 做一次保留决策（推进到下一项）
+- tapOn:
+    id: "keep_button"
+- waitForAnimationToEnd
+
+# 点击撤销，回到上一项
+- tapOn:
+    id: "undo_button"
+- waitForAnimationToEnd
+
+# 浏览页仍正常（删/留按钮可见，未跳到结果页）
+- assertVisible:
+    id: "keep_button"
+- assertVisible:
+    id: "delete_button"
+- takeScreenshot: maestro/screenshots/undo-after

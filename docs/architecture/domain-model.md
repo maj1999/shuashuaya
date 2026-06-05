@@ -37,6 +37,9 @@
 | 分发渠道 | Distribution Channel / productFlavor | 区分构建版本面向的用户群的维度，决定是否包含应用内升级 |
 | 直装版 | Direct Build（`direct` flavor） | 通过 GitHub Release 分发的 APK，包含完整应用内升级能力 |
 | 商店版 | Store Build（`store` flavor） | 通过应用商店分发的 APK，编译期完全移除升级相关代码与网络请求，升级由商店负责 |
+| 全屏查看 | FullscreenViewer | 无状态全屏展示组件，三种交互模式复用；区别于交互模式"全屏上下滑(Fullscreen)" |
+| 撤销 | Undo / canUndo | 单步撤销上一次删/留决策，回到上一项重新选择 |
+| 最近决策项 | lastDecisionIndex | 最近一次做出删/留决策的媒体项下标，撤销的目标 |
 
 ## 核心数据模型
 

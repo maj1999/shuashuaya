@@ -32,11 +32,16 @@ import com.cleanpic.ui.media.VideoPlayerView
 import com.cleanpic.viewmodel.ViewerViewModel
 
 @Composable
-fun CarouselMode(theme: ThemeTokens, viewerViewModel: ViewerViewModel) {
+fun CarouselMode(
+    theme: ThemeTokens,
+    viewerViewModel: ViewerViewModel,
+    onMediaClick: () -> Unit = {}
+) {
     val items by viewerViewModel.items.collectAsState()
     val currentIndex by viewerViewModel.currentIndex.collectAsState()
     if (items.isEmpty() || currentIndex >= items.size) return
 
+    val canUndo by viewerViewModel.canUndo.collectAsState()
     var offsetX by remember { mutableStateOf(0f) }
     val animatedOffset by animateFloatAsState(targetValue = offsetX)
     var isPlaying by remember { mutableStateOf(false) }
@@ -95,7 +100,7 @@ fun CarouselMode(theme: ThemeTokens, viewerViewModel: ViewerViewModel) {
                         }
                 )
             }
-            // 当前主卡片
+            // 当前主卡片（点击进入全屏查看）
             MainCard(
                 item = items[currentIndex],
                 theme = theme,
@@ -107,11 +112,13 @@ fun CarouselMode(theme: ThemeTokens, viewerViewModel: ViewerViewModel) {
                     .fillMaxHeight(0.85f)
                     .fillMaxWidth(0.75f)
                     .graphicsLayer { translationX = animatedOffset }
+                    .testTag("media_card")
+                    .clickable { onMediaClick() }
             )
         }
 
         // 操作按钮
-        ActionButtons(theme, viewerViewModel)
+        ActionButtons(theme, viewerViewModel, canUndo)
         Spacer(modifier = Modifier.height(16.dp))
     }
 }
@@ -187,11 +194,21 @@ private fun PreviewCard(item: ViewerItem, theme: ThemeTokens, modifier: Modifier
 }
 
 @Composable
-private fun ActionButtons(theme: ThemeTokens, viewerViewModel: ViewerViewModel) {
+private fun ActionButtons(theme: ThemeTokens, viewerViewModel: ViewerViewModel, canUndo: Boolean) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 48.dp),
-        horizontalArrangement = Arrangement.SpaceEvenly
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 36.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
     ) {
+        ThemedActionButton(
+            iconName = "undo",
+            color = theme.colorTextSecondary,
+            theme = theme,
+            onClick = { viewerViewModel.undo() },
+            size = 48.dp,
+            testTag = "undo_button",
+            enabled = canUndo
+        )
         ThemedActionButton(
             iconName = "delete",
             color = theme.colorDanger,

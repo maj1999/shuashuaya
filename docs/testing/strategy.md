@@ -6,10 +6,10 @@
 
 | 层级 | 用例数 | 测试目标 | 真实依赖 | Mock 依赖 | 真实 Infra | Mock Infra | 执行时机 | 耗时 | 代码位置 |
 |------|--------|---------|---------|-----------|-----------|-----------|---------|------|---------|
-| L1 单元 | 19 | 共享层业务逻辑正确性 | 无 | MediaRepository, AppSettings | 无 | 内存 Mock | 每次提交 | <10s | shared/test/ |
+| L1 单元 | 26 | 共享层业务逻辑正确性 | 无 | MediaRepository, AppSettings | 无 | 内存 Mock | 每次提交 | <10s | shared/test/ |
 | L2 组件 | 18 | UI 组件交互与状态 | ThemeManager, RandomPicker | MediaRepository | 无 | 模拟媒体数据 | 每次提交 | <30s | shared/test/ui/ |
 | L3 集成 | 16 | 平台原生 Module 真机验证 | 系统相册, 系统权限 | 无 | 真机 | 无 | 每日/MR | <5min | {platform}/test/ |
-| L4 E2E | 32 | 完整用户流程端到端 | 全部真实 | 无 | 真机 | 无 | 发版前 | <15min | e2e/ |
+| L4 E2E | 40 | 完整用户流程端到端 | 全部真实 | 无 | 真机 | 无 | 发版前 | <15min | e2e/ |
 
 ## 二、分层逻辑
 
@@ -69,6 +69,8 @@ shared/src/commonTest/kotlin/com/cleanpic/
 | US-CP-10 每轮数量 | U12-U14 | E17 | — | E17 |
 | US-CP-11 权限引导 | — | — | P01-P06 | P01-P06 |
 | US-CP-12 中途退出浏览 | — | — | — | E19a,E19b,E19c |
+| US-CP-18 点击全屏查看媒体 | — | — | — | E22a-E22e |
+| US-CP-19 撤销上一步重新决策 | U-UNDO-01~07 | — | — | E23a,E23b,E23c |
 | US-CP-13 启动检查更新 | U-UPD-01~04 | — | — | E-UPD-01~04（direct） |
 | US-CP-14 手动检查+红点 | U-UPD-04 | — | — | E-UPD-06~09（direct） |
 | US-CP-15 下载安装 | — | — | — | E-UPD-10~11（direct） |
@@ -92,6 +94,6 @@ shared/src/commonTest/kotlin/com/cleanpic/
 | [scenarios/ep1-photo-cleanup.md](scenarios/ep1-photo-cleanup.md) | EP1 照片清理 | E01-E06, B01-B10 |
 | [scenarios/ep2-video-cleanup.md](scenarios/ep2-video-cleanup.md) | EP2 视频清理 | E07-E09 |
 | [scenarios/ep3-theme-interaction.md](scenarios/ep3-theme-interaction.md) | EP3 主题与交互 | E10-E18 |
-| [scenarios/ep5-browsing-enhancement.md](scenarios/ep5-browsing-enhancement.md) | EP5 浏览体验增强 | E19a-E19c |
+| [scenarios/ep5-browsing-enhancement.md](scenarios/ep5-browsing-enhancement.md) | EP5 浏览体验增强 | E19a-E19c, E22a-E22e, E23a-E23c, U-UNDO-01~07 |
 | [scenarios/ep6-auto-update.md](scenarios/ep6-auto-update.md) | EP6 自动升级 | U-UPD-01~07, B-UPD-01~03（构建产物扫描）, E-UPD-01~15 |
 | [scenarios/tech-nfr.md](scenarios/tech-nfr.md) | NFR + 权限 + 兼容性 | P01-P06, F01-F08, 兼容性矩阵 |

@@ -1,0 +1,57 @@
+# maestro/flows/direct/video/swipecard-fullscreen-tap.yaml
+#
+# US-CP-18 E22b 卡片模式点击视频进全屏并可播放
+# 切换卡片模式 → 视频浏览 → 点击卡片进全屏 → 全屏内播放 → 验证 mute_button 出现
+#
+appId: com.cleanpic.android
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 30000
+- waitForAnimationToEnd
+
+# 切换到卡片模式
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+- tapOn: "卡片左右"
+- waitForAnimationToEnd
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd
+
+# 进入视频浏览
+- tapOn:
+    id: "start_video"
+- waitForAnimationToEnd
+- tapOn:
+    text: "授权"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Allow"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    id: "start_video"
+    optional: true
+- waitForAnimationToEnd
+
+# 点击卡片上部进入全屏（避开居中的内联播放按钮）
+- tapOn:
+    point: "50%,32%"
+- waitForAnimationToEnd
+- assertVisible:
+    id: "fullscreen_viewer"
+
+# 全屏内视频可播放（点击播放按钮后静音按钮出现）
+- tapOn:
+    id: "play_button"
+    optional: true
+- waitForAnimationToEnd
+- assertVisible:
+    id: "mute_button"
+- takeScreenshot: maestro/screenshots/swipecard-fullscreen-video

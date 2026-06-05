@@ -181,4 +181,74 @@ class ViewerViewModelTest {
         assertEquals(expected, vm.releasedBytes)
         assertTrue(vm.releasedBytes > 0)
     }
+
+    // ===== US-CP-19 撤销上一步 =====
+
+    @Test
+    fun undo_01_canUndo_true_after_decision() = runTest {
+        vm.loadMedia(MediaType.PHOTO)
+        assertFalse(vm.canUndo.value)   // 未决策不可撤
+        vm.markKept()
+        assertTrue(vm.canUndo.value)    // 决策后可撤
+    }
+
+    @Test
+    fun undo_02_reverts_index_and_clears_state() = runTest {
+        vm.loadMedia(MediaType.PHOTO)
+        vm.markDelete()                 // item0 → PENDING_DELETE，index→1
+        assertEquals(1, vm.currentIndex.value)
+        vm.undo()
+        assertEquals(0, vm.currentIndex.value)
+        assertEquals(OperationState.PENDING, vm.items.value[0].state)
+    }
+
+    @Test
+    fun undo_03_canUndo_false_after_undo() = runTest {
+        vm.loadMedia(MediaType.PHOTO)
+        vm.markKept()
+        vm.undo()
+        assertFalse(vm.canUndo.value)
+    }
+
+    @Test
+    fun undo_04_no_effect_when_no_decision() = runTest {
+        vm.loadMedia(MediaType.PHOTO)
+        assertFalse(vm.canUndo.value)
+        vm.undo()                       // 无决策，应无副作用
+        assertEquals(0, vm.currentIndex.value)
+        assertEquals(OperationState.PENDING, vm.items.value[0].state)
+        assertFalse(vm.canUndo.value)
+    }
+
+    @Test
+    fun undo_05_loadMedia_resets_undo_state() = runTest {
+        vm.loadMedia(MediaType.PHOTO)
+        vm.markKept()
+        assertTrue(vm.canUndo.value)
+        vm.loadMedia(MediaType.PHOTO)
+        assertFalse(vm.canUndo.value)
+    }
+
+    @Test
+    fun undo_06_single_step_redecide_then_undo_again() = runTest {
+        vm.loadMedia(MediaType.PHOTO)
+        vm.markKept()                   // index→1
+        vm.undo()                       // 回到 0，canUndo=false
+        assertFalse(vm.canUndo.value)
+        vm.markDelete()                 // 重新决策 item0，index→1
+        assertTrue(vm.canUndo.value)
+        vm.undo()                       // 再次可撤回到 0
+        assertEquals(0, vm.currentIndex.value)
+        assertEquals(OperationState.PENDING, vm.items.value[0].state)
+    }
+
+    @Test
+    fun undo_07_clears_pending_delete() = runTest {
+        vm.loadMedia(MediaType.PHOTO)
+        vm.markDelete()
+        assertEquals(1, vm.deletedCount)
+        vm.undo()
+        assertEquals(OperationState.PENDING, vm.items.value[0].state)
+        assertEquals(0, vm.deletedCount)
+    }
 }

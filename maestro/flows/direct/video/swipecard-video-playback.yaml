@@ -5,11 +5,12 @@
 #
 appId: com.cleanpic.android
 ---
+- stopApp
 - launchApp
 - extendedWaitUntil:
     visible:
       id: "settings_button"
-    timeout: 10000
+    timeout: 30000
 - waitForAnimationToEnd
 
 # 切换到卡片模式
@@ -42,16 +43,17 @@ appId: com.cleanpic.android
 # 截图：视频缩略图 + 播放图标应可见
 - takeScreenshot: maestro/screenshots/swipecard-video-thumbnail
 
-# 点击播放图标
+# 点击播放图标（卡片内联播放，不进全屏）
 - tapOn:
     id: "play_button"
 - waitForAnimationToEnd
 
-# 等待视频加载播放
-- swipe:
-    start: "50%, 50%"
-    end: "50%, 50%"
-    duration: 1500
+# 等待视频加载播放 —— 等静音按钮出现即可，不可用原地 swipe，
+# 否则会被卡片的点击手势识别为「点击进全屏」(US-CP-18)，污染本流的卡片内联播放验证
+- extendedWaitUntil:
+    visible:
+      id: "mute_button"
+    timeout: 5000
 
 # 验证静音按钮可见
 - assertVisible:

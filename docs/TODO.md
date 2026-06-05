@@ -24,6 +24,7 @@
 - [ ] `architecture/cleanpic/viewer-fullscreen-undo.md` — 浏览页点击全屏 + 撤销上一步（US-CP-18/19）
 - [ ] `architecture/cleanpic/viewer-zoom.md` — 全屏查看缩放：双击 + 双指捏合（US-CP-20）
 - [ ] `architecture/cleanpic/viewer-carousel-swipe-nav.md` — 轮播模式左右滑动切换前后媒体（US-CP-21）
+- [ ] `architecture/cleanpic/auto-update-china-gitee.md` — 国内自动升级分发（Gitee 双端点 + 存量迁移）
 
 ## 部署层
 

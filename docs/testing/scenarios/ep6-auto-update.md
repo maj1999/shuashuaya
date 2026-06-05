@@ -94,6 +94,46 @@ maestro/flows/
 
 代码位置：`shared/src/commonTest/kotlin/com/cleanpic/ui/AppHooksTest.kt`
 
+### 国内分发与迁移（本次新增，对应 US-CP-15 国内/迁移/完整性 AC + 方案 §12）
+
+#### U-UPD-08 检查端点超时与双端点 fallback（F2）
+
+| 用例 | 输入 | 期望 |
+|------|------|------|
+| 主端点成功 | 主(CN)返回有效 version.json | 直接用主端点结果，不调兜底 |
+| 主端点超时 | 主端点 hang 超过 timeout | 触发兜底(worker)端点，用其结果 |
+| 主异常兜底成功 | 主抛异常、兜底正常 | 用兜底结果 |
+| 两端点都失败 | 主超时 + 兜底异常 | 返回 UP_TO_DATE，不挂起 |
+| 端点路径可配 | 主=Gitee raw 完整 URL（无 `/api/version` 后缀） | 正确 GET 该 URL 并解析 |
+
+> 关键：必须装 `HttpTimeout`，否则"超时"分支永不触发（现状无超时）。
+
+#### U-UPD-09 versionCode 优先比较（M1）
+
+| 用例 | 输入 | 期望 |
+|------|------|------|
+| 同 version 名仅 bump code | current code=29, remote version 相同、code=30 | 判为有新版 |
+| version 名更新 | current 1.5.0, remote 1.6.0 | 有新版（兼容旧逻辑） |
+| code 相等 version 相等 | 同名同 code | UP_TO_DATE |
+| remote 无 versionCode（旧响应） | 仅 version 字段 | 回退到 version 字符串比较 |
+
+#### U-UPD-10 下载完整性校验（F1）
+
+| 用例 | 下载内容 | 期望 |
+|------|---------|------|
+| 正常 APK | 真 ZIP，sha256/size 匹配 | 校验通过 → INSTALLING |
+| 大小不符 | 字节数 ≠ size | 判 FAILED，不安装 |
+| 哈希不符 | size 同但 sha256 不同 | 判 FAILED，不安装 |
+| HTML 伪装包 | 内容是 HTML（非 ZIP 魔数 `PK\x03\x04`） | 判 FAILED，不安装；可回退 Worker 代理重试 |
+| version.json 无 sha256（兜底/旧） | 缺完整性字段 | 跳过哈希校验（保持向后兼容），仅 ZIP 魔数兜底 |
+
+#### U-UPD-11 version.json schema 解析
+
+| 用例 | 输入 | 期望 |
+|------|------|------|
+| 含 sha256/size | 新字段齐全 | 正确反序列化进 UpdateInfo |
+| 缺新字段 | 旧 schema | 默认空/0，不报错（`ignoreUnknownKeys` + 默认值） |
+
 ## L3 构建产物验证（编译期隔离断言）
 
 本节是为 US-CP-17 新增的测试层级，验证 store flavor APK 不含升级相关字节码与资源。通过独立脚本 `scripts/verify-store-apk.sh <apk-path>` 执行，发布前手动跑一次，CI 上可在 Store flavor build job 末尾自动跑。
@@ -384,6 +424,39 @@ scripts/verify-store-apk.sh store.apk   → 预期 PASS（不含升级代码）
 
 代码位置：`shared/src/androidUnitTest/kotlin/com/cleanpic/update/UpdateDialogOverlayTest.kt`
 
+### W-UPD-01 Worker 下发 Gitee 直链（P0 桥接，worker/test）
+
+| 检查项 | 期望 |
+|------|------|
+| `/api/version` 的 `android.downloadUrl` | 等于配置的 Gitee 直链，**不含 `workers.dev/download`** |
+| `/api/version` 的 `android.sha256` / `size` | 与 Gitee APK 一致（供客户端完整性校验） |
+| `/api/version` 的 `harmonyos.downloadUrl` | 暂仍为 workers.dev 代理（鸿蒙无国内产物、无真实用户；待鸿蒙产物上 Gitee 后再切） |
+| `/download/*` 代理路由 | 仍保留（海外/历史回退可用） |
+
+### E-UPD-16 存量 app 迁移（手动/真机）
+
+**对应 AC**：US-CP-15 国内无代理升级 + 存量迁移 AC
+
+```
+前置：装一个旧版（UPDATE_API_URL=workers.dev）；Worker 已改下发 Gitee 直链；Gitee 已传新版 APK
+步骤：
+1. 启动旧版 → 触发检查更新（小请求经 workers.dev）
+2. 断言：拿到的 downloadUrl 指向 gitee.com（非 workers.dev）
+3. 点立即更新 → 从 Gitee 下载（国内网络不挂代理）
+4. 断言：下载完成、完整性校验通过、弹出系统安装界面
+5. 装上新版 → 新版检查走 Gitee raw version.json（断网 workers.dev 仍可检查）
+```
+
+### E-UPD-17 国内真机穿透实测（上线前，需国内环境）
+
+```
+前置：国内真机/真网，不挂代理
+步骤：
+1. 多次触发 workers.dev/api/version，记录穿透成功率（评估 P0 覆盖）
+2. Gitee raw version.json 与 Gitee release 附件均可匿名直链下载
+3. 手动"检查更新"失败时给出明确提示 + Gitee 下载页引导（不静默吞错）
+```
+
 ## 测试覆盖矩阵
 
 | User Story | L1 单元 | L2 组件 | L3 构建产物 | L4 E2E (Maestro) |
@@ -391,5 +464,6 @@ scripts/verify-store-apk.sh store.apk   → 预期 PASS（不含升级代码）
 | US-CP-13 启动检查更新 | U-UPD-01~04 | U-UPD-06 | — | E-UPD-01~04（direct） |
 | US-CP-14 手动检查+红点 | U-UPD-04 | — | — | E-UPD-06~09（direct） |
 | US-CP-15 下载安装 | — | U-UPD-06 | — | E-UPD-10~11（direct） |
+| US-CP-15 国内无代理升级+迁移+完整性 | U-UPD-08~11 | — | W-UPD-01 | E-UPD-16~17（手动/真机） |
 | US-CP-16 开关自动检查 | U-UPD-05 | — | — | E-UPD-05（direct） |
 | US-CP-17 商店版无应用内升级 | U-UPD-07 | — | B-UPD-01~03 | E-UPD-12~15 |

@@ -11,25 +11,25 @@
 // 版本信息配置 — 发布新版本时更新此处
 const VERSION_CONFIG = {
   android: {
-    version: "1.9.0",
-    versionCode: 36,
+    version: "1.9.1",
+    versionCode: 37,
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "新增待删除照片/视频全屏预览：点击放大查看、左右滑动切换、视频可直接播放；取消删除按钮适配主题配色。",
+    changelog: "修复全屏预览操作按钮遮挡画面；修复全屏播放时静音图标与实际声音不一致（进全屏不再有底层声音泄漏）。",
     downloadUrl: "" // 运行时按 version 确定性构造 Gitee 直链（见 GITEE_DIST）
   },
   ios: {
-    version: "1.9.0",
+    version: "1.9.1",
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "新增待删除照片/视频全屏预览：点击放大查看、左右滑动切换、视频可直接播放；取消删除按钮适配主题配色。",
+    changelog: "修复全屏预览操作按钮遮挡画面；修复全屏播放时静音图标与实际声音不一致（进全屏不再有底层声音泄漏）。",
     downloadUrl: ""
   },
   harmonyos: {
-    version: "1.9.0",
+    version: "1.9.1",
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "新增待删除照片/视频全屏预览：点击放大查看、左右滑动切换、视频可直接播放；取消删除按钮适配主题配色。",
+    changelog: "修复全屏预览操作按钮遮挡画面；修复全屏播放时静音图标与实际声音不一致（进全屏不再有底层声音泄漏）。",
     downloadUrl: ""
   }
 };

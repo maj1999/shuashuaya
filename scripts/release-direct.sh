@@ -125,7 +125,7 @@ echo "【国内渠道】发布到 Gitee ..."
 
 # Step 5: 提交版本号变更 + 打 Tag + 创建 GitHub Release
 echo ""
-echo "【5/6】创建 GitHub Release..."
+echo "【5/5】创建 GitHub Release..."
 cd "$PROJECT_ROOT"
 git add "$BUILD_CONFIG" "$PROJECT_ROOT/shared/src/commonMain/kotlin/com/cleanpic/AppInfo.kt"
 git commit -m "chore: bump version to ${VERSION}"
@@ -142,30 +142,8 @@ retry gh release create "$TAG" "$UPLOAD_APK" \
     --notes "$CHANGELOG"
 echo "  ✅ GitHub Release 创建成功"
 
-# Step 6: 更新 Worker 版本信息并部署
-echo ""
-echo "【6/6】更新 Cloudflare Worker..."
-
-# 更新 worker/src/index.js 中的版本号和 changelog（JS 对象 key 无引号）
-# changelog 经环境变量传入 perl 按字面量替换，避免内容含 / | & 等字符破坏替换命令
-sed -i '' "s/version: \"[^\"]*\"/version: \"${VERSION}\"/g" "$WORKER_CONFIG"
-NEW_CHANGELOG="$CHANGELOG" perl -i -pe 's/(changelog: ")[^"]*(")/$1 . $ENV{NEW_CHANGELOG} . $2/ge' "$WORKER_CONFIG"
-sed -i '' "s/versionCode: [0-9]*/versionCode: ${NEW_CODE}/" "$WORKER_CONFIG"
-
-cd "$WORKER_DIR"
-if [ -z "${CLOUDFLARE_API_TOKEN:-}" ]; then
-    echo "  ⚠️  未设置 CLOUDFLARE_API_TOKEN，跳过自动部署"
-    echo "  请手动运行: cd worker && CLOUDFLARE_API_TOKEN=你的token npx wrangler deploy"
-else
-    retry npx wrangler deploy
-    echo "  ✅ Worker 部署成功"
-fi
-
-# 提交 Worker 变更
-cd "$PROJECT_ROOT"
-git add "$WORKER_CONFIG"
-git commit -m "chore: update worker version to ${VERSION}"
-retry git push origin main
+# 更新检测改为只走 Gitee（update/version.json，已在第 4.5 步发布），
+# 不再部署 Cloudflare Worker。客户端端点见 UpdateWiring.kt（仅 UPDATE_API_URL_CN）。
 
 echo ""
 echo "══════════════════════════════════════"

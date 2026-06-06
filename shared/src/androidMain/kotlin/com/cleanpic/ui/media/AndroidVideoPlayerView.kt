@@ -13,14 +13,17 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.common.MediaItem as ExoMediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
+import com.cleanpic.media.VideoControl
 import com.cleanpic.model.MediaItem
 import com.cleanpic.shared.R
+import kotlinx.coroutines.delay
 
 @Composable
 actual fun VideoPlayerView(
     item: MediaItem,
     isMuted: Boolean,
-    modifier: Modifier
+    modifier: Modifier,
+    control: VideoControl?
 ) {
     val context = LocalContext.current
 
@@ -38,6 +41,22 @@ actual fun VideoPlayerView(
 
     LaunchedEffect(isMuted) {
         exoPlayer.volume = if (isMuted) 0f else 1f
+    }
+
+    // 传入 control 时接管 seek 并轮询上报播放进度，供外部进度条使用；不传则无开销。
+    if (control != null) {
+        LaunchedEffect(exoPlayer) {
+            control.seek = { positionMs -> exoPlayer.seekTo(positionMs.coerceAtLeast(0L)) }
+            while (true) {
+                val dur = exoPlayer.duration
+                control.update(
+                    position = exoPlayer.currentPosition.coerceAtLeast(0L),
+                    // duration 未就绪时 ExoPlayer 返回 C.TIME_UNSET(负值)，归一为 0
+                    duration = if (dur > 0L) dur else 0L
+                )
+                delay(250)
+            }
+        }
     }
 
     DisposableEffect(item.id) {

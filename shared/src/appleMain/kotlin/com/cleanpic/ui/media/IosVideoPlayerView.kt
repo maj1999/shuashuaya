@@ -14,9 +14,10 @@ import com.cleanpic.model.MediaItem
 actual fun VideoPlayerView(
     item: MediaItem,
     isMuted: Boolean,
-    modifier: Modifier
+    modifier: Modifier,
+    control: com.cleanpic.media.VideoControl?
 ) {
-    // TODO: 通过 Kotlin/Native interop 使用 AVPlayer 实现
+    // TODO: 通过 Kotlin/Native interop 使用 AVPlayer 实现（control 进度上报一并待实现）
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center

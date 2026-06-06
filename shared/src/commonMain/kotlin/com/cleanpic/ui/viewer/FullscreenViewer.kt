@@ -13,6 +13,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cleanpic.icons.IconPainter
+import com.cleanpic.media.VideoControl
 import com.cleanpic.model.MediaType
 import com.cleanpic.model.ViewerItem
 import com.cleanpic.theme.ThemeTokens
@@ -39,13 +40,21 @@ fun FullscreenViewer(
     onToggleMute: () -> Unit,
     backLabel: String = "退出"
 ) {
+    val isVideo = item.media.type == MediaType.VIDEO
+    // 视频进度桥：仅视频需要；切换媒体时重建以复位进度。
+    val videoControl = remember(item.media.id) { VideoControl() }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .testTag("fullscreen_viewer")
             .background(Color.Black)
     ) {
-        ZoomableMediaContent(media = item.media, isMuted = isMuted)
+        ZoomableMediaContent(
+            media = item.media,
+            isMuted = isMuted,
+            control = if (isVideo) videoControl else null
+        )
 
         TopBar(
             theme = theme,
@@ -65,6 +74,7 @@ fun FullscreenViewer(
             onUndo = onUndo,
             onDelete = onDelete,
             onKeep = onKeep,
+            videoControl = if (isVideo) videoControl else null,
             modifier = Modifier.align(Alignment.BottomCenter)
         )
     }
@@ -128,6 +138,7 @@ private fun BottomBar(
     onUndo: () -> Unit,
     onDelete: () -> Unit,
     onKeep: () -> Unit,
+    videoControl: VideoControl?,
     modifier: Modifier
 ) {
     Column(
@@ -137,6 +148,11 @@ private fun BottomBar(
             .padding(top = 12.dp)
             .padding(bottom = 34.dp)
     ) {
+        // 视频进度条：位于信息条上方，可拖拽 seek 到任意位置。
+        if (videoControl != null) {
+            VideoScrubber(control = videoControl, theme = theme)
+            Spacer(modifier = Modifier.height(8.dp))
+        }
         MediaMeta(
             item = item,
             theme = theme,
@@ -178,6 +194,68 @@ private fun BottomBar(
             )
         }
     }
+}
+
+/**
+ * 视频进度条：拖拽可 seek 到任意位置。拖拽中显示本地 scrub 值，松手调用 [VideoControl.seek]；
+ * 平台播放器轮询上报真实进度（[VideoControl.positionMs]/[durationMs]）。
+ */
+@Composable
+private fun VideoScrubber(control: VideoControl, theme: ThemeTokens) {
+    val duration = control.durationMs
+    val position = control.positionMs
+    var scrubbing by remember { mutableStateOf(false) }
+    var scrubFraction by remember { mutableStateOf(0f) }
+
+    val fraction = when {
+        scrubbing -> scrubFraction
+        duration > 0L -> (position.toFloat() / duration).coerceIn(0f, 1f)
+        else -> 0f
+    }
+    val shownMs = if (scrubbing && duration > 0L) (scrubFraction * duration).toLong() else position
+
+    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+        Slider(
+            value = fraction,
+            onValueChange = {
+                scrubbing = true
+                scrubFraction = it
+            },
+            onValueChangeFinished = {
+                if (duration > 0L) control.seek((scrubFraction * duration).toLong())
+                scrubbing = false
+            },
+            enabled = duration > 0L,
+            colors = SliderDefaults.colors(
+                thumbColor = Color(theme.colorPrimary),
+                activeTrackColor = Color(theme.colorPrimary),
+                inactiveTrackColor = Color.White.copy(alpha = 0.3f)
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag("video_scrubber")
+        )
+        Row(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = formatTime(shownMs),
+                fontSize = 11.sp,
+                color = Color.White.copy(alpha = 0.8f)
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = formatTime(duration),
+                fontSize = 11.sp,
+                color = Color.White.copy(alpha = 0.8f)
+            )
+        }
+    }
+}
+
+private fun formatTime(ms: Long): String {
+    val totalSec = (ms / 1000).coerceAtLeast(0L)
+    val m = totalSec / 60
+    val s = totalSec % 60
+    return "$m:${s.toString().padStart(2, '0')}"
 }
 
 @Composable

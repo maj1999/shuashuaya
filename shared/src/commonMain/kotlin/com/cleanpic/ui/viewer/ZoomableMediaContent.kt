@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.ContentScale
+import com.cleanpic.media.VideoControl
 import com.cleanpic.model.MediaItem
 import com.cleanpic.model.MediaType
 import com.cleanpic.ui.media.MediaImage
@@ -27,6 +28,7 @@ fun ZoomableMediaContent(
     media: MediaItem,
     isMuted: Boolean,
     modifier: Modifier = Modifier,
+    control: VideoControl? = null,
 ) {
     val zoomState = rememberZoomState(
         contentSize = Size(media.width.toFloat(), media.height.toFloat()),
@@ -44,7 +46,8 @@ fun ZoomableMediaContent(
             VideoPlayerView(
                 item = media,
                 isMuted = isMuted,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
+                control = control
             )
         } else {
             MediaImage(

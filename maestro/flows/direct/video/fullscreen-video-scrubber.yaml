@@ -1,0 +1,59 @@
+# maestro/flows/direct/video/fullscreen-video-scrubber.yaml
+#
+# US-CP-?? 全屏视频播放进度条：点视频进全屏后底部出现可拖拽进度条（video_scrubber）
+# 进度条仅视频显示、仅全屏显示（轮播小卡不显示）
+#
+appId: com.cleanpic.android
+---
+- launchApp
+# 关闭可能出现的「发现新版本」弹窗（测试设备版本可能落后于线上已发布版）
+- tapOn:
+    id: "update_later_button"
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 15000
+- waitForAnimationToEnd
+
+# 轮播模式
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+- tapOn: "轮播相册"
+- waitForAnimationToEnd
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd
+
+# 切到「视频」Tab 进入视频浏览
+- tapOn: "视频"
+- waitForAnimationToEnd
+- tapOn:
+    id: "start_video"
+- waitForAnimationToEnd
+- tapOn:
+    id: "start_video"
+    optional: true
+- waitForAnimationToEnd
+
+# 播放视频
+- tapOn:
+    id: "play_button"
+- waitForAnimationToEnd
+
+# 轮播小卡上不应有进度条（进度条仅全屏显示）
+- assertNotVisible:
+    id: "video_scrubber"
+
+# 点击进入全屏
+- tapOn:
+    id: "media_card"
+- waitForAnimationToEnd
+- assertVisible:
+    id: "fullscreen_viewer"
+
+# 全屏底部出现可拖拽进度条
+- assertVisible:
+    id: "video_scrubber"
+- takeScreenshot: maestro/screenshots/fullscreen-video-scrubber

@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.lerp
+import androidx.compose.ui.zIndex
 import kotlinx.coroutines.launch
 import com.cleanpic.icons.IconPainter
 import com.cleanpic.model.MediaType
@@ -133,57 +134,62 @@ fun CarouselMode(
 
             // 渲染 前一张/当前/后一张 三张卡片，按各自的"逻辑槽位"随手指连续过渡。
             // visualSlot = baseSlot + drag：左滑(drag→-1)时后一张(+1)滑到中心(0)，当前卡(0)退到左侧(-1)。
-            // 越靠近中心(|v|越小)越后绘制，保证过渡中目标卡逐渐压到顶层。
+            // 关键：用稳定的 key(media.id) 保持每张卡的组合身份，组合顺序固定不随拖动重排；
+            // 这样"相邻预览图变主卡"时直接复用已加载位图，切换不再触发 AsyncImage 重建重载而闪屏。
+            // 层级改用 zIndex 控制（越靠近中心越在上层），而非靠调整组合/绘制顺序。
             listOf(-1, 0, 1)
                 .filter { currentIndex + it in items.indices }
-                .map { base -> base to (base + drag) }
-                .sortedByDescending { kotlin.math.abs(it.second) }
-                .forEach { (base, v) ->
-                    val focused = base == 0
-                    val av = kotlin.math.abs(v).coerceIn(0f, 1f)
-                    val scale = lerp(1f, CAROUSEL_SIDE_SCALE, av)
-                    val cardAlpha = if (kotlin.math.abs(v) <= 1f) {
-                        lerp(1f, CAROUSEL_SIDE_ALPHA, av)
-                    } else {
-                        lerp(CAROUSEL_SIDE_ALPHA, 0f, (kotlin.math.abs(v) - 1f).coerceIn(0f, 1f))
-                    }
-
-                    // 末张主卡往后滑（offsetX<0）时：整卡 1:1 跟手平移滑出，保持原尺寸不缩小
-                    val slideOff = focused && isLastItem
-                    var cardModifier = Modifier
-                        .fillMaxHeight(0.85f)
-                        .fillMaxWidth(0.78f)
-                        .graphicsLayer {
-                            if (slideOff && offsetX.value < 0f) {
-                                translationX = offsetX.value
-                                scaleX = 1f
-                                scaleY = 1f
-                                alpha = 1f
-                            } else {
-                                translationX = v * slotSpacing
-                                scaleX = scale
-                                scaleY = scale
-                                alpha = cardAlpha
-                            }
+                .forEach { base ->
+                    val item = items[currentIndex + base]
+                    key(item.media.id) {
+                        val v = base + drag
+                        val focused = base == 0
+                        val av = kotlin.math.abs(v).coerceIn(0f, 1f)
+                        val scale = lerp(1f, CAROUSEL_SIDE_SCALE, av)
+                        val cardAlpha = if (kotlin.math.abs(v) <= 1f) {
+                            lerp(1f, CAROUSEL_SIDE_ALPHA, av)
+                        } else {
+                            lerp(CAROUSEL_SIDE_ALPHA, 0f, (kotlin.math.abs(v) - 1f).coerceIn(0f, 1f))
                         }
-                    if (focused) {
-                        cardModifier = cardModifier
-                            .testTag("media_card")
-                            .pointerInput(currentIndex) {
-                                detectTapGestures(onTap = { onMediaClick() })
-                            }
-                    }
 
-                    CarouselCard(
-                        item = items[currentIndex + base],
-                        theme = theme,
-                        focused = focused,
-                        isPlaying = focused && isPlaying,
-                        isMuted = isMuted,
-                        onPlayClick = { isPlaying = true },
-                        onToggleMute = { isMuted = !isMuted },
-                        modifier = cardModifier
-                    )
+                        // 末张主卡往后滑（offsetX<0）时：整卡 1:1 跟手平移滑出，保持原尺寸不缩小
+                        val slideOff = focused && isLastItem
+                        var cardModifier = Modifier
+                            .fillMaxHeight(0.85f)
+                            .fillMaxWidth(0.78f)
+                            .zIndex(1f - kotlin.math.abs(v))
+                            .graphicsLayer {
+                                if (slideOff && offsetX.value < 0f) {
+                                    translationX = offsetX.value
+                                    scaleX = 1f
+                                    scaleY = 1f
+                                    alpha = 1f
+                                } else {
+                                    translationX = v * slotSpacing
+                                    scaleX = scale
+                                    scaleY = scale
+                                    alpha = cardAlpha
+                                }
+                            }
+                        if (focused) {
+                            cardModifier = cardModifier
+                                .testTag("media_card")
+                                .pointerInput(currentIndex) {
+                                    detectTapGestures(onTap = { onMediaClick() })
+                                }
+                        }
+
+                        CarouselCard(
+                            item = item,
+                            theme = theme,
+                            focused = focused,
+                            isPlaying = focused && isPlaying,
+                            isMuted = isMuted,
+                            onPlayClick = { isPlaying = true },
+                            onToggleMute = { isMuted = !isMuted },
+                            modifier = cardModifier
+                        )
+                    }
                 }
         }
 

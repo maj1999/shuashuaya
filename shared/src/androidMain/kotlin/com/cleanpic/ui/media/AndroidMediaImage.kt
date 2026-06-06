@@ -47,7 +47,8 @@ actual fun MediaImage(
         contentDescription = item.name,
         contentScale = contentScale,
         modifier = modifier,
-        placeholder = ColorPainter(Color(0xFF2A2A2A)),
+        // 不设深色占位：加载中透出卡片自身的 surface 背景（浅色），加载完淡入，
+        // 避免切换/首次加载时一闪深灰。内存缓存命中时 Coil 跳过 crossfade，即时显示。
         error = ColorPainter(Color(0xFF3A3A3A))
     )
 }

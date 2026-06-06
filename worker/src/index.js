@@ -11,25 +11,25 @@
 // 版本信息配置 — 发布新版本时更新此处
 const VERSION_CONFIG = {
   android: {
-    version: "1.8.0",
-    versionCode: 34,
+    version: "1.9.0",
+    versionCode: 36,
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "随机算法升级：改用洗牌袋 + 持久化浏览记忆，不再反复抽到最近看过或已保留过的照片视频；新增设置页「重置浏览记录」。",
+    changelog: "新增待删除照片/视频全屏预览：点击放大查看、左右滑动切换、视频可直接播放；取消删除按钮适配主题配色。",
     downloadUrl: "" // 运行时按 version 确定性构造 Gitee 直链（见 GITEE_DIST）
   },
   ios: {
-    version: "1.8.0",
+    version: "1.9.0",
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "随机算法升级：改用洗牌袋 + 持久化浏览记忆，不再反复抽到最近看过或已保留过的照片视频；新增设置页「重置浏览记录」。",
+    changelog: "新增待删除照片/视频全屏预览：点击放大查看、左右滑动切换、视频可直接播放；取消删除按钮适配主题配色。",
     downloadUrl: ""
   },
   harmonyos: {
-    version: "1.8.0",
+    version: "1.9.0",
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "随机算法升级：改用洗牌袋 + 持久化浏览记忆，不再反复抽到最近看过或已保留过的照片视频；新增设置页「重置浏览记录」。",
+    changelog: "新增待删除照片/视频全屏预览：点击放大查看、左右滑动切换、视频可直接播放；取消删除按钮适配主题配色。",
     downloadUrl: ""
   }
 };

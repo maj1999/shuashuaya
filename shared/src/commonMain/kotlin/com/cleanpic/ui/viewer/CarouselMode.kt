@@ -103,12 +103,16 @@ fun CarouselMode(
                                 // 向左滑：当前卡滑出、下一张过渡到主位（未决策默认保留）
                                 off <= -thresholdPx -> scope.launch {
                                     offsetX.animateTo(-full, tween(CAROUSEL_TRANSITION_MS))
+                                    // 换页与偏移归零在同一协程内同步完成，确保同一帧生效：
+                                    // 否则换页后 offsetX 仍为 -full 会有一帧把"未加载的下一张"错映到中心而闪屏
                                     viewerViewModel.goNext()
+                                    offsetX.snapTo(0f)
                                 }
                                 // 向右滑：当前卡滑出、上一张过渡到主位（保持原决策）
                                 off >= thresholdPx && currentIndex > 0 -> scope.launch {
                                     offsetX.animateTo(full, tween(CAROUSEL_TRANSITION_MS))
                                     viewerViewModel.goPrevious()
+                                    offsetX.snapTo(0f)
                                 }
                                 // 未达阈值或已到首张：回弹复位
                                 else -> scope.launch { offsetX.animateTo(0f, tween(CAROUSEL_SETTLE_MS)) }

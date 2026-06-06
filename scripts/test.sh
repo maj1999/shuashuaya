@@ -15,4 +15,4 @@ echo "=== CleanPic: 运行 shared + :update 模块测试 ==="
 cd "$PROJECT_ROOT"
 ./gradlew :shared:allTests :update:allTests "$@" 2>&1 | tee "$LOG_FILE"
 
-echo "=== 测试完成（日志: $LOG_FILE）==="
+echo "=== 测试完成（日志: ${LOG_FILE}）==="

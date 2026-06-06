@@ -8,7 +8,15 @@
 |---------|---------|------|
 | 照片 | MediaItem (type=PHOTO) | 用户相册中的图片文件 |
 | 视频 | MediaItem (type=VIDEO) | 用户相册中的视频文件 |
-| 随机选取 | RandomPicker.pick() | 从媒体列表中不重复随机抽取指定数量 |
+| 随机选取 | RandomPicker.pick() | 纯函数：基于浏览记忆从媒体列表不重复抽取，返回结果 + 新记忆 |
+| 洗牌袋 | Shuffle Bag | 不放回抽取直到袋子耗尽再装满的随机策略，保证一圈内不重复 |
+| 浏览记忆 | PickState | 持久化的随机选取状态：循环号 + 每媒体的 SeenRecord（替代旧 shownIds） |
+| 浏览记录 | SeenRecord | 单个媒体的记忆：lastDrawnCycle / lastSeenMillis / kept |
+| 循环 | cycle | 洗牌袋的一个完整轮次；袋中非保留项耗尽则 cycle++ |
+| 保留集 | SeenRecord.kept | 被保留过的媒体，沉底，仅在非保留项耗尽时才再出现 |
+| 天数新鲜度 | freshDays | 近 N 天看过的项在有更优项时轻微后排，默认 1 天 |
+| 浏览记录存储 | PickStateStore | 持久化 PickState 的接口（load/save/clearAll），按 MediaType 分键 |
+| 重置浏览记录 | PickStateStore.clearAll() | 清空全部浏览记忆，让所有媒体重新参与随机 |
 | 一轮清理 | Round / Session | 用户从点击"开始"到查看结果的完整流程 |
 | 每轮数量 | roundCount (AppSettings) | 每轮随机选取的媒体数量，默认 10 |
 | 保留 | OperationState.KEPT | 用户决定不删除该媒体 |
@@ -26,7 +34,6 @@
 | 页面状态接口 | HomeScreenState 等 | 页面业务逻辑的共享接口，5 个布局变体通过它接收数据和回调 |
 | 交互模式 | InteractionMode | 浏览页的操作方式（轮播/卡片/全屏） |
 | 设置 | AppSettings | 持久化的用户偏好（主题/模式/数量） |
-| 已展示集合 | shownIds (SessionState) | 本次会话中已展示过的媒体 ID 集合，用于去重 |
 | 版本检查 | UpdateChecker.checkForUpdate() | 请求远程 API 获取最新版本信息并与本地版本比较 |
 | 更新信息 | UpdateInfo | 包含版本号、下载地址、是否强制、更新日志的数据结构 |
 | 强制更新 | UpdateStatus.FORCE_UPDATE | 用户必须更新才能继续使用（不可关闭弹窗） |

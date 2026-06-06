@@ -394,4 +394,74 @@ class ViewerViewModelTest {
         vm.markDelete()                 // 改判为删除
         assertEquals(OperationState.PENDING_DELETE, vm.items.value[0].state)
     }
+
+    // ===== US-CP-22/23 随机算法增强（持久化浏览记忆）=====
+
+    // I-VM-01 连续三轮互不重复（洗牌袋）
+    @Test
+    fun ivm_01_three_rounds_no_overlap() = runTest {
+        vm.loadMedia(MediaType.PHOTO); val r1 = vm.items.value.map { it.media.id }.toSet()
+        vm.loadMedia(MediaType.PHOTO); val r2 = vm.items.value.map { it.media.id }.toSet()
+        vm.loadMedia(MediaType.PHOTO); val r3 = vm.items.value.map { it.media.id }.toSet()
+        assertEquals(30, (r1 + r2 + r3).size)  // 30 张全覆盖且互不重复
+    }
+
+    // I-VM-02 跨重启记忆（同一 store，重建 VM）
+    @Test
+    fun ivm_02_persists_across_restart() = runTest {
+        vm.loadMedia(MediaType.PHOTO)
+        val firstRound = vm.items.value.map { it.media.id }.toSet()
+        val restarted = ViewerViewModel()   // 共用 ServiceLocator.pickStateStore，模拟重启
+        restarted.loadMedia(MediaType.PHOTO)
+        val secondRound = restarted.items.value.map { it.media.id }.toSet()
+        assertTrue(firstRound.intersect(secondRound).isEmpty())
+    }
+
+    // I-VM-03 回首页不丢记忆（不再 clearSession）→ 第二轮不重复第一轮
+    @Test
+    fun ivm_03_go_home_keeps_memory() = runTest {
+        vm.loadMedia(MediaType.PHOTO)
+        val first = vm.items.value.map { it.media.id }.toSet()
+        // 模拟回首页（不调用 clearSession）后再开始
+        vm.loadMedia(MediaType.PHOTO)
+        val second = vm.items.value.map { it.media.id }.toSet()
+        assertTrue(first.intersect(second).isEmpty())
+    }
+
+    // I-VM-04 已保留过的沉底
+    @Test
+    fun ivm_04_kept_items_sink() = runTest {
+        vm.loadMedia(MediaType.PHOTO)
+        val kept = vm.items.value.map { it.media.id }.toSet()
+        repeat(10) { vm.markKept() }
+        vm.loadMedia(MediaType.PHOTO); val r2 = vm.items.value.map { it.media.id }.toSet()
+        vm.loadMedia(MediaType.PHOTO); val r3 = vm.items.value.map { it.media.id }.toSet()
+        // 30 张里 20 张非保留，两轮刚好用完；保留的 10 张不应出现
+        assertTrue((r2 + r3).intersect(kept).isEmpty())
+    }
+
+    // I-VM-05 删除后从记忆移除（自愈）
+    @Test
+    fun ivm_05_confirm_delete_forgets_record() = runTest {
+        vm.loadMedia(MediaType.PHOTO)
+        vm.markDelete()
+        val deletedId = vm.items.value[0].media.id
+        repeat(9) { vm.markKept() }
+        val result = vm.confirmDelete()
+        assertTrue(result.isSuccess)
+        val records = ServiceLocator.pickStateStore.load(MediaType.PHOTO).records
+        assertFalse(records.containsKey(deletedId))
+    }
+
+    // I-VM-06 重置浏览记录后清空
+    @Test
+    fun ivm_06_clear_session_resets_store() = runTest {
+        vm.loadMedia(MediaType.PHOTO)
+        repeat(10) { vm.markKept() }
+        assertTrue(ServiceLocator.pickStateStore.load(MediaType.PHOTO).records.isNotEmpty())
+        vm.clearSession()
+        assertTrue(ServiceLocator.pickStateStore.load(MediaType.PHOTO).records.isEmpty())
+        vm.loadMedia(MediaType.PHOTO)
+        assertEquals(10, vm.items.value.size)
+    }
 }

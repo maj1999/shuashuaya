@@ -24,4 +24,9 @@ class SettingsViewModel {
     fun setRoundCount(count: Int) {
         settings.roundCount = count
     }
+
+    /** 重置浏览记录（US-CP-23）：清空全部浏览/保留记忆，让所有媒体重新参与随机。 */
+    fun resetBrowsingHistory() {
+        ServiceLocator.pickStateStore.clearAll()
+    }
 }

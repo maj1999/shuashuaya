@@ -14,6 +14,7 @@ import androidx.core.view.WindowCompat
 import com.cleanpic.android.wiring.UpdateWiring
 import com.cleanpic.di.ServiceLocator
 import com.cleanpic.media.AndroidMediaRepository
+import com.cleanpic.media.AndroidPickStateStore
 import com.cleanpic.media.AndroidVideoPlayer
 import com.cleanpic.permission.AndroidPermission
 import com.cleanpic.settings.AndroidAppSettings
@@ -56,7 +57,8 @@ class MainActivity : ComponentActivity() {
             mediaRepo = AndroidMediaRepository(applicationContext),
             settings = AndroidAppSettings(applicationContext),
             permission = androidPermission,
-            player = AndroidVideoPlayer()
+            player = AndroidVideoPlayer(),
+            pickStateStore = AndroidPickStateStore(applicationContext)
         )
 
         val hooks = UpdateWiring.provideHooks(this)

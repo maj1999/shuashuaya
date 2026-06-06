@@ -73,7 +73,8 @@ fun ResultScreen(
             }
         },
         onGoHome = {
-            viewerViewModel.clearSession()
+            // 不再清空浏览记忆：回首页应保留记忆，避免下轮重复（US-CP-22）。
+            // 清空仅由设置页「重置浏览记录」显式触发。
             router.navigate(
                 Route.Home,
                 clearBackStackUpTo = Route.Home,

@@ -1,0 +1,69 @@
+# maestro/flows/direct/random-no-repeat.yaml
+#
+# E-RP-01: 刷一轮 → 返回首页 → 再刷（持久化浏览记忆，US-CP-22）
+# 说明：E2E 无稳定可见 id 断言"不重复"，此处验证回首页后可再次开启新一轮且不崩溃、
+#       进度正常推进；精确去重由单元/集成层 U-RP-*/I-VM-* 保证。
+#
+appId: com.cleanpic.android
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 30000
+- waitForAnimationToEnd
+
+# 轮播模式 + 每轮 5 张
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+- tapOn: "轮播相册"
+- waitForAnimationToEnd
+- tapOn: "5"
+- waitForAnimationToEnd
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd
+
+# 第一轮：进入并全部保留
+- tapOn:
+    id: "start_photo"
+- waitForAnimationToEnd
+- tapOn:
+    text: "授权"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Allow"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    id: "start_photo"
+    optional: true
+- waitForAnimationToEnd
+- repeat:
+    times: 5
+    commands:
+      - tapOn:
+          id: "keep_button"
+      - waitForAnimationToEnd
+
+# 结果页 → 返回首页（不再清空浏览记忆）
+- assertVisible: ".*本轮清理完成.*"
+- tapOn: "返回首页"
+- waitForAnimationToEnd
+- assertVisible:
+    id: "start_photo"
+
+# 第二轮：再次开始，验证可正常进入新一轮浏览
+- tapOn:
+    id: "start_photo"
+- waitForAnimationToEnd
+- tapOn:
+    id: "start_photo"
+    optional: true
+- waitForAnimationToEnd
+- assertVisible:
+    id: "keep_button"
+- takeScreenshot: maestro/screenshots/random-no-repeat-round2

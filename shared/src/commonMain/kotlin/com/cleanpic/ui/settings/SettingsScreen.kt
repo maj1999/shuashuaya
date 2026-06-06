@@ -35,6 +35,7 @@ fun SettingsScreen(
             selectedCount = count
             viewModel.setRoundCount(count)
         },
+        onResetHistory = { viewModel.resetBrowsingHistory() },
         onBack = { router.popBackStack() },
         extras = { hooks.SettingsExtras() }
     )

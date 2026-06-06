@@ -1,0 +1,42 @@
+# maestro/flows/direct/reset-history.yaml
+#
+# E-RP-02: 设置页「重置浏览记录」+ 二次确认（US-CP-23）
+#
+appId: com.cleanpic.android
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 30000
+- waitForAnimationToEnd
+
+# 进入设置页
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+
+# 点击「重置浏览记录」（Maestro 自动滚动定位）
+- tapOn:
+    id: "reset_history_button"
+- waitForAnimationToEnd
+
+# 二次确认弹窗出现
+- assertVisible: ".*此操作不可撤销.*"
+- assertVisible: "取消"
+
+# 先取消 → 记录保持不变（弹窗关闭）
+- tapOn: "取消"
+- waitForAnimationToEnd
+- assertNotVisible: ".*此操作不可撤销.*"
+
+# 再次打开并确认重置
+- tapOn:
+    id: "reset_history_button"
+- waitForAnimationToEnd
+- assertVisible: ".*此操作不可撤销.*"
+- tapOn: "确认重置"
+- waitForAnimationToEnd
+- assertNotVisible: ".*此操作不可撤销.*"
+- takeScreenshot: maestro/screenshots/reset-history-done

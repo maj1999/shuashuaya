@@ -71,7 +71,8 @@ graph TB
 | AppIcons | 统一矢量图标入口，根据主题 Token 返回对应风格的 ImageVector | shared |
 | InteractionMode | 3 种浏览交互的统一接口 | shared |
 | MediaRepository | 媒体查询/删除的跨平台抽象 (expect/actual) | shared + 各平台 |
-| RandomPicker | 随机不重复选取 + 会话级去重 | shared |
+| RandomPicker | 纯函数随机选取（Shuffle Bag 洗牌袋 + 保留沉底 + 删除自愈） | shared |
+| PickStateStore | 持久化浏览记忆 PickState 的跨平台抽象 (expect/actual) | shared + 各平台 |
 | AppSettings | 偏好持久化的跨平台抽象 (expect/actual) | shared + 各平台 |
 | VideoPlayer | 视频播放的跨平台抽象 (expect/actual) | shared + 各平台 |
 | AppHooks | shared 对外的插槽接口，宿主通过它注入升级 UI 与回调 | shared |

@@ -10,8 +10,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,6 +42,7 @@ fun SharedSettingsLayout(state: SettingsScreenState) {
     val theme = state.theme
     val titleFont = if (theme.titleFontFamily == "Serif") FontFamily.Serif else FontFamily.Default
     val radius = theme.borderRadius.dp
+    var showResetDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -114,6 +121,13 @@ fun SharedSettingsLayout(state: SettingsScreenState) {
                 Spacer(modifier = Modifier.height(32.dp))
             }
 
+            // 浏览记录（重置）
+            item {
+                SectionTitle("浏览记录", theme, titleFont)
+                ResetHistoryButton(theme) { showResetDialog = true }
+                Spacer(modifier = Modifier.height(28.dp))
+            }
+
             // 宿主注入区块（如版本更新）
             item {
                 state.extras()
@@ -126,6 +140,57 @@ fun SharedSettingsLayout(state: SettingsScreenState) {
                 Spacer(modifier = Modifier.height(48.dp))
             }
         }
+    }
+
+    if (showResetDialog) {
+        AlertDialog(
+            onDismissRequest = { showResetDialog = false },
+            title = { Text("重置浏览记录", color = Color(theme.colorText)) },
+            text = {
+                Text(
+                    "将清空「看过 / 保留过」的记忆，所有照片和视频都会重新参与随机。此操作不可撤销。",
+                    color = Color(theme.colorTextSecondary)
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        state.onResetHistory()
+                        showResetDialog = false
+                    },
+                    modifier = Modifier.testTag("reset_history_confirm")
+                ) { Text("确认重置", color = Color(theme.colorPrimary)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showResetDialog = false }) {
+                    Text("取消", color = Color(theme.colorTextSecondary))
+                }
+            }
+        )
+    }
+}
+
+// ── 重置浏览记录按钮 ──────────────────────────────────────────────
+
+@Composable
+private fun ResetHistoryButton(theme: ThemeTokens, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag("reset_history_button")
+            .clip(RoundedCornerShape(theme.borderRadius.dp))
+            .background(cardBackground(theme))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconPainter(name = "back", theme = theme, size = 18.dp, colorOverride = theme.iconStrokeColor)
+        Spacer(modifier = Modifier.width(10.dp))
+        Text(
+            text = "重置浏览记录",
+            fontSize = 14.sp,
+            color = Color(theme.colorText)
+        )
     }
 }
 

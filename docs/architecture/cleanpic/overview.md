@@ -6,6 +6,7 @@
 
 | 子模块 | 文档 | 说明 |
 |--------|------|------|
+| 随机选取算法 | [random-picker.md](random-picker.md) | Shuffle Bag 洗牌袋 + 持久化浏览记忆（PickState） |
 | 主题系统 | [theme-system.md](theme-system.md) | Token 定义与 5 套主题 |
 | 原生 Module | [native-modules.md](native-modules.md) | 各平台 MediaModule/权限/视频播放 |
 | 自动升级 | [auto-update.md](auto-update.md) | UpdateChecker/UpdateInstaller + Cloudflare Workers |
@@ -28,16 +29,19 @@
     │     → 空列表? → 展示空状态页
     │     → 数量 < roundCount? → 用实际数量，Toast 提示
     │
-    ├─ RandomPicker.pick(items, count=roundCount, exclude=shownIds)
-    │     → 随机不重复抽取，排除本次会话已展示的 ID
-    │     → 剩余不足时，清空 shownIds 重新开始
+    ├─ state = PickStateStore.load(type)（持久化浏览记忆）
+    ├─ RandomPicker.pick(items, count=roundCount, state) → (结果, 新记忆)
+    │     → 洗牌袋：本循环不放回抽取，保留过的沉底，删除项自愈忽略
+    │     → 非保留项耗尽 → cycle++ 开新循环；整库都保留过 → 大循环重置
+    │     → PickStateStore.save(type, 新记忆)
+    │     详见 random-picker.md
     │
     ├─ 进入 Viewer 页，逐一展示
     │     → 照片: getThumbnail() 预加载 + getFullImage() 按需
     │     → 视频: getThumbnail() + VideoPlayer 按需初始化
     │     → 加载失败 → 占位图 + 提示
     │
-    ├─ 用户操作: 保留→KEPT / 删除→PENDING_DELETE（仅标记）
+    ├─ 用户操作: 保留→KEPT（记忆标 kept，沉底）/ 删除→PENDING_DELETE（仅标记）
     │
     ├─ 用户中途退出（任何模式均提供退出按钮）
     │     → 丢弃本轮标记 → 返回首页
@@ -58,10 +62,10 @@
     │     │     → 统计：已删除 / 已保留 / 已释放
     │     │     → 隐藏确认按钮与待删除列表
     │     │
-    │     → "再来一轮" → 重新 pick()
-    │     → "返回首页" → 清空 shownIds
+    │     → "再来一轮" → 重新 pick()（沿用持久化记忆，不重复）
+    │     → "返回首页" → 不再清空记忆（浏览记忆持久保留）
     │
-    └─ 会话结束 → 清空 SessionState
+    └─ 重置浏览记录（设置页，二次确认）→ PickStateStore.clearAll()
 ```
 
 ## 导航栈
@@ -81,13 +85,13 @@
 | 状态 | 生命周期 | 内容 |
 |------|---------|------|
 | ViewerState | 单轮 (Viewer→Result) | MediaItem 列表、当前索引、每项 OperationState |
-| SessionState | 会话级 (首页到返回首页) | 已展示 MediaItem ID 集合 (shownIds) |
+| PickState | 持久化（按 PHOTO/VIDEO 分别存） | 浏览记忆：cycle + 每媒体 SeenRecord(lastDrawnCycle/lastSeenMillis/kept)，详见 random-picker.md |
 | AppSettings | 持久化 | theme / interactionMode / roundCount |
 
 ### 应用生命周期处理
 
 - **前后台切换**：ViewerState 保持在内存中，恢复后继续
-- **进程被系统回收**：不持久化 ViewerState，重启从首页开始
+- **进程被系统回收**：不持久化 ViewerState，重启从首页开始；但 PickState 浏览记忆已持久化，重启后仍不重复刚看过的
 - **来电/通知中断**：保持当前页面状态
 
 ## 删除行为（批量延迟删除）
@@ -123,6 +127,17 @@ roundCount: Int         — 默认 10，可选 5/10/15/20
 autoCheckUpdate: Boolean — 默认 true，是否启动时自动检查更新
 ```
 
+### PickState Schema（浏览记忆，独立持久化）
+
+```
+键 pick_state_photo / pick_state_video（同 cleanpic_prefs，JSON 序列化）
+PickState
+├── cycle: Int                       — 当前循环号
+└── records: Map<String, SeenRecord> — id → 记录
+       SeenRecord { lastDrawnCycle: Int, lastSeenMillis: Long, kept: Boolean }
+封顶：records.size > max(live*1.2, 2000) 时懒清理（先剔除已删除 id，再丢最老）
+```
+
 ### 各平台存储方案
 
 | 平台 | 实现 |
@@ -146,5 +161,5 @@ autoCheckUpdate: Boolean — 默认 true，是否启动时自动检查更新
 | 删除 API 异常 | 提示"部分文件删除失败"，展示失败列表 |
 | 权限永久拒绝 | 引导页 + "去设置"按钮 |
 | 部分权限 | 首页提示条，引导授权全部 |
-| 无更多未展示媒体 | 清空 shownIds，Toast 提示"重新开始" |
+| 无更多未展示媒体（整库都决定过） | 大循环重置（kept 清零、cycle++），Toast 提示"所有照片都看过了，重新开始" |
 | 大相册（10 万+） | 分页查询，每页 500 条 |

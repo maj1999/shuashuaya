@@ -21,6 +21,7 @@
 - [x] `architecture/cleanpic/native-modules.md` — 原生 Module 设计
 - [x] `architecture/cleanpic/auto-update.md` — 自动升级模块设计
 - [x] `architecture/cleanpic/auto-update-distribution.md` — 升级功能的分发渠道与编译期隔离
+- [x] `architecture/cleanpic/random-picker.md` — 随机选取算法 Shuffle Bag + 持久化浏览记忆（US-CP-22/23）
 - [ ] `architecture/cleanpic/viewer-fullscreen-undo.md` — 浏览页点击全屏 + 撤销上一步（US-CP-18/19）
 - [ ] `architecture/cleanpic/viewer-zoom.md` — 全屏查看缩放：双击 + 双指捏合（US-CP-20）
 - [ ] `architecture/cleanpic/viewer-carousel-swipe-nav.md` — 轮播模式左右滑动切换前后媒体（US-CP-21）
@@ -37,10 +38,12 @@
 - [x] `testing/scenarios/ep2-video-cleanup.md` — Epic 2 视频清理场景
 - [x] `testing/scenarios/ep3-theme-interaction.md` — Epic 3 主题与交互场景（已更新 v2 主题）
 - [x] `testing/scenarios/tech-nfr.md` — NFR 性能/兼容性/安全
+- [x] `testing/scenarios/ep7-random-enhancement.md` — EP7 随机算法增强场景（US-CP-22/23）
 
 ## 设计 Spec
 
 - [x] `superpowers/specs/2026-04-04-ui-theme-redesign-design.md` — UI 主题重设计 Spec
+- [x] `superpowers/specs/2026-06-06-shuffle-bag-random-design.md` — 随机算法优化 Shuffle Bag 设计 Spec
 
 ## 实现计划
 

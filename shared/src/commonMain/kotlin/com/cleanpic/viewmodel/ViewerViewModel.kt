@@ -1,7 +1,9 @@
 package com.cleanpic.viewmodel
 
+import com.cleanpic.currentEpochMillis
 import com.cleanpic.di.ServiceLocator
 import com.cleanpic.media.RandomPicker
+import com.cleanpic.media.SeenRecord
 import com.cleanpic.model.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -9,6 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 class ViewerViewModel {
     private val repo get() = ServiceLocator.mediaRepository
     private val settings get() = ServiceLocator.appSettings
+    private val pickStore get() = ServiceLocator.pickStateStore
 
     private val _items = MutableStateFlow<List<ViewerItem>>(emptyList())
     val items: StateFlow<List<ViewerItem>> = _items
@@ -25,7 +28,7 @@ class ViewerViewModel {
     private val _canUndo = MutableStateFlow(false)
     val canUndo: StateFlow<Boolean> = _canUndo
 
-    private val _shownIds = mutableSetOf<String>()
+    private var currentType: MediaType? = null
 
     val totalCount: Int get() = _items.value.size
     val isComplete: Boolean get() = _currentIndex.value >= _items.value.size
@@ -48,16 +51,18 @@ class ViewerViewModel {
             _isLoading.value = false
             return
         }
-        val picked = RandomPicker.pick(all, settings.roundCount, _shownIds)
-        _shownIds.addAll(picked.map { it.id })
-        _items.value = picked.map { ViewerItem(it) }
+        currentType = type
+        val state = pickStore.load(type)
+        val result = RandomPicker.pick(all, settings.roundCount, state, now = currentEpochMillis())
+        pickStore.save(type, result.state)
+        _items.value = result.items.map { ViewerItem(it) }
         _currentIndex.value = 0
         _isLoading.value = false
         resetUndo()
     }
 
-    fun markKept() { updateCurrent(OperationState.KEPT); advance() }
-    fun markDelete() { updateCurrent(OperationState.PENDING_DELETE); advance() }
+    fun markKept() { val id = currentId(); updateCurrent(OperationState.KEPT); persistKept(id, true); advance() }
+    fun markDelete() { val id = currentId(); updateCurrent(OperationState.PENDING_DELETE); persistKept(id, false); advance() }
 
     /**
      * 轮播模式：向后切换到下一个媒体（左滑）。
@@ -72,6 +77,7 @@ class ViewerViewModel {
         if (list[idx].state == OperationState.PENDING) {
             list[idx] = list[idx].copy(state = OperationState.KEPT)
             _items.value = list
+            persistKept(list[idx].media.id, true)  // 默认保留：记忆沉底
         }
         _currentIndex.value = idx + 1
         refreshCanUndo()
@@ -121,11 +127,39 @@ class ViewerViewModel {
     suspend fun confirmDelete(): Result<Int> {
         val items = pendingDeletes.map { it.media }
         if (items.isEmpty()) return Result.success(0)
-        return repo.deleteMediaItems(items)
+        val result = repo.deleteMediaItems(items)
+        if (result.isSuccess) forgetRecords(items.map { it.id })
+        return result
     }
 
     fun resetForNextRound() { _currentIndex.value = 0; resetUndo() }
-    fun clearSession() { _shownIds.clear() }
+
+    /** 重置浏览记录（US-CP-23）：清空全部浏览记忆。 */
+    fun clearSession() { pickStore.clearAll() }
+
+    private fun currentId(): String? = _items.value.getOrNull(_currentIndex.value)?.media?.id
+
+    /** 把某媒体的"保留过"标记写入浏览记忆（沉底/取消沉底）。 */
+    private fun persistKept(id: String?, kept: Boolean) {
+        val type = currentType ?: return
+        if (id == null) return
+        val state = pickStore.load(type)
+        val prev = state.records[id]
+        val updated = if (prev != null) {
+            prev.copy(kept = kept)
+        } else {
+            SeenRecord(lastDrawnCycle = state.cycle, lastSeenMillis = currentEpochMillis(), kept = kept)
+        }
+        pickStore.save(type, state.copy(records = state.records + (id to updated)))
+    }
+
+    /** 删除成功后，从浏览记忆移除这些 id（自愈）。 */
+    private fun forgetRecords(ids: List<String>) {
+        val type = currentType ?: return
+        val state = pickStore.load(type)
+        if (state.records.keys.none { it in ids }) return
+        pickStore.save(type, state.copy(records = state.records.filterKeys { it !in ids }))
+    }
 
     private fun updateCurrent(state: OperationState) {
         val idx = _currentIndex.value

@@ -56,22 +56,15 @@ fun FullscreenViewer(
             modifier = Modifier.align(Alignment.TopCenter)
         )
 
-        SideActions(
-            theme = theme,
-            canUndo = canUndo,
-            onUndo = onUndo,
-            onDelete = onDelete,
-            onKeep = onKeep,
-            modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .padding(end = 16.dp)
-        )
-
-        BottomInfo(
+        BottomBar(
             item = item,
             theme = theme,
             isMuted = isMuted,
             onToggleMute = { isMuted = !isMuted },
+            canUndo = canUndo,
+            onUndo = onUndo,
+            onDelete = onDelete,
+            onKeep = onKeep,
             modifier = Modifier.align(Alignment.BottomCenter)
         )
     }
@@ -120,9 +113,17 @@ private fun TopBar(
     }
 }
 
+/**
+ * 底部面板：媒体信息条 + 操作按钮行。
+ * 按钮采用底部一行（undo/delete/keep），与轮播/卡片模式 [CarouselMode] 一致，
+ * 避免覆盖全屏媒体内容（此前竖排锚 CenterEnd 会压住超宽媒体右侧）。
+ */
 @Composable
-private fun SideActions(
+private fun BottomBar(
+    item: ViewerItem,
     theme: ThemeTokens,
+    isMuted: Boolean,
+    onToggleMute: () -> Unit,
     canUndo: Boolean,
     onUndo: () -> Unit,
     onDelete: () -> Unit,
@@ -130,51 +131,66 @@ private fun SideActions(
     modifier: Modifier
 ) {
     Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier = modifier
+            .fillMaxWidth()
+            .background(Color.Black.copy(alpha = 0.5f))
+            .padding(top = 12.dp)
+            .padding(bottom = 34.dp)
     ) {
-        ThemedActionButton(
-            iconName = "undo",
-            color = theme.colorTextSecondary,
+        MediaMeta(
+            item = item,
             theme = theme,
-            onClick = onUndo,
-            size = 48.dp,
-            testTag = "undo_button",
-            enabled = canUndo
+            isMuted = isMuted,
+            onToggleMute = onToggleMute
         )
-        ThemedActionButton(
-            iconName = "delete",
-            color = theme.colorDanger,
-            theme = theme,
-            onClick = onDelete,
-            size = 56.dp,
-            testTag = "delete_button"
-        )
-        ThemedActionButton(
-            iconName = "keep",
-            color = theme.colorSuccess,
-            theme = theme,
-            onClick = onKeep,
-            size = 56.dp,
-            testTag = "keep_button"
-        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 36.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            ThemedActionButton(
+                iconName = "undo",
+                color = theme.colorTextSecondary,
+                theme = theme,
+                onClick = onUndo,
+                size = 48.dp,
+                testTag = "undo_button",
+                enabled = canUndo
+            )
+            ThemedActionButton(
+                iconName = "delete",
+                color = theme.colorDanger,
+                theme = theme,
+                onClick = onDelete,
+                size = 64.dp,
+                testTag = "delete_button"
+            )
+            ThemedActionButton(
+                iconName = "keep",
+                color = theme.colorSuccess,
+                theme = theme,
+                onClick = onKeep,
+                size = 64.dp,
+                testTag = "keep_button"
+            )
+        }
     }
 }
 
 @Composable
-private fun BottomInfo(
+private fun MediaMeta(
     item: ViewerItem,
     theme: ThemeTokens,
     isMuted: Boolean,
-    onToggleMute: () -> Unit,
-    modifier: Modifier
+    onToggleMute: () -> Unit
 ) {
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
-            .background(Color.Black.copy(alpha = 0.5f))
-            .padding(horizontal = 16.dp, vertical = 12.dp)
-            .padding(bottom = 34.dp)
+            .padding(horizontal = 16.dp)
     ) {
         Text(
             text = item.media.name,

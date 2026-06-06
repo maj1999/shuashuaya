@@ -7,6 +7,10 @@ appId: com.cleanpic.android
 ---
 - stopApp
 - launchApp
+# 关闭可能出现的「发现新版本」弹窗（测试设备版本可能落后于线上已发布版，不影响被测功能）
+- tapOn:
+    id: "update_later_button"
+    optional: true
 - extendedWaitUntil:
     visible:
       id: "settings_button"
@@ -23,6 +27,9 @@ appId: com.cleanpic.android
     id: "back_button"
 - waitForAnimationToEnd
 
+# 切到「视频」Tab（首页默认照片 Tab，start_video 仅在视频 Tab 下出现）
+- tapOn: "视频"
+- waitForAnimationToEnd
 # 进入视频浏览
 - tapOn:
     id: "start_video"

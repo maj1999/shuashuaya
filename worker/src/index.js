@@ -11,25 +11,25 @@
 // 版本信息配置 — 发布新版本时更新此处
 const VERSION_CONFIG = {
   android: {
-    version: "1.7.0",
-    versionCode: 31,
+    version: "1.7.1",
+    versionCode: 32,
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "优化国内自动升级：升级包改由国内渠道分发，无需代理即可下载安装；新增下载完整性校验，升级更稳更安全。",
+    changelog: "轮播相册：新增左右滑动过渡动画、末张滑出过渡；修复触碰照片/视频闪黑问题",
     downloadUrl: "" // 运行时按 version 确定性构造 Gitee 直链（见 GITEE_DIST）
   },
   ios: {
-    version: "1.7.0",
+    version: "1.7.1",
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "优化国内自动升级：升级包改由国内渠道分发，无需代理即可下载安装；新增下载完整性校验，升级更稳更安全。",
+    changelog: "轮播相册：新增左右滑动过渡动画、末张滑出过渡；修复触碰照片/视频闪黑问题",
     downloadUrl: ""
   },
   harmonyos: {
-    version: "1.7.0",
+    version: "1.7.1",
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "优化国内自动升级：升级包改由国内渠道分发，无需代理即可下载安装；新增下载完整性校验，升级更稳更安全。",
+    changelog: "轮播相册：新增左右滑动过渡动画、末张滑出过渡；修复触碰照片/视频闪黑问题",
     downloadUrl: ""
   }
 };

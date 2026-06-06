@@ -35,10 +35,10 @@ fun FullscreenViewer(
     onDelete: () -> Unit,
     onKeep: () -> Unit,
     onBack: () -> Unit,
+    isMuted: Boolean,
+    onToggleMute: () -> Unit,
     backLabel: String = "退出"
 ) {
-    var isMuted by remember { mutableStateOf(true) }
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -60,7 +60,7 @@ fun FullscreenViewer(
             item = item,
             theme = theme,
             isMuted = isMuted,
-            onToggleMute = { isMuted = !isMuted },
+            onToggleMute = onToggleMute,
             canUndo = canUndo,
             onUndo = onUndo,
             onDelete = onDelete,

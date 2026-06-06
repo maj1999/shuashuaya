@@ -56,6 +56,9 @@ fun ViewerScreen(
             // 轮播/卡片模式下点击媒体进入的全屏叠层；全屏上下滑模式本就全屏，不使用
             var showFullscreen by remember { mutableStateOf(false) }
             LaunchedEffect(currentIndex) { showFullscreen = false }
+            // 静音状态上提到 ViewerScreen 统一持有，底层模式与全屏叠层共享同一份：
+            // 放大前在轮播页取消静音后，进入全屏仍保持有声，不再各自为政导致"放大后又变静音"。
+            var isMuted by remember { mutableStateOf(true) }
 
             Box(modifier = Modifier.fillMaxSize()) {
                 Column(
@@ -79,14 +82,20 @@ fun ViewerScreen(
                             when (mode) {
                                 InteractionMode.CAROUSEL -> CarouselMode(
                                     theme, viewerViewModel,
+                                    isMuted = isMuted,
+                                    onToggleMute = { isMuted = !isMuted },
                                     onMediaClick = { showFullscreen = true }
                                 )
                                 InteractionMode.SWIPE_CARD -> SwipeCardMode(
                                     theme, viewerViewModel,
+                                    isMuted = isMuted,
+                                    onToggleMute = { isMuted = !isMuted },
                                     onMediaClick = { showFullscreen = true }
                                 )
                                 InteractionMode.FULLSCREEN -> FullscreenMode(
-                                    theme, viewerViewModel, router
+                                    theme, viewerViewModel, router,
+                                    isMuted = isMuted,
+                                    onToggleMute = { isMuted = !isMuted }
                                 )
                             }
                         }
@@ -105,6 +114,8 @@ fun ViewerScreen(
                         onDelete = { viewerViewModel.markDelete(); showFullscreen = false },
                         onKeep = { viewerViewModel.markKept(); showFullscreen = false },
                         onBack = { showFullscreen = false },
+                        isMuted = isMuted,
+                        onToggleMute = { isMuted = !isMuted },
                         backLabel = "返回"
                     )
                 }

@@ -13,7 +13,9 @@ import com.cleanpic.viewmodel.ViewerViewModel
 fun FullscreenMode(
     theme: ThemeTokens,
     viewerViewModel: ViewerViewModel,
-    router: AppRouter
+    router: AppRouter,
+    isMuted: Boolean,
+    onToggleMute: () -> Unit
 ) {
     val items by viewerViewModel.items.collectAsState()
     val currentIndex by viewerViewModel.currentIndex.collectAsState()
@@ -30,6 +32,8 @@ fun FullscreenMode(
         onDelete = { viewerViewModel.markDelete() },
         onKeep = { viewerViewModel.markKept() },
         onBack = { router.popBackStack() },
+        isMuted = isMuted,
+        onToggleMute = onToggleMute,
         backLabel = "退出"
     )
 }

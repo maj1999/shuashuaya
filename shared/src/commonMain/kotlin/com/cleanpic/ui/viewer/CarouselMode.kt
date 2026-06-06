@@ -52,6 +52,8 @@ private const val CAROUSEL_SETTLE_MS = 200
 fun CarouselMode(
     theme: ThemeTokens,
     viewerViewModel: ViewerViewModel,
+    isMuted: Boolean,
+    onToggleMute: () -> Unit,
     onMediaClick: () -> Unit = {}
 ) {
     val items by viewerViewModel.items.collectAsState()
@@ -64,7 +66,6 @@ fun CarouselMode(
     val offsetX = remember { Animatable(0f) }
     var containerWidth by remember { mutableStateOf(0f) }
     var isPlaying by remember { mutableStateOf(false) }
-    var isMuted by remember { mutableStateOf(true) }
     val thresholdPx = with(LocalDensity.current) { CAROUSEL_SWIPE_THRESHOLD_DP.dp.toPx() }
 
     // 切换到下一项时复位偏移与播放状态
@@ -190,7 +191,7 @@ fun CarouselMode(
                             isPlaying = focused && isPlaying,
                             isMuted = isMuted,
                             onPlayClick = { isPlaying = true },
-                            onToggleMute = { isMuted = !isMuted },
+                            onToggleMute = onToggleMute,
                             modifier = cardModifier
                         )
                     }

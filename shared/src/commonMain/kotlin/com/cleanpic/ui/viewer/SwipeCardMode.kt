@@ -36,6 +36,8 @@ private const val DISMISS_TARGET = 1000f
 fun SwipeCardMode(
     theme: ThemeTokens,
     viewerViewModel: ViewerViewModel,
+    isMuted: Boolean,
+    onToggleMute: () -> Unit,
     onMediaClick: () -> Unit = {}
 ) {
     val items by viewerViewModel.items.collectAsState()
@@ -49,7 +51,6 @@ fun SwipeCardMode(
 
     val canUndo by viewerViewModel.canUndo.collectAsState()
     var isPlaying by remember { mutableStateOf(false) }
-    var isMuted by remember { mutableStateOf(true) }
 
     // 每次 index 变化时重置偏移与播放状态
     LaunchedEffect(currentIndex) {
@@ -141,7 +142,7 @@ fun SwipeCardMode(
                 isPlaying = isPlaying,
                 isMuted = isMuted,
                 onPlayClick = { isPlaying = true },
-                onToggleMute = { isMuted = !isMuted },
+                onToggleMute = onToggleMute,
                 modifier = Modifier
                     .fillMaxHeight(0.8f)
                     .fillMaxWidth(0.85f)

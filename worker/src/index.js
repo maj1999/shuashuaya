@@ -11,25 +11,25 @@
 // 版本信息配置 — 发布新版本时更新此处
 const VERSION_CONFIG = {
   android: {
-    version: "1.9.1",
-    versionCode: 37,
+    version: "1.9.2",
+    versionCode: 38,
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "修复全屏预览操作按钮遮挡画面；修复全屏播放时静音图标与实际声音不一致（进全屏不再有底层声音泄漏）。",
+    changelog: "全屏播放视频时保持声音连续，放大不再打断声音（静音状态在浏览页与全屏间统一）。",
     downloadUrl: "" // 运行时按 version 确定性构造 Gitee 直链（见 GITEE_DIST）
   },
   ios: {
-    version: "1.9.1",
+    version: "1.9.2",
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "修复全屏预览操作按钮遮挡画面；修复全屏播放时静音图标与实际声音不一致（进全屏不再有底层声音泄漏）。",
+    changelog: "全屏播放视频时保持声音连续，放大不再打断声音（静音状态在浏览页与全屏间统一）。",
     downloadUrl: ""
   },
   harmonyos: {
-    version: "1.9.1",
+    version: "1.9.2",
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "修复全屏预览操作按钮遮挡画面；修复全屏播放时静音图标与实际声音不一致（进全屏不再有底层声音泄漏）。",
+    changelog: "全屏播放视频时保持声音连续，放大不再打断声音（静音状态在浏览页与全屏间统一）。",
     downloadUrl: ""
   }
 };

@@ -11,25 +11,25 @@
 // 版本信息配置 — 发布新版本时更新此处
 const VERSION_CONFIG = {
   android: {
-    version: "1.7.2",
-    versionCode: 33,
+    version: "1.8.0",
+    versionCode: 34,
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "修复轮播相册切换照片/视频时的闪屏",
+    changelog: "随机算法升级：改用洗牌袋 + 持久化浏览记忆，不再反复抽到最近看过或已保留过的照片视频；新增设置页「重置浏览记录」。",
     downloadUrl: "" // 运行时按 version 确定性构造 Gitee 直链（见 GITEE_DIST）
   },
   ios: {
-    version: "1.7.2",
+    version: "1.8.0",
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "修复轮播相册切换照片/视频时的闪屏",
+    changelog: "随机算法升级：改用洗牌袋 + 持久化浏览记忆，不再反复抽到最近看过或已保留过的照片视频；新增设置页「重置浏览记录」。",
     downloadUrl: ""
   },
   harmonyos: {
-    version: "1.7.2",
+    version: "1.8.0",
     forceUpdate: false,
     minVersion: "1.0.0",
-    changelog: "修复轮播相册切换照片/视频时的闪屏",
+    changelog: "随机算法升级：改用洗牌袋 + 持久化浏览记忆，不再反复抽到最近看过或已保留过的照片视频；新增设置页「重置浏览记录」。",
     downloadUrl: ""
   }
 };

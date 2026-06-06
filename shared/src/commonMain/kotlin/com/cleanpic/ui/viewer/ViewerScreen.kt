@@ -72,18 +72,23 @@ fun ViewerScreen(
                         )
                     }
                     Box(modifier = Modifier.weight(1f)) {
-                        when (mode) {
-                            InteractionMode.CAROUSEL -> CarouselMode(
-                                theme, viewerViewModel,
-                                onMediaClick = { showFullscreen = true }
-                            )
-                            InteractionMode.SWIPE_CARD -> SwipeCardMode(
-                                theme, viewerViewModel,
-                                onMediaClick = { showFullscreen = true }
-                            )
-                            InteractionMode.FULLSCREEN -> FullscreenMode(
-                                theme, viewerViewModel, router
-                            )
+                        // 全屏叠层打开时不组合底层交互模式：否则底层视频播放器仍在后台播放，
+                        // 会与全屏播放器同时发声，导致"全屏图标显示静音但仍有声音"。
+                        // 移出组合树会触发其 ExoPlayer 的 onDispose 释放，保证同一时刻只有一个播放器在放。
+                        if (!showFullscreen) {
+                            when (mode) {
+                                InteractionMode.CAROUSEL -> CarouselMode(
+                                    theme, viewerViewModel,
+                                    onMediaClick = { showFullscreen = true }
+                                )
+                                InteractionMode.SWIPE_CARD -> SwipeCardMode(
+                                    theme, viewerViewModel,
+                                    onMediaClick = { showFullscreen = true }
+                                )
+                                InteractionMode.FULLSCREEN -> FullscreenMode(
+                                    theme, viewerViewModel, router
+                                )
+                            }
                         }
                     }
                 }

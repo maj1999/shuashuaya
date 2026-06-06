@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -120,7 +121,8 @@ fun MinimalResultLayout(state: ResultScreenState) {
                         MinimalDeletePreviewItem(
                             mediaItem = mediaItem,
                             theme = theme,
-                            onCancel = { state.onCancelItem(mediaItem) }
+                            onCancel = { state.onCancelItem(mediaItem) },
+                            onPreview = { state.onPreviewItem(mediaItem) }
                         )
                     }
                 }
@@ -231,25 +233,31 @@ private fun MinimalDivider() {
 private fun MinimalDeletePreviewItem(
     mediaItem: MediaItem,
     theme: ThemeTokens,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
+    onPreview: () -> Unit
 ) {
     Box(
         modifier = Modifier
             .size(48.dp)
             .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(2.dp))
             .clip(RoundedCornerShape(2.dp))
-            .clickable(onClick = onCancel)
     ) {
+        // 点图 → 全屏预览：testTag + onPreview 放在图片叶子节点，
+        // 避免外层容器 onPreview 内嵌 onCancel 子节点导致点击被误分派给取消。
         MediaImage(
             item = mediaItem,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable(onClick = onPreview)
+                .testTag("delete_thumb")
         )
-        // 取消覆盖层
+        // 取消角标（点 × → 取消删除）—— 与图片平级，叠加右上角
         Box(
             modifier = Modifier
                 .size(16.dp)
                 .align(Alignment.TopEnd)
-                .background(Color(0x88FFFFFF)),
+                .background(Color(0x88FFFFFF))
+                .clickable(onClick = onCancel),
             contentAlignment = Alignment.Center
         ) {
             IconPainter(

@@ -22,6 +22,8 @@ data class ResultScreenState(
     val deleteResult: String?,
     val onConfirmDelete: () -> Unit,
     val onCancelItem: (MediaItem) -> Unit,
+    /** 点击待删除缩略图 → 进入全屏预览（US-CP-24） */
+    val onPreviewItem: (MediaItem) -> Unit,
     val onNextRound: () -> Unit,
     val onGoHome: () -> Unit
 )

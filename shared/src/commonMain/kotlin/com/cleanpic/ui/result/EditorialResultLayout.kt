@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -152,7 +153,8 @@ fun EditorialResultLayout(state: ResultScreenState) {
                     items(state.pendingDeleteItems, key = { it.id }) { mediaItem ->
                         EditorialDeletePreviewItem(
                             mediaItem = mediaItem,
-                            onCancel = { state.onCancelItem(mediaItem) }
+                            onCancel = { state.onCancelItem(mediaItem) },
+                            onPreview = { state.onPreviewItem(mediaItem) }
                         )
                     }
                 }
@@ -286,7 +288,8 @@ private fun EditorialStatCell(
 @Composable
 private fun EditorialDeletePreviewItem(
     mediaItem: MediaItem,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
+    onPreview: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -296,7 +299,10 @@ private fun EditorialDeletePreviewItem(
     ) {
         MediaImage(
             item = mediaItem,
-            modifier = Modifier.size(64.dp)
+            modifier = Modifier
+                .size(64.dp)
+                .clickable(onClick = onPreview)
+                .testTag("delete_thumb")
         )
         Spacer(modifier = Modifier.height(2.dp))
         Text(

@@ -7,9 +7,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -18,10 +16,6 @@ import com.cleanpic.icons.IconPainter
 import com.cleanpic.model.MediaType
 import com.cleanpic.model.ViewerItem
 import com.cleanpic.theme.ThemeTokens
-import com.cleanpic.ui.media.MediaImage
-import com.cleanpic.ui.media.VideoPlayerView
-import net.engawapg.lib.zoomable.rememberZoomState
-import net.engawapg.lib.zoomable.zoomable
 
 /**
  * 无状态全屏展示组件 — 三种交互模式复用。
@@ -51,7 +45,7 @@ fun FullscreenViewer(
             .testTag("fullscreen_viewer")
             .background(Color.Black)
     ) {
-        FullscreenContent(item = item, isMuted = isMuted)
+        ZoomableMediaContent(media = item.media, isMuted = isMuted)
 
         TopBar(
             theme = theme,
@@ -80,38 +74,6 @@ fun FullscreenViewer(
             onToggleMute = { isMuted = !isMuted },
             modifier = Modifier.align(Alignment.BottomCenter)
         )
-    }
-}
-
-@Composable
-private fun FullscreenContent(item: ViewerItem, isMuted: Boolean) {
-    // 双击 + 双指捏合缩放，照片与视频共用同一套手势/变换。
-    // 传入媒体真实尺寸作为 contentSize，使库能正确计算缩放/平移边界。
-    val zoomState = rememberZoomState(
-        contentSize = Size(item.media.width.toFloat(), item.media.height.toFloat()),
-        maxScale = 5f
-    )
-    // 切换上一个/下一个媒体时自动复位到 1×
-    LaunchedEffect(item.media.id) { zoomState.reset() }
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .zoomable(zoomState, enableOneFingerZoom = false),
-        contentAlignment = Alignment.Center
-    ) {
-        if (item.media.type == MediaType.VIDEO) {
-            VideoPlayerView(
-                item = item.media,
-                isMuted = isMuted,
-                modifier = Modifier.fillMaxSize()
-            )
-        } else {
-            MediaImage(
-                item = item.media,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Fit
-            )
-        }
     }
 }
 

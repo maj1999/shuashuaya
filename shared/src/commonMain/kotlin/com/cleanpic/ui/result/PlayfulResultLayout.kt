@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -138,7 +139,8 @@ fun PlayfulResultLayout(state: ResultScreenState) {
                             PlayfulDeletePreviewItem(
                                 mediaItem = mediaItem,
                                 theme = state.theme,
-                                onCancel = { state.onCancelItem(mediaItem) }
+                                onCancel = { state.onCancelItem(mediaItem) },
+                                onPreview = { state.onPreviewItem(mediaItem) }
                             )
                         }
                     }
@@ -254,7 +256,8 @@ private fun PlayfulStatCard(
 private fun PlayfulDeletePreviewItem(
     mediaItem: MediaItem,
     theme: com.cleanpic.theme.ThemeTokens,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
+    onPreview: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -269,6 +272,8 @@ private fun PlayfulDeletePreviewItem(
             modifier = Modifier
                 .size(60.dp)
                 .clip(RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp))
+                .clickable(onClick = onPreview)
+                .testTag("delete_thumb")
         )
         Text(
             text = mediaItem.name,

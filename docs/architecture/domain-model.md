@@ -45,6 +45,8 @@
 | 直装版 | Direct Build（`direct` flavor） | 通过 GitHub Release 分发的 APK，包含完整应用内升级能力 |
 | 商店版 | Store Build（`store` flavor） | 通过应用商店分发的 APK，编译期完全移除升级相关代码与网络请求，升级由商店负责 |
 | 全屏查看 | FullscreenViewer | 无状态全屏展示组件，三种交互模式复用；区别于交互模式"全屏上下滑(Fullscreen)" |
+| 缩放播放内核 | ZoomableMediaContent | 抽取自 FullscreenViewer 的照片缩放 + 视频播放公共组件，浏览页与待删除预览共用 |
+| 待删除预览 | DeletePreviewOverlay | 结果页待确认态点缩略图进入的全屏预览（HorizontalPager 左右滑 + 取消删除） |
 | 撤销 | Undo / canUndo | 单步撤销上一次删/留决策，回到上一项重新选择 |
 | 最近决策项 | lastDecisionIndex | 最近一次做出删/留决策的媒体项下标，撤销的目标 |
 | 向后翻看 | goNext | 轮播模式左滑切到下一个媒体；离开项未决策则默认保留，已决策保持原样 |

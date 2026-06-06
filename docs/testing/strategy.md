@@ -71,6 +71,7 @@ shared/src/commonTest/kotlin/com/cleanpic/
 | US-CP-12 中途退出浏览 | — | — | — | E19a,E19b,E19c |
 | US-CP-18 点击全屏查看媒体 | — | — | — | E22a-E22e |
 | US-CP-19 撤销上一步重新决策 | U-UNDO-01~07 | — | — | E23a,E23b,E23c |
+| US-CP-24 待删除项全屏预览 | — | — | — | E-PRV-01~03 |
 | US-CP-13 启动检查更新 | U-UPD-01~04 | — | — | E-UPD-01~04（direct） |
 | US-CP-14 手动检查+红点 | U-UPD-04 | — | — | E-UPD-06~09（direct） |
 | US-CP-15 下载安装 | — | — | — | E-UPD-10~11（direct） |

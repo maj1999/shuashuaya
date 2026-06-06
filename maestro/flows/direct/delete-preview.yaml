@@ -1,0 +1,93 @@
+# maestro/flows/direct/delete-preview.yaml
+#
+# E-PRV-01/02: 待删除项全屏预览 —— 点击放大 + 左右滑 + 取消删除 + 删空自动退出（US-CP-24）
+#
+appId: com.cleanpic.android
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 30000
+- waitForAnimationToEnd
+
+# 轮播模式 + 每轮 5 张
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+- tapOn: "轮播相册"
+- waitForAnimationToEnd
+- tapOn: "5"
+- waitForAnimationToEnd
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd
+
+# 进入照片浏览
+- tapOn:
+    id: "start_photo"
+- waitForAnimationToEnd
+- tapOn:
+    text: "授权"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Allow"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    id: "start_photo"
+    optional: true
+- waitForAnimationToEnd
+
+# 标记删除 2 张，保留 3 张
+- tapOn:
+    id: "delete_button"
+- waitForAnimationToEnd
+- tapOn:
+    id: "delete_button"
+- waitForAnimationToEnd
+- repeat:
+    times: 3
+    commands:
+      - tapOn:
+          id: "keep_button"
+      - waitForAnimationToEnd
+
+# 结果页待确认态：标题"即将删除 2 项"
+- assertVisible: ".*即将删除 2 项.*"
+
+# 点击待删除缩略图 → 全屏预览
+- tapOn:
+    id: "delete_thumb"
+- waitForAnimationToEnd
+- assertVisible:
+    id: "delete_preview_overlay"
+- assertVisible:
+    id: "preview_back_button"
+
+# 左右滑切换待删除项
+- swipe:
+    direction: LEFT
+- waitForAnimationToEnd
+- swipe:
+    direction: RIGHT
+- waitForAnimationToEnd
+- takeScreenshot: maestro/screenshots/delete-preview-fullscreen
+
+# 取消删除当前项 → 列表 2→1，全屏仍在
+- tapOn:
+    id: "preview_cancel_delete"
+- waitForAnimationToEnd
+- assertVisible:
+    id: "delete_preview_overlay"
+
+# 再取消最后一项 → 列表空 → 全屏自动关闭，结果页回到完成态
+- tapOn:
+    id: "preview_cancel_delete"
+- waitForAnimationToEnd
+- assertNotVisible:
+    id: "delete_preview_overlay"
+- assertVisible: ".*本轮清理完成.*"
+- takeScreenshot: maestro/screenshots/delete-preview-emptied

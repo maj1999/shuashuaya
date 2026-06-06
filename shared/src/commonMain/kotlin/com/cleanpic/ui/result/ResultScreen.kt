@@ -22,6 +22,7 @@ fun ResultScreen(
     var confirmResult by remember { mutableStateOf<String?>(null) }
     var isDeleting by remember { mutableStateOf(false) }
     var deleteConfirmed by remember { mutableStateOf(false) }
+    var previewIndex by remember { mutableStateOf<Int?>(null) }
 
     val pendingDeletes = items.filter { it.state == OperationState.PENDING_DELETE }
     val keptCount = items.count { it.state == OperationState.KEPT }
@@ -61,6 +62,10 @@ fun ResultScreen(
         onCancelItem = { mediaItem ->
             viewerViewModel.cancelDelete(mediaItem.id)
         },
+        onPreviewItem = { mediaItem ->
+            val i = pendingDeletes.indexOfFirst { it.media.id == mediaItem.id }
+            if (i >= 0) previewIndex = i
+        },
         onNextRound = {
             val type = items.firstOrNull()?.media?.type ?: MediaType.PHOTO
             scope.launch {
@@ -89,5 +94,21 @@ fun ResultScreen(
         ThemeLayoutId.WARM      -> WarmResultLayout(state)
         ThemeLayoutId.PLAYFUL   -> PlayfulResultLayout(state)
         ThemeLayoutId.EDITORIAL -> EditorialResultLayout(state)
+    }
+
+    // 待删除项全屏预览（US-CP-24）—— 仅待确认态、列表非空时
+    val previewItems = pendingDeletes.map { it.media }
+    LaunchedEffect(previewItems.isEmpty()) {
+        if (previewItems.isEmpty()) previewIndex = null
+    }
+    val idx = previewIndex
+    if (idx != null && !deleteConfirmed && previewItems.isNotEmpty()) {
+        DeletePreviewOverlay(
+            items = previewItems,
+            startIndex = idx,
+            theme = theme,
+            onCancelDelete = { viewerViewModel.cancelDelete(it.id) },
+            onBack = { previewIndex = null }
+        )
     }
 }

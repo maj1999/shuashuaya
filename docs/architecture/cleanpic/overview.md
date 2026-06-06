@@ -7,6 +7,7 @@
 | 子模块 | 文档 | 说明 |
 |--------|------|------|
 | 随机选取算法 | [random-picker.md](random-picker.md) | Shuffle Bag 洗牌袋 + 持久化浏览记忆（PickState） |
+| 待删除项全屏预览 | [result-delete-preview.md](result-delete-preview.md) | 结果页点缩略图放大 + 左右滑 + 视频播放 + 取消删除 |
 | 主题系统 | [theme-system.md](theme-system.md) | Token 定义与 5 套主题 |
 | 原生 Module | [native-modules.md](native-modules.md) | 各平台 MediaModule/权限/视频播放 |
 | 自动升级 | [auto-update.md](auto-update.md) | UpdateChecker/UpdateInstaller + Cloudflare Workers |

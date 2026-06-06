@@ -12,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -140,7 +141,8 @@ fun WarmResultLayout(state: ResultScreenState) {
                         WarmDeletePreviewItem(
                             mediaItem = mediaItem,
                             theme = theme,
-                            onCancel = { state.onCancelItem(mediaItem) }
+                            onCancel = { state.onCancelItem(mediaItem) },
+                            onPreview = { state.onPreviewItem(mediaItem) }
                         )
                     }
                 }
@@ -262,7 +264,8 @@ private fun WarmStatCard(
 private fun WarmDeletePreviewItem(
     mediaItem: MediaItem,
     theme: com.cleanpic.theme.ThemeTokens,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
+    onPreview: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -282,6 +285,8 @@ private fun WarmDeletePreviewItem(
             modifier = Modifier
                 .size(60.dp)
                 .clip(RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp))
+                .clickable(onClick = onPreview)
+                .testTag("delete_thumb")
         )
         Text(
             text = mediaItem.name,

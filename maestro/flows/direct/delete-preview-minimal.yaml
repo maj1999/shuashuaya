@@ -1,0 +1,75 @@
+# E-PRV-03: Minimal 主题点待删除缩略图进入全屏预览
+# 回归 US-CP-24 在 Minimal 主题点缩略图误触发"取消删除"、进不了预览的 bug。
+appId: com.cleanpic.android
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 30000
+- waitForAnimationToEnd
+# 切 Minimal 主题
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+- tapOn:
+    id: "theme_minimal"
+- waitForAnimationToEnd
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd
+# 轮播 + 每轮 5 张
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+- tapOn: "轮播相册"
+- waitForAnimationToEnd
+- tapOn: "5"
+- waitForAnimationToEnd
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd
+# 进照片浏览
+- tapOn:
+    id: "start_photo"
+- waitForAnimationToEnd
+- tapOn:
+    text: "授权"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Allow"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    id: "start_photo"
+    optional: true
+- waitForAnimationToEnd
+# 标记删除 2 张，保留 3 张
+- tapOn:
+    id: "delete_button"
+- waitForAnimationToEnd
+- tapOn:
+    id: "delete_button"
+- waitForAnimationToEnd
+- repeat:
+    times: 3
+    commands:
+      - tapOn:
+          id: "keep_button"
+      - waitForAnimationToEnd
+- assertVisible: ".*即将删除 2 项.*"
+# 关键断言：点缩略图必须进入全屏预览（而非误触发取消删除）
+- tapOn:
+    id: "delete_thumb"
+- waitForAnimationToEnd
+- assertVisible:
+    id: "delete_preview_overlay"
+- assertVisible:
+    id: "preview_cancel_delete"
+# 列表仍是 2 项（没被误取消）
+- tapOn:
+    id: "preview_back_button"
+- waitForAnimationToEnd
+- assertVisible: ".*即将删除 2 项.*"

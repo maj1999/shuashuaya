@@ -1,0 +1,64 @@
+# maestro/flows/direct/fullscreen-immersive-toggle.yaml
+#
+# US-CP-?? 全屏沉浸模式：全屏看图/视频时单击媒体可隐藏顶栏+底栏（沉浸），再点恢复
+#
+appId: com.cleanpic.android
+---
+- launchApp
+# 关闭可能出现的「发现新版本」弹窗（测试设备版本可能落后于线上已发布版）
+- tapOn:
+    id: "update_later_button"
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 15000
+- waitForAnimationToEnd
+
+# 轮播模式
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+- tapOn: "轮播相册"
+- waitForAnimationToEnd
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd
+
+# 照片浏览（默认照片 Tab）
+- tapOn:
+    id: "start_photo"
+- waitForAnimationToEnd
+- tapOn:
+    id: "start_photo"
+    optional: true
+- waitForAnimationToEnd
+
+# 进入全屏，默认显示顶/底栏
+- tapOn:
+    id: "media_card"
+- waitForAnimationToEnd
+- assertVisible:
+    id: "fullscreen_viewer"
+- assertVisible:
+    id: "exit_button"
+- assertVisible:
+    id: "keep_button"
+
+# 单击媒体中间 → 进入沉浸：顶/底栏隐藏
+- tapOn:
+    point: "50%, 40%"
+- waitForAnimationToEnd
+- assertNotVisible:
+    id: "exit_button"
+- assertNotVisible:
+    id: "keep_button"
+
+# 再次单击 → 恢复显示
+- tapOn:
+    point: "50%, 40%"
+- waitForAnimationToEnd
+- assertVisible:
+    id: "exit_button"
+- assertVisible:
+    id: "keep_button"

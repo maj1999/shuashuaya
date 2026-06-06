@@ -1,5 +1,8 @@
 package com.cleanpic.ui.viewer
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -43,6 +46,8 @@ fun FullscreenViewer(
     val isVideo = item.media.type == MediaType.VIDEO
     // 视频进度桥：仅视频需要；切换媒体时重建以复位进度。
     val videoControl = remember(item.media.id) { VideoControl() }
+    // 沉浸模式：单击媒体切换顶/底栏显隐；切换媒体时复位为显示态。
+    var chromeVisible by remember(item.media.id) { mutableStateOf(true) }
 
     Box(
         modifier = Modifier
@@ -53,30 +58,45 @@ fun FullscreenViewer(
         ZoomableMediaContent(
             media = item.media,
             isMuted = isMuted,
-            control = if (isVideo) videoControl else null
+            control = if (isVideo) videoControl else null,
+            onTap = { chromeVisible = !chromeVisible }
         )
 
-        TopBar(
-            theme = theme,
-            current = current,
-            total = total,
-            backLabel = backLabel,
-            onBack = onBack,
+        AnimatedVisibility(
+            visible = chromeVisible,
+            enter = fadeIn(),
+            exit = fadeOut(),
             modifier = Modifier.align(Alignment.TopCenter)
-        )
+        ) {
+            TopBar(
+                theme = theme,
+                current = current,
+                total = total,
+                backLabel = backLabel,
+                onBack = onBack,
+                modifier = Modifier
+            )
+        }
 
-        BottomBar(
-            item = item,
-            theme = theme,
-            isMuted = isMuted,
-            onToggleMute = onToggleMute,
-            canUndo = canUndo,
-            onUndo = onUndo,
-            onDelete = onDelete,
-            onKeep = onKeep,
-            videoControl = if (isVideo) videoControl else null,
+        AnimatedVisibility(
+            visible = chromeVisible,
+            enter = fadeIn(),
+            exit = fadeOut(),
             modifier = Modifier.align(Alignment.BottomCenter)
-        )
+        ) {
+            BottomBar(
+                item = item,
+                theme = theme,
+                isMuted = isMuted,
+                onToggleMute = onToggleMute,
+                canUndo = canUndo,
+                onUndo = onUndo,
+                onDelete = onDelete,
+                onKeep = onKeep,
+                videoControl = if (isVideo) videoControl else null,
+                modifier = Modifier
+            )
+        }
     }
 }
 

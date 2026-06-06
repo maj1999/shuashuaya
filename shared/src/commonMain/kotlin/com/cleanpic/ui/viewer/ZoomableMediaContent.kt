@@ -29,6 +29,7 @@ fun ZoomableMediaContent(
     isMuted: Boolean,
     modifier: Modifier = Modifier,
     control: VideoControl? = null,
+    onTap: (() -> Unit)? = null,
 ) {
     val zoomState = rememberZoomState(
         contentSize = Size(media.width.toFloat(), media.height.toFloat()),
@@ -39,7 +40,12 @@ fun ZoomableMediaContent(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .zoomable(zoomState, enableOneFingerZoom = false),
+            // onTap：单击回调（用于全屏切换沉浸模式）；双击仍由库默认处理为放大/复位。
+            .zoomable(
+                zoomState,
+                enableOneFingerZoom = false,
+                onTap = onTap?.let { cb -> { _ -> cb() } }
+            ),
         contentAlignment = Alignment.Center
     ) {
         if (media.type == MediaType.VIDEO) {

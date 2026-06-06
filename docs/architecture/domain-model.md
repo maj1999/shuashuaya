@@ -47,6 +47,9 @@
 | 全屏查看 | FullscreenViewer | 无状态全屏展示组件，三种交互模式复用；区别于交互模式"全屏上下滑(Fullscreen)" |
 | 缩放播放内核 | ZoomableMediaContent | 抽取自 FullscreenViewer 的照片缩放 + 视频播放公共组件，浏览页与待删除预览共用 |
 | 待删除预览 | DeletePreviewOverlay | 结果页待确认态点缩略图进入的全屏预览（HorizontalPager 左右滑 + 取消删除） |
+| 视频进度桥 | VideoControl | 平台播放器与 Compose UI 之间的进度桥：上报 position/duration + 提供 seek 回调 |
+| 视频进度条 | VideoScrubber / video_scrubber | 全屏视频底部可拖拽进度条（Material3 Slider），拖拽 seek 到任意位置；仅全屏、仅视频 |
+| 沉浸模式 | chromeVisible | 全屏单击切换顶栏/底栏显隐的状态；隐藏后仅留媒体画面，淡入淡出 |
 | 撤销 | Undo / canUndo | 单步撤销上一次删/留决策，回到上一项重新选择 |
 | 最近决策项 | lastDecisionIndex | 最近一次做出删/留决策的媒体项下标，撤销的目标 |
 | 向后翻看 | goNext | 轮播模式左滑切到下一个媒体；离开项未决策则默认保留，已决策保持原样 |

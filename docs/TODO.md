@@ -26,6 +26,8 @@
 - [x] `architecture/cleanpic/viewer-fullscreen-undo.md` — 浏览页点击全屏 + 撤销上一步（US-CP-18/19）
 - [x] `architecture/cleanpic/viewer-zoom.md` — 全屏查看缩放：双击 + 双指捏合（US-CP-20）
 - [x] `architecture/cleanpic/viewer-carousel-swipe-nav.md` — 轮播模式左右滑动切换前后媒体（US-CP-21）
+- [x] `architecture/cleanpic/viewer-video-playback.md` — 全屏视频播放：静音统一 + 单播放器 + 拖拽进度条（US-CP-18/25）
+- [x] `architecture/cleanpic/viewer-immersive.md` — 全屏沉浸模式：单击隐藏/显示界面（US-CP-26）
 - [x] `architecture/cleanpic/auto-update-china-gitee.md` — 国内自动升级分发（Gitee 双端点 + 存量迁移）
 
 ## 部署层
@@ -38,6 +40,8 @@
 - [x] `testing/scenarios/ep1-photo-cleanup.md` — Epic 1 照片清理场景
 - [x] `testing/scenarios/ep2-video-cleanup.md` — Epic 2 视频清理场景
 - [x] `testing/scenarios/ep3-theme-interaction.md` — Epic 3 主题与交互场景（已更新 v2 主题）
+- [x] `testing/scenarios/ep5-browsing-enhancement.md` — EP5 浏览体验增强场景（US-CP-12/18/19/21/26）
+- [x] `testing/scenarios/ep6-auto-update.md` — EP6 自动升级场景
 - [x] `testing/scenarios/tech-nfr.md` — NFR 性能/兼容性/安全
 - [x] `testing/scenarios/ep7-random-enhancement.md` — EP7 随机算法增强场景（US-CP-22/23）
 

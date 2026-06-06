@@ -2,7 +2,7 @@
 
 |文档状态| 更新 | 2026-05-31 |
 
-覆盖 US-CP-12（中途退出）、US-CP-18（点击全屏查看）、US-CP-19（撤销上一步）、US-CP-21（轮播左右滑动切换前后媒体）。
+覆盖 US-CP-12（中途退出）、US-CP-18（点击全屏查看）、US-CP-19（撤销上一步）、US-CP-21（轮播左右滑动切换前后媒体）、US-CP-26（全屏沉浸观看）。
 
 ## AC 级追溯表
 
@@ -160,3 +160,17 @@ US-CP-21 轮播左右滑动导航（`ViewerViewModelTest`，方法前缀 `nav_`�
 | 预期 | 结果页可见"删除"与"保留"统计（第 1 张删除 + 其余默认保留），可"返回首页" |
 
 > 说明：L4 用例需在 `maestro/flows/direct/` 与 `maestro/flows/store/`（撤销/全屏属通用功能，两 flavor 都覆盖）下新建对应 yaml，视频相关放 `video/` 子目录。具体 yaml 在 Step 4 TDD 实现时编写。轮播左右滑动导航（E24）当前仅在 `direct/` 下覆盖。
+
+### E-IMM 全屏沉浸观看（US-CP-26）
+
+> 实现：`maestro/flows/direct/fullscreen-immersive-toggle.yaml`。
+
+| AC 场景 | L4 |
+|---------|----|
+| 单击隐藏顶/底栏 | E-IMM-01 |
+| 再次单击恢复 | E-IMM-02 |
+
+| 编号 | 前置 | 操作 | 预期 |
+|------|------|------|------|
+| E-IMM-01 | 轮播模式，照片，已进全屏（`exit_button`/`keep_button` 可见） | 单击画面中央（point 50%,40%） | `exit_button`/`keep_button` 隐藏（顶/底栏淡出，仅留画面） |
+| E-IMM-02 | 处于沉浸态（界面已隐藏） | 再次单击画面中央 | `exit_button`/`keep_button` 恢复可见 |

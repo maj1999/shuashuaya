@@ -1,6 +1,6 @@
 # maestro/flows/direct/video/fullscreen-video-scrubber.yaml
 #
-# US-CP-?? 全屏视频播放进度条：点视频进全屏后底部出现可拖拽进度条（video_scrubber）
+# US-CP-25 全屏视频播放进度条：点视频进全屏后底部出现可拖拽进度条（video_scrubber）
 # 进度条仅视频显示、仅全屏显示（轮播小卡不显示）
 #
 appId: com.cleanpic.android

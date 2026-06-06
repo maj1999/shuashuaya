@@ -1,6 +1,6 @@
 # maestro/flows/direct/fullscreen-immersive-toggle.yaml
 #
-# US-CP-?? 全屏沉浸模式：全屏看图/视频时单击媒体可隐藏顶栏+底栏（沉浸），再点恢复
+# US-CP-26 全屏沉浸模式：全屏看图/视频时单击媒体可隐藏顶栏+底栏（沉浸），再点恢复
 #
 appId: com.cleanpic.android
 ---

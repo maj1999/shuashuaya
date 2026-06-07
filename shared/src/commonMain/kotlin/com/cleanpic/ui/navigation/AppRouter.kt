@@ -13,6 +13,7 @@ sealed class Route {
     data class Viewer(val type: MediaType) : Route()
     data object Result : Route()
     data object Settings : Route()
+    data object Stats : Route()
 }
 
 class AppRouter {

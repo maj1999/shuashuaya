@@ -13,6 +13,7 @@ import com.cleanpic.ui.home.HomeScreen
 import com.cleanpic.ui.viewer.ViewerScreen
 import com.cleanpic.ui.result.ResultScreen
 import com.cleanpic.ui.settings.SettingsScreen
+import com.cleanpic.ui.stats.StatsScreen
 import com.cleanpic.viewmodel.ViewerViewModel
 
 @Composable
@@ -31,6 +32,7 @@ fun CleanPicApp(hooks: AppHooks = AppHooks.Empty) {
             is Route.Viewer -> ViewerScreen(router, theme, viewerViewModel, route.type)
             is Route.Result -> ResultScreen(router, theme, viewerViewModel)
             is Route.Settings -> SettingsScreen(router, theme, hooks)
+            is Route.Stats -> StatsScreen(router, theme)
         }
         // 跨路由 overlay（升级弹窗、下载进度等）——必须放在 when 之外，
         // 这样从设置页触发的下载进度 dialog 在 Settings 路由也可见。

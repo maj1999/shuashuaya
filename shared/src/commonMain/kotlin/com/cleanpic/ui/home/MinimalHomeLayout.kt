@@ -46,15 +46,27 @@ fun MinimalHomeLayout(state: HomeScreenState) {
                 color = Color(0xFF333333),
                 letterSpacing = 3.sp
             )
-            IconPainter(
-                name = "settings",
-                theme = theme,
-                size = 20.dp,
-                colorOverride = 0xFF999999,
-                modifier = Modifier
-                    .testTag("settings_button")
-                    .clickable { state.onOpenSettings() }
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconPainter(
+                    name = "stats",
+                    theme = theme,
+                    size = 20.dp,
+                    colorOverride = 0xFF999999,
+                    modifier = Modifier
+                        .testTag("stats_button")
+                        .clickable { state.onOpenStats() }
+                )
+                Spacer(modifier = Modifier.width(18.dp))
+                IconPainter(
+                    name = "settings",
+                    theme = theme,
+                    size = 20.dp,
+                    colorOverride = 0xFF999999,
+                    modifier = Modifier
+                        .testTag("settings_button")
+                        .clickable { state.onOpenSettings() }
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(8.dp))

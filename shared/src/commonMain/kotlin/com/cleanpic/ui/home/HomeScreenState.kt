@@ -12,6 +12,7 @@ data class HomeScreenState(
     val onStartPhoto: () -> Unit,
     val onStartVideo: () -> Unit,
     val onOpenSettings: () -> Unit,
+    val onOpenStats: () -> Unit,
     val onRequestPermission: () -> Unit,
     val onShowDeniedDialog: () -> Unit,
     val onShowPermanentDialog: () -> Unit

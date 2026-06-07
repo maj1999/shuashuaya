@@ -51,23 +51,45 @@ fun PlayfulHomeLayout(state: HomeScreenState) {
                     fontWeight = FontWeight(700),
                     color = Color.White
                 )
-                // 毛玻璃设置按钮
-                Box(
-                    modifier = Modifier
-                        .size(36.dp)
-                        .testTag("settings_button")
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(Color(0x1FFFFFFF))
-                        .border(1.dp, Color(0x33FFFFFF), RoundedCornerShape(12.dp))
-                        .clickable { state.onOpenSettings() },
-                    contentAlignment = Alignment.Center
+                // 毛玻璃统计 + 设置按钮
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    IconPainter(
-                        name = "settings",
-                        theme = state.theme,
-                        size = 18.dp,
-                        colorOverride = 0xFFFFFFFF.toLong()
-                    )
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .testTag("stats_button")
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Color(0x1FFFFFFF))
+                            .border(1.dp, Color(0x33FFFFFF), RoundedCornerShape(12.dp))
+                            .clickable { state.onOpenStats() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        IconPainter(
+                            name = "stats",
+                            theme = state.theme,
+                            size = 18.dp,
+                            colorOverride = 0xFFFFFFFF.toLong()
+                        )
+                    }
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .testTag("settings_button")
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Color(0x1FFFFFFF))
+                            .border(1.dp, Color(0x33FFFFFF), RoundedCornerShape(12.dp))
+                            .clickable { state.onOpenSettings() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        IconPainter(
+                            name = "settings",
+                            theme = state.theme,
+                            size = 18.dp,
+                            colorOverride = 0xFFFFFFFF.toLong()
+                        )
+                    }
                 }
             }
 

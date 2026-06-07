@@ -43,6 +43,7 @@ fun HomeScreen(
         onStartPhoto = { launchViewer(MediaType.PHOTO) },
         onStartVideo = { launchViewer(MediaType.VIDEO) },
         onOpenSettings = { router.navigate(Route.Settings) },
+        onOpenStats = { router.navigate(Route.Stats) },
         onRequestPermission = { scope.launch { homeViewModel.requestPermission() } },
         onShowDeniedDialog = { showDeniedDialog = true },
         onShowPermanentDialog = { showPermanentDialog = true }

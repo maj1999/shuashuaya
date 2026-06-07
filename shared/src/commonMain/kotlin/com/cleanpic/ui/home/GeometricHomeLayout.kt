@@ -45,6 +45,16 @@ fun GeometricHomeLayout(state: HomeScreenState) {
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 IconPainter(
+                    name = "stats",
+                    theme = theme,
+                    size = 24.dp,
+                    colorOverride = 0x99FFFFFF,
+                    modifier = Modifier
+                        .testTag("stats_button")
+                        .clickable { state.onOpenStats() }
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                IconPainter(
                     name = "settings",
                     theme = theme,
                     size = 24.dp,

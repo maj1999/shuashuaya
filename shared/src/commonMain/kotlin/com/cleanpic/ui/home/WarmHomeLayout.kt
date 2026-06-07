@@ -79,15 +79,26 @@ fun WarmHomeLayout(state: HomeScreenState) {
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // 底部设置图标
-        IconPainter(
-            name = "settings",
-            theme = theme,
-            size = 28.dp,
-            modifier = Modifier
-                .testTag("settings_button")
-                .clickable { state.onOpenSettings() }
-        )
+        // 底部设置图标 + 统计图标
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconPainter(
+                name = "stats",
+                theme = theme,
+                size = 28.dp,
+                modifier = Modifier
+                    .testTag("stats_button")
+                    .clickable { state.onOpenStats() }
+            )
+            Spacer(modifier = Modifier.width(30.dp))
+            IconPainter(
+                name = "settings",
+                theme = theme,
+                size = 28.dp,
+                modifier = Modifier
+                    .testTag("settings_button")
+                    .clickable { state.onOpenSettings() }
+            )
+        }
 
         Spacer(modifier = Modifier.height(40.dp))
     }

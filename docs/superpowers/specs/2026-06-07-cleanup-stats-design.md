@@ -50,26 +50,33 @@
 
 ## 3. 数据模型（`model/` 层，纯数据）
 
+**核心：照片 / 视频完全拆分**（大小、数量、轮次都各记一份），合计由相加得出。App 的清理入口本就分"清理照片""清理视频"，一轮只属于一种类型。
+
 ```kotlin
-// 累计聚合
-data class LifetimeStats(
-    val totalBytes: Long,      // 累计清理字节
-    val totalDeleted: Int,     // 累计清理文件数
-    val totalPhotos: Int,      // 其中照片数
-    val totalVideos: Int,      // 其中视频数
-    val totalRounds: Int,      // 累计完成轮次
-    val firstCleanupAt: Long,  // 首次清理时间戳（0 = 无）
-    val lastCleanupAt: Long,   // 最近清理时间戳
+// 单一媒体类型（照片 或 视频）的统计三元组
+data class MediaTypeStats(
+    val bytes: Long,   // 清理字节
+    val count: Int,    // 清理数量
+    val rounds: Int,   // 完成轮次
 )
 
-// 按天明细（每天一条），为阶段二/三的趋势、连续天数、月度回顾提前埋数据
+// 累计聚合：照片 + 视频 各一份，所有"合计"都由相加得出
+data class LifetimeStats(
+    val photo: MediaTypeStats,
+    val video: MediaTypeStats,
+    val firstCleanupAt: Long,  // 首次清理时间戳（0 = 无）
+    val lastCleanupAt: Long,   // 最近清理时间戳
+) {
+    val totalBytes get() = photo.bytes + video.bytes
+    val totalCount get() = photo.count + video.count
+    val totalRounds get() = photo.rounds + video.rounds
+}
+
+// 按天明细（每天一条），照片/视频分别记；为阶段二/三的趋势、连续天数、月度回顾提前埋数据
 data class DailyStat(
     val date: String,          // "yyyy-MM-dd"（设备本地时区）
-    val bytes: Long,
-    val deleted: Int,
-    val photos: Int,
-    val videos: Int,
-    val rounds: Int,
+    val photo: MediaTypeStats,
+    val video: MediaTypeStats,
 )
 
 // 持久化的整体快照
@@ -79,22 +86,19 @@ data class StatsSnapshot(
 )
 ```
 
-> `daily` 按天聚合，天然限制增长（每条约几十字节，数年也仅数十 KB）。阶段一只采集、不展示。
+> `daily` 按天聚合，天然限制增长（每条约百余字节，数年也仅数十 KB）。阶段一只采集、不展示。
 
 ## 4. 持久化（`stats/` 新包）
 
 照搬 `AppSettings` / `AndroidAppSettings` 范式：
 
 ```kotlin
-// commonMain
+// commonMain。一轮只属于一种 MediaType，故两个 record 都带 type
 interface StatsStore {
     fun load(): StatsSnapshot
-    fun recordRoundReached(nowMillis: Long, today: String)
-    fun recordDeletion(
-        nowMillis: Long, today: String,
-        deletedBytes: Long, photos: Int, videos: Int,
-    )
-    fun reset()   // 供设置页"清空统计"用（阶段一可选）
+    fun recordRoundReached(type: MediaType, nowMillis: Long, today: String)
+    fun recordDeletion(type: MediaType, nowMillis: Long, today: String, bytes: Long, count: Int)
+    fun reset()   // 供设置页"清空统计"用（接口保留，阶段一不接入 UI）
 }
 ```
 
@@ -105,24 +109,31 @@ interface StatsStore {
 
 ## 5. 埋点（核心改动）
 
-位置：`viewmodel/ViewerViewModel.kt`
+位置：`viewmodel/ViewerViewModel.kt`（当前清理类型即 Viewer 的 `MediaType`）
 
-1. **轮次**：到达结果页时调用 `statsStore.recordRoundReached(...)`，每轮一次性（用标志位 `roundCounted`，进入新一轮时重置）。
-2. **清理量**：`confirmDelete()` 中 `repo.deleteMediaItems(items)` **返回成功后**，按实际删除结果调用 `statsStore.recordDeletion(...)`，分别统计照片/视频数与字节。
+1. **轮次**：到达结果页时调用 `statsStore.recordRoundReached(currentType, ...)`，每轮一次性（用标志位 `roundCounted`，进入新一轮时重置）。
+2. **清理量**：`confirmDelete()` 中 `repo.deleteMediaItems(items)` **返回成功后**，按实际删除结果调用 `statsStore.recordDeletion(currentType, ..., bytes, count)`，累加该类型的字节与数量。
 
-> 现有 `confirmDelete()` 在 `ViewerViewModel.kt:127-133`；删除返回 `Result<Int>`（实际删除数）。需以实际删除的项为准累加，而非 `pendingDeletes` 的全集。
+> 现有 `confirmDelete()` 在 `ViewerViewModel.kt:127-133`；删除返回 `Result<Int>`（实际删除数）。需以实际删除的项为准累加，而非 `pendingDeletes` 的全集。一轮只处理一种类型，故无需在一次事件里同时累加照片与视频。
 
 ## 6. UI（阶段一）
 
-技术栈：Compose Multiplatform + 自定义 `AppRouter`（沿用现有）。
+技术栈：Compose Multiplatform + 自定义 `AppRouter`（沿用现有）。**5 个主题全部适配、跟随当前主题切换**（与其它页一致）；视觉细节（配色/圆角/阴影/字体/图标描边）一律读各主题 `ThemeTokens`。
 
 ### 6.1 清理成果页 `StatsScreen`（新增 `Route.Stats`）
 
-1. **累计大卡**：已清理总量（字节格式化）、清理数量、完成轮次。
-2. **拟物化换算**：根据累计量自动选最贴切表达（见 §7）。
-3. **设备存储现状**：`StatFs` 读真实可用/已用，前后对比条。
-4. **离线信任声明**："全程离线 · 清理记录仅存本机，不上传"。
-5. **预留占位区**：为阶段二（徽章/连续天数/构成）、阶段三（月度回顾/分享/备份）留结构，阶段一不渲染实际内容。
+单屏不滚动，自上而下五段（定稿见 `stats-mockup.html` 及截图 `stats-5themes-h.png`）：
+
+1. **成果总览大卡（hero）**：
+   - 大数字「累计已清理 12.6 GB」
+   - 副标「共 N 个文件 · 完成 N 轮清理」
+   - 卡片底部一道极淡分隔线 + **一句语录**（情感注脚，见 §7）。语录归属此卡，不独立漂浮。
+2. **分类构成**：照片、视频各一组，每组 = `图标 + 名称 + 占比% + (大小·数量·轮次)三元组 + 占比条`。占比按字节。
+3. **设备存储现状**：`StatFs` 读真实可用/已用 + 进度条。
+4. **离线信任声明**：盾牌图标 +「全程离线 · 清理记录仅存本机，不上传」。
+5. （阶段二/三的徽章/趋势/月度回顾等暂不渲染，留结构。）
+
+**图标**：用 Lucide（lucide.dev，MIT）图标，**SVG path 内联**喂给现有 `icons/SvgPathParser`，不引网络依赖。阶段一用到：`chevron-left`(返回)、`image`(照片)、`film`(视频)、`hard-drive`(存储)、`shield-check`(离线)。描边粗细跟随各主题 `iconStrokeWidth` token（极简 1.4 / 几何 2.5 / 暖 1.8 / 活泼 2.2 / 杂志 1.1）。**不用任何 emoji**。语录前不加图标（避免 `sparkles` 类星形被误认为 emoji）。
 
 ### 6.2 首页入口
 
@@ -132,34 +143,44 @@ interface StatsStore {
 
 - 本轮完成后展示"**本次清理 X** + **累计已清理 Y**"。
 - **数字滚动动画**（Compose `animate*AsState`），最低成本最高回报的爽点。
-- 附拟物化换算文案。
+- 附一句语录（同 §7 体系）。
 
 ### 6.4 文案
 
-沿用项目现状（硬编码中文，无 i18n）。统一用"已清理"口径。
+沿用项目现状（硬编码中文，无 i18n）。统一用"已清理"口径。**中文不使用斜体**（伪斜体发虚、廉价）。
 
-## 7. 拟物化换算基准（写死取整，便于记忆）
+## 7. 语录系统（治愈温柔 · 动态轮换）
 
-| 基准 | 取值 |
-|---|---|
-| 1 张照片 | 4 MB（1GB ≈ 250 张） |
-| 1 分钟 1080p 视频 | 100 MB（1GB ≈ 10 分钟） |
-| 1 部电影（1080p） | ≈ 2 GB |
+> 替代原"拟物化换算"——对照片清理 App，把 GB 换算成"≈N 张照片"是同义反复（用户清的就是照片），故去掉。改为情感语录。
 
-文案优先用"照片/视频"换算（与本品类直接相关、最可信），大数字时补"电影"。避免"绕地球 X 圈"这类不可信类比。
+- **调性**：治愈温柔。
+- **机制**：内置文案池，commonMain **纯函数** `pickQuote(stats, today, seed): String` 按情境选句，优先级：
+  1. **里程碑**（累计破 1G/10G/50G 等阈值）
+  2. **首次清理**（`totalRounds` 极少）
+  3. **连续清理**（`lastCleanupAt` 落在今天/昨天，体现坚持）
+  4. **大额清理**（最近一次清理量较大）
+  5. **日常随机池**
+- **种子**：commonMain 不可用 `Math.random()`/`Date.now()`，随机由调用方传入种子（如 `lastCleanupAt` 或进入次数），保证纯函数可测。
+- **情境数据全部来自已有统计**，不额外采集。
+- 文案示例（治愈温柔）：
+  - 首次：「第一次清理完成，相册轻盈了一点点。」
+  - 里程碑：「已经清出 10 GB，给自己一个温柔的赞。」
+  - 连续：「又见面了，坚持整理的样子真好。」
+  - 日常：「干净的相册，像刚收拾好的房间。」「每一次清理，都是对自己温柔一点。」「少一点冗余，多一点清爽。」「整理好的不只是手机，还有心情。」
 
-示例：释放 2GB → "≈ 500 张照片 / ≈ 1 部电影"。
+文案池可在实现阶段补充扩展，建议每个情境 ≥3 句。
 
 ## 8. 测试策略
 
-- `StatsAggregator`（commonMain 纯函数）单测：累计合并、按天聚合、首次/最近时间、照片/视频拆分、轮次与清理量解耦（全保留轮次：轮次+1 量+0）。
-- 换算函数单测：各量级选词正确。
+- `StatsAggregator`（commonMain 纯函数）单测：累计合并、按天聚合、首次/最近时间、照片/视频拆分、合计=相加、轮次与清理量解耦（全保留轮次：轮次+1 量+0）。
+- `pickQuote`（commonMain 纯函数）单测：各情境（里程碑/首次/连续/大额/日常）选句正确、优先级正确、同种子结果稳定。
 - 参考现有 `update/src/commonTest/.../UpdateCheckerTest.kt` 范式。
-- UI 以编译通过 + 手动/Maestro 冒烟为准（不强制 UI 单测）。
+- 按 CLAUDE.md 测试纪律：新增 Maestro E2E 流覆盖"进入统计页 / 清理后数字增长"。
+- UI 以编译通过 + Maestro 冒烟为准（不强制 UI 单测）。
 
 ## 9. 分阶段路线图
 
-- **阶段一（本次实现）**：数据模型 + `StatsStore`/`StatsAggregator` + 埋点（轮次 + 清理量）+ `StatsScreen`（累计/换算/存储现状/离线声明）+ 首页入口 + 结果页升级（数字动画）。`daily` 数据开始采集但不展示。
+- **阶段一（本次实现）**：数据模型（按类型拆分）+ `StatsStore`/`StatsAggregator` + 语录 `pickQuote` + 埋点（轮次 + 清理量，按类型）+ `StatsScreen`（成果总览/分类构成/语录/存储现状/离线声明，5 主题适配 + Lucide 内联图标）+ 首页入口 + 结果页升级（数字动画 + 语录）。`daily` 数据开始采集但不展示。
 - **阶段二（B）**：里程碑徽章（1G/10G/100G、1000 张等）、连续清理天数(streak)、照片/视频构成图。
 - **阶段三（C）**：月度回顾卡、可分享成果图、本地备份导出（解决纯本地换机归零）。
 

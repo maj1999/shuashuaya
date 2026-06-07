@@ -4,6 +4,10 @@
 
 一款精致的相册随机清理工具。在碎片时间打开 App，随机浏览几张照片或视频，轻松决定去留，释放手机存储空间。
 
+**当前版本 v1.13.1** · Android 8.0+（iOS / HarmonyOS 规划中）· Kotlin Multiplatform + Compose
+
+---
+
 ## 功能特性
 
 - **随机清理** — 不用翻遍相册，随机挑选一小批，降低决策负担
@@ -12,7 +16,8 @@
 - **5 套主题** — 温暖手工感 / 克制极简 / 大胆几何 / 活泼精致 / 杂志排版（每个主题独立布局，切换主题 = 换一个 App）
 - **矢量图标** — 全部图标使用 SVG path + Canvas 绘制，风格随主题变化，告别 emoji
 - **安全删除** — 浏览时仅标记，结果页统一确认，支持反悔
-- **自动更新** — 启动时自动检测新版本，支持强制/可选更新，可在设置页关闭
+- **清理成果** — 统计页展示累计已清理数量、分类构成与设备存储情况，全程离线、记录仅存本机
+- **自动更新** — 启动自动检测新版本；下载多源竞速、自动选最快可用线路（适配国内直连与境外梯子），支持强制/可选更新，可在设置页关闭
 - **隐私优先** — 除版本检查外纯本地处理，不收集任何用户数据
 
 ## 截图
@@ -29,7 +34,6 @@
 |-----------|-----------|-----------|
 | ![轮播](docs/screenshots/viewer-carousel.png) | ![卡片](docs/screenshots/viewer-swipecard.png) | ![全屏](docs/screenshots/viewer-fullscreen.png) |
 
-
 ## 技术栈
 
 | 项目 | 技术 |
@@ -37,14 +41,16 @@
 | 语言 | Kotlin (Multiplatform) |
 | UI 框架 | Compose Multiplatform |
 | 目标平台 | Android 8.0+ / iOS 14.0+ / HarmonyOS NEXT 5.0+ |
-| 构建工具 | Gradle 8.5 + AGP 8.2.2 |
-| E2E 测试 | Maestro |
+| 图片 / 视频 | Coil 3 / Media3 ExoPlayer |
+| 网络 / 更新 | Ktor Client（Android OkHttp / iOS Darwin），多源竞速下载 |
+| 构建工具 | Gradle 8.5 + AGP 8.2.2（compileSdk 34） |
+| 测试 | Kotlin Test（单元）+ Maestro（E2E） |
 
 ## 项目结构
 
 ```
 cleanpic/
-├── shared/                     # KMP 共享模块
+├── shared/                     # KMP 共享模块（UI / 图标 / 主题 / 媒体 / 设置 / 权限 / DI）
 │   └── src/
 │       ├── commonMain/         # 跨平台共享代码
 │       │   └── kotlin/com/cleanpic/
@@ -55,21 +61,28 @@ cleanpic/
 │       │       ├── media/      # 媒体仓库 + 随机选取
 │       │       ├── theme/      # 主题管理（5 套 ThemeTokens + 布局标识）
 │       │       ├── settings/   # 偏好设置
-│       │       ├── update/     # 自动更新（版本检查 + 更新弹窗）
 │       │       ├── permission/ # 权限管理
 │       │       └── di/         # 依赖注入
-│       ├── androidMain/        # Android 平台实现（含 AndroidUpdateInstaller）
-│       ├── appleMain/          # iOS 平台实现（含 IosUpdateInstaller）
+│       ├── androidMain/        # Android 平台实现
+│       ├── appleMain/          # iOS 平台实现
 │       └── commonTest/         # 单元测试
-├── androidApp/                 # Android 壳工程
-├── worker/                     # Cloudflare Workers（版本检查 API + 下载代理）
+├── update/                     # 自动更新独立模块
+│   └── src/
+│       ├── commonMain/         # 版本检查 + 选源竞速 + 更新弹窗（UpdateChecker / DownloadSourceSelector / UpdateDialog）
+│       ├── androidMain/        # Android 下载安装（ktor 流式下载 ApkDownloader + AndroidUpdateInstaller + 完整性校验）
+│       ├── appleMain/          # iOS 安装（IosUpdateInstaller）
+│       ├── commonTest/         # 选源 / 版本检查单测
+│       └── androidUnitTest/    # 下载 / 完整性单测
+├── androidApp/                 # Android 壳工程（direct / store 两个 flavor）
+├── worker/                     # （遗留）旧 Cloudflare Worker；现已改为 Gitee 静态 version.json 分发，不再部署
 ├── maestro/                    # E2E 测试
-│   ├── flows/                  # 照片相关测试流程（13 个）
-│   ├── flows/video/            # 视频相关测试流程（5 个，需 ffmpeg 生成资源）
+│   ├── flows/direct/           # direct flavor 测试流（照片 25 个）
+│   ├── flows/direct/video/     # 视频测试流（7 个，需 ffmpeg 生成资源）
+│   ├── flows/store/            # store flavor 测试流（16 个）
 │   └── screenshots/            # 测试截图输出（git 忽略）
-├── scripts/                    # 构建/运行/测试/发布脚本
+├── scripts/                    # 构建 / 运行 / 测试 / 发布脚本
 ├── test-assets/                # 测试媒体（本地生成）
-└── docs/                       # 产品/架构/测试/部署文档
+└── docs/                       # 产品 / 架构 / 测试 / 部署文档
 ```
 
 ## 快速开始
@@ -78,145 +91,95 @@ cleanpic/
 
 - JDK 17
 - Android Studio（含 Android SDK 34）
-- ffmpeg（用于生成测试媒体，可选）
-- Maestro（用于 E2E 测试，可选）
-
-可以运行以下命令一键检查环境是否就绪：
+- ffmpeg（生成测试媒体，可选）
+- Maestro（E2E 测试，可选）
 
 ```bash
-scripts/check-env.sh
+scripts/check-env.sh        # 一键检查环境是否就绪
 ```
 
-### 第一步：启动模拟器
+### 1. 启动模拟器
 
-**方式一：使用脚本（推荐，需要已创建 AVD）**
+**方式一：使用脚本**（推荐，需已创建 AVD）
 
 ```bash
-# 启动模拟器（会自动等待启动完成，并注入测试媒体）
-scripts/emulators/android.sh start
-
-# 如需冷启动（忽略快照）
-scripts/emulators/android.sh start --cold
-
-# 查看模拟器状态
-scripts/emulators/android.sh status
+scripts/emulators/android.sh start          # 启动并自动等待就绪 + 注入测试媒体
+scripts/emulators/android.sh start --cold    # 冷启动（忽略快照）
+scripts/emulators/android.sh status          # 查看状态
 ```
 
-**方式二：纯命令行创建并启动 AVD（不需要 Android Studio）**
+**方式二：纯命令行创建 AVD**（无需 Android Studio）
 
 ```bash
-# 1. 安装 Android SDK 命令行工具（macOS）
-brew install --cask android-commandlinetools
-
-# 2. 接受许可协议
-yes | sdkmanager --licenses
-
-# 3. 安装必要组件
-sdkmanager "platform-tools" "platforms;android-34" "emulator" "system-images;android-34;google_apis;arm64-v8a"
-
-# 4. 创建 AVD
-avdmanager create avd -n CleanPic_API34 -k "system-images;android-34;google_apis;arm64-v8a" -d pixel_6
-
-# 5. 启动模拟器
-emulator -avd CleanPic_API34 &
-
-# 6. 等待启动完成
-adb wait-for-device
-adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done'
-echo "模拟器就绪"
+brew install --cask android-commandlinetools          # 1. 安装命令行工具（macOS）
+yes | sdkmanager --licenses                            # 2. 接受许可
+sdkmanager "platform-tools" "platforms;android-34" "emulator" "system-images;android-34;google_apis;arm64-v8a"  # 3. 安装组件
+avdmanager create avd -n CleanPic_API34 -k "system-images;android-34;google_apis;arm64-v8a" -d pixel_6           # 4. 创建 AVD
+emulator -avd CleanPic_API34 &                         # 5. 启动
+adb wait-for-device && adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done'  # 6. 等待就绪
 ```
 
-> Intel Mac 用 `x86_64` 替换 `arm64-v8a`。如果 `emulator` 不在 PATH 中，完整路径通常为 `$ANDROID_HOME/emulator/emulator`。
+> Intel Mac 用 `x86_64` 替换 `arm64-v8a`；`emulator` 不在 PATH 时完整路径通常为 `$ANDROID_HOME/emulator/emulator`。
+> 已有模拟器运行或连接了实机可跳过此步，`adb devices` 确认设备在线即可。
 
-> 如果已有模拟器运行中或连接了实机，可跳过此步。用 `adb devices` 确认设备在线即可。
-
-### 第二步：构建 APK
+### 2. 构建并安装
 
 ```bash
-scripts/build-android.sh           # 默认 direct flavor
-scripts/build-android.sh store     # 显式 store flavor
+scripts/build-android.sh        # 构建 direct flavor（store flavor：scripts/build-android.sh store）
+scripts/test-android.sh deploy  # 安装到已连接的设备 / 模拟器
 ```
 
-构建成功后，APK 输出路径：`androidApp/build/outputs/apk/direct/debug/刷刷鸭-direct.apk`（store flavor 对应 `apk/store/debug/刷刷鸭-store.apk`）
-
-### 第三步：安装并启动 App
-
-**方式一：使用脚本（推荐）**
+构建产物：`androidApp/build/outputs/apk/direct/debug/刷刷鸭-direct.apk`。手动安装亦可：
 
 ```bash
-# 安装 APK 到已连接的设备/模拟器
-scripts/test-android.sh deploy
-```
-
-**方式二：手动安装**
-
-```bash
-# 安装
 adb install -r androidApp/build/outputs/apk/direct/debug/刷刷鸭-direct.apk
-
-# 启动 App
 adb shell am start -n com.cleanpic.android/.MainActivity
 ```
 
-App 启动后，授予相册权限即可开始使用。
+App 启动后授予相册权限即可使用。
 
-### 一键完整流程
-
-如果你想从构建到 E2E 测试一步到位：
+### 3. 运行测试
 
 ```bash
-# 构建 + 部署 + 运行 E2E 测试（需要模拟器已启动 + Maestro 已安装）
-scripts/test-android.sh
+scripts/test.sh                                      # 全部单元测试（shared + update 模块）
+scripts/generate-test-assets.sh                      # 生成测试媒体（12 张照片 + 2 个视频，E2E 前需要）
+~/.maestro/bin/maestro test maestro/flows/direct/    # E2E 照片测试（25 个，需 Maestro + 模拟器 + 已部署 App）
+~/.maestro/bin/maestro test maestro/flows/direct/video/  # E2E 视频测试（7 个，额外需 ffmpeg 视频资源）
+
+scripts/test-android.sh         # 一键：构建 + 部署 + 跑全量 E2E
 ```
 
-### 运行测试
+## 构建变体与发布
+
+项目有 `direct` / `store` 两个 productFlavor：
+
+- **direct** — 含应用内升级，走 GitHub / Gitee Release 渠道分发
+- **store** — 编译期完全剥离应用内升级代码、URL、权限，用于上架各应用商店
 
 ```bash
-# 单元测试（71 用例）
-scripts/test.sh
+# direct 渠道发布（含自动更新）：更新版本号 → 构建 Release APK
+#   → 上传 Gitee（国内主源）+ GitHub（境外备用源）→ 更新 version.json（含匿名下载 sha256 门禁校验）
+./scripts/release-direct.sh 1.13.1 "更新说明"
 
-# 生成测试媒体（12 张照片 + 2 个视频，E2E 测试前需要）
-scripts/generate-test-assets.sh
-
-# E2E 照片测试（13 个流程，需要 Maestro + 模拟器 + 已部署 App + 相册中有照片）
-~/.maestro/bin/maestro test maestro/flows/
-
-# E2E 视频测试（5 个流程，额外需要 ffmpeg 生成的视频资源）
-~/.maestro/bin/maestro test maestro/flows/video/
+# store 渠道构建：编译期移除升级代码（经字节码扫描确认），需手动签名上架
+./scripts/build-store.sh 1.13.1
+# 输出: dist/刷刷鸭-store-v1.13.1.apk
 ```
 
-### 打包 Release APK
+## 自动更新机制
 
-```bash
-./gradlew :androidApp:assembleDirectRelease
-# 输出: androidApp/build/outputs/apk/direct/release/刷刷鸭-direct.apk
-```
+更新分发为**纯静态**，不依赖任何服务端（已弃用早期的 Cloudflare Worker）：
 
-> 项目有 `direct` / `store` 两个 productFlavor：
-> - **direct** — 含应用内升级，用于 GitHub Release 渠道分发
-> - **store** — 编译期完全剥离应用内升级代码、URL、权限，用于上架各应用商店
+1. **检测** — 客户端读取 Gitee 上的静态 `update/version.json`，与本地 versionCode 比较，判定无更新 / 可选更新 / 强制更新；网络异常安全降级为"已是最新"。
+2. **选源** — 下载前**并发探测** Gitee（国内主源）与 GitHub（境外备用源），只读响应头判定连通，自动选**当前网络最快可达**的线路——零地域判断，国内直连与境外梯子都适配。
+3. **下载** — 用 App 内 ktor（与检测同一网络栈，"能检查就能下"）流式下载到外部私有目录，实时回调进度；单源卡死 / 失败自动切换下一源。
+4. **校验与安装** — 对下载包做 `sha256` + ZIP 魔数完整性校验（挡住防盗链 / 风控返回的 HTML 伪装页），通过后经 FileProvider 拉起系统安装器。
 
-### 发布新版本（direct 渠道，含自动更新）
-
-```bash
-# 一键发布：更新版本号 → 构建 direct APK → GitHub Release → 部署 Worker
-./scripts/release-direct.sh 1.3.0 "更新说明"
-```
-
-首次使用需要配置 Cloudflare Workers，详见 [自动更新部署指南](docs/deployment/auto-update-setup.md)。
-
-### 商店渠道构建
-
-```bash
-./scripts/build-store.sh 1.3.0
-# 输出: dist/刷刷鸭-store-v1.3.0.apk（已通过字节码扫描，确认无升级相关代码）
-```
-
-store flavor 编译期完全移除应用内升级代码、URL 与权限，符合应用商店审核要求。商店上架需各渠道独立签名与元数据，请手动处理。
+> 设计详见 [自动更新设计文档](docs/architecture/cleanpic/auto-update.md)。
 
 ## 测试覆盖
 
-### 单元测试（L1）
+### 单元测试
 
 | 测试类 | 用例数 | 覆盖 |
 |--------|--------|------|
@@ -224,79 +187,52 @@ store flavor 编译期完全移除应用内升级代码、URL 与权限，符合
 | ThemeManagerTest | 6 | 5 主题切换、旧 ID 迁移回退、Token 完整性 |
 | ThemeTokensTest | 5 | 枚举值验证、WarmTheme 参数校验 |
 | AppSettingsTest | 5 | 读写、默认值、非法值防御、autoCheckUpdate |
-| UpdateCheckerTest | 18 | 版本比较、强制更新、平台提取、完整评估 |
-| AppIconsTest | 3 | 13 图标定义、主题参数跟随、未知名异常 |
-| SvgPathParserTest | 13 | SVG 命令解析（M/L/H/V/C/A/Z）、13 图标 path 全量验证 |
+| UpdateCheckerTest | 32 | 版本比较、强制更新、平台提取、完整评估、双端点 fallback |
+| DownloadSourceSelectorTest | 4 | 选源竞速：跳过失败源、最快优先、全失败、忽略 Range 仍成功 |
+| ApkDownloaderTest | 4 | ktor 流式下载、失败切源、完整性挡 HTML 伪装包、进度回调 |
+| ApkIntegrityTest | 6 | ZIP 魔数 / size / sha256 校验、缺字段向后兼容 |
+| AppIconsTest | 3 | 图标定义、主题参数跟随、未知名异常 |
+| SvgPathParserTest | 13 | SVG 命令解析（M/L/H/V/C/S/A/Z）、图标 path 全量验证 |
 | ViewerViewModelTest | 13 | 加载、标记、删除、统计 |
 | PlatformTest | 1 | 平台标识 |
 
-### E2E 测试（L4）
+### E2E 测试（Maestro）
 
-**照片测试（maestro/flows/，13 个）：**
-
-| 流程 | 场景 | 内容 |
-|------|------|------|
-| browse-photos | E01 | 完整照片清理：标记删除/保留 → 结果页验证 |
-| delete-confirm | E04 | 全部标记删除 → 确认删除 |
-| keep-all | E03 | 全部保留 → 验证无删除按钮 |
-| next-round | E02 | 完成一轮 → 再来一轮 |
-| switch-theme | E16 | 切换全部 5 个新主题并验证布局变化 |
-| swipe-card-mode | E11 | 卡片左右滑手势操作 |
-| round-count | E17 | 设置每轮数量为 5 |
-| photo-thumbnail | E04 | 照片缩略图展示验证 |
-| swipe-card-thumbnail | E10 | 卡片模式缩略图展示 |
-| result-stats-layout | E12 | 结果页统计布局验证 |
-| exit-button | E19 | 三种模式中途退出按钮 |
-| settings-update-section | EP6 | 设置页版本更新区域 UI 验证 |
-| auto-check-update-toggle | EP6 | 自动检查更新开关开/关 |
-
-**视频测试（maestro/flows/video/，5 个，需 ffmpeg 生成测试视频）：**
-
-| 流程 | 场景 | 内容 |
-|------|------|------|
-| video-cleanup | E07 | 视频清理流程 |
-| video-thumbnail | E06 | 视频缩略图+时长展示验证 |
-| fullscreen-video-playback | E09 | 全屏模式视频自动播放 |
-| carousel-video-playback | E08a | 轮播模式视频播放+静音 |
-| swipecard-video-playback | E08b | 卡片模式视频播放+静音 |
+- **照片**（`maestro/flows/direct/`，25 个）— 完整清理流程、删除确认、全部保留、再来一轮、5 主题切换、三种交互模式、缩略图、结果页统计、设置页更新区、自动检查更新开关、清理成果页等
+- **视频**（`maestro/flows/direct/video/`，7 个）— 视频清理、缩略图 + 时长、三种模式下的视频播放与静音
+- **store flavor**（`maestro/flows/store/`，16 个）— 验证商店版已剥离更新相关入口与请求
 
 ## 开发路线图
 
-### V1.0
+### V1.0 — 核心清理
 
-- [x] 随机照片清理（浏览 + 标记 + 确认删除）
-- [x] 随机视频清理
-- [x] 5 套主题切换
-- [x] 3 种交互模式（轮播/卡片滑动/全屏）
-- [x] 每轮数量可配置（5/10/15/20）
-- [x] 批量延迟删除 + 反悔
-- [x] 再来一轮（自动去重）
-- [x] Android 权限请求流程
-- [x] 真实照片/视频缩略图加载（Coil 3）
-- [x] 视频播放器集成（ExoPlayer，三种模式均支持）
+- [x] 随机照片 / 视频清理（浏览 + 标记 + 确认删除）
+- [x] 5 套主题切换 · 3 种交互模式（轮播 / 卡片滑动 / 全屏）
+- [x] 每轮数量可配置（5/10/15/20）· 批量延迟删除 + 反悔 · 再来一轮（自动去重）
+- [x] Android 权限请求流程 · 真实缩略图加载（Coil 3）· 视频播放（ExoPlayer，三种模式）
 
-### V1.1
+### V1.1 — 主题与图标
 
 - [x] **UI 主题全面重设计** — 5 个主题各有独立布局，切换主题等于换一个 App
-- [x] **矢量图标系统** — SVG Path 解析器 + Canvas 渲染，13 个主题化图标替换全部 emoji
+- [x] **矢量图标系统** — SVG Path 解析器 + Canvas 渲染，主题化图标替换全部 emoji
 - [x] **State 分发架构** — 业务逻辑与 UI 布局分离，每页 5 个布局变体
 
-### V1.2（当前）
+### V1.2 — 自动更新
 
-- [x] **自动更新系统** — Cloudflare Workers 版本检查 API + GitHub Release 下载代理，支持强制/可选更新
-- [x] **设置页更新入口** — 自动检查更新开关、手动检查按钮、红点提示新版本
-- [x] **一键发布脚本** — `scripts/release-direct.sh` 自动完成版本号更新→构建→GitHub Release→Worker 部署
-- [ ] iOS 平台适配
-- [ ] 删除动画效果
-- [ ] 相册权限 LIMITED 模式下的增量授权引导
+- [x] **自动更新系统** — 版本检查 + 更新弹窗，支持强制 / 可选更新
+- [x] **设置页更新入口** — 自动检查开关、手动检查按钮、红点提示新版本
+- [x] **一键发布脚本** — `scripts/release-direct.sh` 自动完成版本号更新 → 构建 → Release
 
-### V1.3（规划中）
+### V1.3（当前，v1.13.x）
 
+- [x] **清理成果统计页** — 累计已清理数量、分类构成、设备存储情况（全程离线，仅存本机）
+- [x] **分发改纯静态** — Gitee 静态 version.json（国内主源）+ GitHub Release（境外备用），替代 Cloudflare Worker
+- [x] **多源自适应下载** — App 内 ktor 流式下载 + 选源竞速，自动选最快可达线路，修复梯子环境下载卡在 0% 的问题
 - [ ] HarmonyOS NEXT 适配
-- [ ] 数据统计（累计清理张数、释放空间）
 - [ ] 清理历史记录
 - [ ] Widget 桌面小组件（"今日清理"快捷入口）
 - [ ] 减少动效模式（响应系统无障碍偏好）
+- [ ] iOS 平台适配
 
 ### V2.0（远期）
 
@@ -315,7 +251,6 @@ store flavor 编译期完全移除应用内升级代码、URL 与权限，符合
 | 主题系统（v2） | [docs/architecture/cleanpic/theme-system.md](docs/architecture/cleanpic/theme-system.md) |
 | UI 重设计 Spec | [docs/superpowers/specs/2026-04-04-ui-theme-redesign-design.md](docs/superpowers/specs/2026-04-04-ui-theme-redesign-design.md) |
 | 自动更新设计 | [docs/architecture/cleanpic/auto-update.md](docs/architecture/cleanpic/auto-update.md) |
-| 自动更新部署指南 | [docs/deployment/auto-update-setup.md](docs/deployment/auto-update-setup.md) |
 | 测试策略 | [docs/testing/strategy.md](docs/testing/strategy.md) |
 | 测试场景 | [docs/testing/scenarios/](docs/testing/scenarios/) |
 

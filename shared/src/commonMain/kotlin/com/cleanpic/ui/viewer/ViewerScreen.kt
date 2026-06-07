@@ -35,6 +35,7 @@ fun ViewerScreen(
 
     LaunchedEffect(viewerViewModel.isComplete, currentIndex) {
         if (items.isNotEmpty() && currentIndex >= items.size) {
+            viewerViewModel.recordRoundReached()
             router.navigate(
                 Route.Result,
                 clearBackStackUpTo = Route.Viewer(type),

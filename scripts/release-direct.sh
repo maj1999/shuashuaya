@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# 发布 direct flavor 新版本：构建 Release APK → 创建 GitHub Release → 更新 Worker
+# 发布 direct flavor 新版本：构建 Release APK → 提交打 Tag → GitHub Releases(境外备用源) → Gitee(国内主源 + 写 version.json)
 #
 # 用法:
 #   ./scripts/release-direct.sh 1.2.0 "修复了xxx，新增了xxx"
@@ -116,39 +116,44 @@ fi
 APK_SIZE=$(du -h "$APK_PATH" | cut -f1)
 echo "  ✅ APK 构建成功 ($APK_SIZE)"
 
-# Step 4.5: 发布到 Gitee 国内分发渠道（门禁式：上传 + 匿名下载校验通过才更新 version.json）
-# 必须在改 Worker / 发 GitHub 之前完成——Worker 的 android downloadUrl 按 version 确定性指向 Gitee，
-# 若 Gitee 无对应 Release 则存量 app 下载 404，故 Gitee 先行且带下载门禁。
+# Step 4.5: 提交版本号变更 + 打 Tag + 推送（GitHub Release 需要 tag 先就位）
 echo ""
-echo "【国内渠道】发布到 Gitee ..."
-"$SCRIPT_DIR/gitee-publish.sh" "$VERSION" "$APK_PATH" "$NEW_CODE" "$CHANGELOG"
-
-# Step 5: 提交版本号变更 + 打 Tag + 创建 GitHub Release
-echo ""
-echo "【5/5】创建 GitHub Release..."
+echo "【4.5/6】提交版本变更并打 Tag ${TAG} ..."
 cd "$PROJECT_ROOT"
 git add "$BUILD_CONFIG" "$PROJECT_ROOT/shared/src/commonMain/kotlin/com/cleanpic/AppInfo.kt"
 git commit -m "chore: bump version to ${VERSION}"
 git tag "$TAG"
 retry git push origin main
 retry git push origin "$TAG"
+echo "  ✅ 已提交并推送 ${TAG}"
 
-# GitHub 不支持中文资产名，复制为 ASCII 文件名上传
-UPLOAD_APK="/tmp/shuashuaya-direct.apk"
-cp "$APK_PATH" "$UPLOAD_APK"
+# Step 5: 发布到 GitHub Releases（境外备用下载源，门禁式）。best-effort：
+#   失败不阻断国内发布（Gitee 才是主源），仅令 version.json 的 downloadUrlFallback 留空。
+echo ""
+echo "【5/6】发布境外备用源到 GitHub Releases ..."
+FALLBACK_URL=""
+if FALLBACK_URL="$("$SCRIPT_DIR/github-publish.sh" "$VERSION" "$APK_PATH" "$CHANGELOG")"; then
+    echo "  ✅ 备用源就绪：$FALLBACK_URL"
+else
+    FALLBACK_URL=""
+    echo "  ⚠️ GitHub 备用源发布/门禁失败，本次仅发 Gitee（境外用户体验不变）。请稍后排查后重发。"
+fi
 
-retry gh release create "$TAG" "$UPLOAD_APK" \
-    --title "v${VERSION}" \
-    --notes "$CHANGELOG"
-echo "  ✅ GitHub Release 创建成功"
+# Step 6: 发布到 Gitee 国内分发渠道（门禁式：上传 + 匿名下载校验通过才更新 version.json）。
+#   把已门禁校验过的 GitHub URL 作为 downloadUrlFallback 一并写入，供客户端境外下载失败时自动回退。
+echo ""
+echo "【6/6】发布国内主源到 Gitee ..."
+DLURL_FALLBACK="$FALLBACK_URL" "$SCRIPT_DIR/gitee-publish.sh" "$VERSION" "$APK_PATH" "$NEW_CODE" "$CHANGELOG"
 
-# 更新检测改为只走 Gitee（update/version.json，已在第 4.5 步发布），
-# 不再部署 Cloudflare Worker。客户端端点见 UpdateWiring.kt（仅 UPDATE_API_URL_CN）。
+# 更新检测只走 Gitee（update/version.json），下载主源 Gitee + 备用源 GitHub，不再部署 Cloudflare Worker。
+# 客户端端点见 UpdateWiring.kt（仅 UPDATE_API_URL_CN）；下载回退逻辑见 AndroidUpdateInstaller.kt。
 
 echo ""
 echo "══════════════════════════════════════"
 echo "  ✅ v${VERSION} 发布完成！"
 echo ""
 echo "  APK: $APK_PATH"
-echo "  Release: https://github.com/maj1999/shuashuaya/releases/tag/${TAG}"
+echo "  国内主源 (Gitee): update/version.json downloadUrl"
+echo "  境外备用源 (GitHub): ${FALLBACK_URL:-（本次未发布 / 门禁未通过）}"
+echo "  GitHub Release: https://github.com/maj1999/shuashuaya/releases/tag/${TAG}"
 echo "══════════════════════════════════════"

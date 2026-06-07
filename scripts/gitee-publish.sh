@@ -30,6 +30,9 @@ ASSET="shuashuaya-direct.apk"
 API="https://gitee.com/api/v5"
 REPO="${GITEE_OWNER}/${GITEE_DIST_REPO}"
 DLURL="https://gitee.com/${REPO}/releases/download/${TAG}/${ASSET}"
+# 境外备用下载源（GitHub Releases）。由 release-direct.sh 经 github-publish.sh 门禁校验后通过环境变量传入；
+# 缺省为空 → version.json 的 downloadUrlFallback 留空，客户端只走 Gitee（与旧行为一致）。
+DLURL_FALLBACK="${DLURL_FALLBACK:-}"
 
 [ -f "$APK" ] || { echo "❌ APK 不存在: $APK"; exit 1; }
 SHA="$(shasum -a 256 "$APK" | cut -d' ' -f1)"
@@ -73,7 +76,7 @@ echo "【Gitee 4/4】更新 update/version.json ..."
 CL_JSON="$CHANGELOG"
 cat > /tmp/version.json <<EOF
 {
-  "android": { "version": "${VERSION}", "versionCode": ${VCODE}, "forceUpdate": false, "minVersion": "1.0.0", "changelog": "${CL_JSON}", "downloadUrl": "${DLURL}", "sha256": "${SHA}", "size": ${SIZE} },
+  "android": { "version": "${VERSION}", "versionCode": ${VCODE}, "forceUpdate": false, "minVersion": "1.0.0", "changelog": "${CL_JSON}", "downloadUrl": "${DLURL}", "downloadUrlFallback": "${DLURL_FALLBACK}", "sha256": "${SHA}", "size": ${SIZE} },
   "ios": { "version": "${VERSION}", "forceUpdate": false, "minVersion": "1.0.0", "changelog": "${CL_JSON}", "downloadUrl": "" },
   "harmonyos": { "version": "${VERSION}", "versionCode": ${VCODE}, "forceUpdate": false, "minVersion": "1.0.0", "changelog": "${CL_JSON}", "downloadUrl": "", "sha256": "", "size": 0 }
 }

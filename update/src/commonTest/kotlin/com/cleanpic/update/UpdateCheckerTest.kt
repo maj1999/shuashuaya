@@ -209,4 +209,53 @@ class UpdateCheckerTest {
         assertEquals("", resp.android?.sha256)
         assertEquals(0L, resp.android?.size)
     }
+
+    // ── U-UPD-12 境外备用下载源（downloadUrlFallback）解析 + 候选源排序 ──
+
+    @Test fun version_json_with_fallback_url_parses() {
+        val raw = """
+            {"android":{"version":"1.11.0","downloadUrl":"https://gitee.com/o/r/releases/download/v1.11.0/a.apk",
+            "downloadUrlFallback":"https://github.com/o/r/releases/download/v1.11.0/a.apk","sha256":"abc","size":1}}
+        """.trimIndent()
+        val resp = Json { ignoreUnknownKeys = true }.decodeFromString(VersionResponse.serializer(), raw)
+        assertEquals("https://github.com/o/r/releases/download/v1.11.0/a.apk", resp.android?.downloadUrlFallback)
+    }
+
+    @Test fun version_json_without_fallback_url_defaults_empty() {
+        // 旧 version.json 无该字段 → 默认空，行为与升级前一致（只走主源）
+        val raw = """{"android":{"version":"1.11.0","downloadUrl":"https://gitee.com/x.apk"}}"""
+        val resp = Json { ignoreUnknownKeys = true }.decodeFromString(VersionResponse.serializer(), raw)
+        assertEquals("", resp.android?.downloadUrlFallback)
+    }
+
+    @Test fun download_candidates_primary_then_fallback() {
+        val info = UpdateInfo(
+            version = "1.11.0",
+            downloadUrl = "https://gitee.com/x.apk",
+            downloadUrlFallback = "https://github.com/x.apk"
+        )
+        assertEquals(
+            listOf("https://gitee.com/x.apk", "https://github.com/x.apk"),
+            info.downloadCandidates()
+        )
+    }
+
+    @Test fun download_candidates_skips_blank_fallback() {
+        val info = UpdateInfo(version = "1.11.0", downloadUrl = "https://gitee.com/x.apk")
+        assertEquals(listOf("https://gitee.com/x.apk"), info.downloadCandidates())
+    }
+
+    @Test fun download_candidates_dedups_identical_sources() {
+        val info = UpdateInfo(
+            version = "1.11.0",
+            downloadUrl = "https://same.com/x.apk",
+            downloadUrlFallback = "https://same.com/x.apk"
+        )
+        assertEquals(listOf("https://same.com/x.apk"), info.downloadCandidates())
+    }
+
+    @Test fun download_candidates_empty_when_no_url() {
+        val info = UpdateInfo(version = "1.11.0")
+        assertTrue(info.downloadCandidates().isEmpty())
+    }
 }

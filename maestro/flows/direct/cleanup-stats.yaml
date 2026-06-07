@@ -1,0 +1,30 @@
+# maestro/flows/direct/cleanup-stats.yaml
+#
+# E2E: 清理成果页验证
+# 从首页点击统计入口，验证 StatsScreen 各区块文案可见
+# 对应: feat/cleanup-stats
+#
+appId: com.cleanpic.android
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "stats_button"
+    timeout: 30000
+- waitForAnimationToEnd
+
+# 点击清理成果入口
+- tapOn:
+    id: "stats_button"
+- waitForAnimationToEnd
+
+# 验证清理成果页各区块文案
+- assertVisible: "清理成果"
+- assertVisible: "累计已清理"
+- assertVisible: "分类构成"
+- assertVisible: "设备存储"
+- assertVisible: "全程离线 · 清理记录仅存本机，不上传"
+
+# 截图留存
+- takeScreenshot: maestro/screenshots/cleanup-stats

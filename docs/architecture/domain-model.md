@@ -55,6 +55,15 @@
 | 向后翻看 | goNext | 轮播模式左滑切到下一个媒体；离开项未决策则默认保留，已决策保持原样 |
 | 向前翻看 | goPrevious | 轮播模式右滑切回上一个媒体；纯位移，不改任何项的决定 |
 | 默认保留 | PENDING→KEPT on goNext | 轮播左滑离开未决策项时的隐式保留语义，区别于显式点「保留」 |
+| 清理成果 | StatsScreen | 统计页：累计已清理大小/数量/完成轮次 + 照片/视频分项 + 设备存储 + 离线声明 + 语录 |
+| 完成轮次 | LifetimeStats.totalRounds | 累计"一轮清理"完成次数；到达结果页即 +1（无论删留），与清理量解耦 |
+| 清理统计 | StatsSnapshot | 持久化的清理累计：LifetimeStats（按类型）+ DailyStat 按天明细 |
+| 类型统计 | MediaTypeStats | 单一类型（照片或视频）的 bytes/count/rounds 三元组 |
+| 统计编解码 | StatsCodec | StatsSnapshot 的零依赖紧凑编解码（仿 PickStateCodec，不引 serialization-json） |
+| 统计聚合 | StatsAggregator | 把单次清理事件并入快照的纯函数（轮次/清理量解耦、按天聚合） |
+| 清理统计存储 | StatsStore | 持久化 StatsSnapshot 的接口（load/recordRoundReached/recordDeletion/reset） |
+| 清理语录 | CleanupQuotes | 治愈温柔语录池 + 情境化选句（首次/连续/日常） |
+| 设备存储 | StorageInfo | 设备主分区 total/available 字节（StatFs / NSFileManager） |
 
 ## 核心数据模型
 
@@ -73,4 +82,11 @@ ViewerItem (浏览页运行时)
 ├── media: MediaItem
 ├── state: PENDING | KEPT | PENDING_DELETE
 └── thumbnailLoaded: Boolean
+
+StatsSnapshot (清理统计持久化)
+├── lifetime: LifetimeStats
+│   ├── photo / video: MediaTypeStats(bytes, count, rounds)
+│   ├── firstCleanupAt / lastCleanupAt: Long
+│   └── total{Bytes,Count,Rounds}: 派生 = photo + video
+└── daily: List<DailyStat>(date, photo, video)  — 按天明细，阶段一只采集不展示
 ```

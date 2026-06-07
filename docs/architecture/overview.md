@@ -67,12 +67,14 @@ graph TB
 | ui/viewer | 核心浏览页，承载 3 种交互模式 | shared |
 | ui/result | 结果统计 + 删除确认 + 再来一轮 | shared |
 | ui/settings | 主题/模式/数量切换 | shared |
+| ui/stats | 清理成果统计页（累计/分类/存储/离线，5 主题适配） | shared |
 | ThemeManager | 主题状态管理，切换时更新全局 Token + 布局标识 | shared |
 | AppIcons | 统一矢量图标入口，根据主题 Token 返回对应风格的 ImageVector | shared |
 | InteractionMode | 3 种浏览交互的统一接口 | shared |
 | MediaRepository | 媒体查询/删除的跨平台抽象 (expect/actual) | shared + 各平台 |
 | RandomPicker | 纯函数随机选取（Shuffle Bag 洗牌袋 + 保留沉底 + 删除自愈） | shared |
 | PickStateStore | 持久化浏览记忆 PickState 的跨平台抽象 (expect/actual) | shared + 各平台 |
+| StatsStore | 持久化清理统计 StatsSnapshot（按类型累计 + 按天明细），紧凑编码 | shared + 各平台 |
 | AppSettings | 偏好持久化的跨平台抽象 (expect/actual) | shared + 各平台 |
 | VideoPlayer | 视频播放的跨平台抽象 (expect/actual) | shared + 各平台 |
 | AppHooks | shared 对外的插槽接口，宿主通过它注入升级 UI 与回调 | shared |
@@ -88,6 +90,7 @@ graph TB
 | 原生 Module | [cleanpic/native-modules.md](cleanpic/native-modules.md) | MediaModule/PermissionModule/VideoPlayer 各平台实现 |
 | 自动升级 | [cleanpic/auto-update.md](cleanpic/auto-update.md) | UpdateChecker/UpdateInstaller + Cloudflare Workers 后端 |
 | 升级的分发隔离 | [cleanpic/auto-update-distribution.md](cleanpic/auto-update-distribution.md) | `:update` 独立模块、shared 脱钩、direct/store flavor、iOS 预留方案 |
+| 清理成果统计 | [cleanpic/cleanup-stats.md](cleanpic/cleanup-stats.md) | 按类型累计 + 统计页（5 主题）+ 首页入口（US-CP-27） |
 | 技术栈选型 | [tech-stack.md](tech-stack.md) | 框架选型对比与最终决策 |
 | 领域模型 | [domain-model.md](domain-model.md) | 业务术语 <-> 技术术语映射 SSOT |
 

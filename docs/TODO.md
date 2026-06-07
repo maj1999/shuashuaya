@@ -29,6 +29,7 @@
 - [x] `architecture/cleanpic/viewer-video-playback.md` — 全屏视频播放：静音统一 + 单播放器 + 拖拽进度条（US-CP-18/25）
 - [x] `architecture/cleanpic/viewer-immersive.md` — 全屏沉浸模式：单击隐藏/显示界面（US-CP-26）
 - [x] `architecture/cleanpic/auto-update-china-gitee.md` — 国内自动升级分发（Gitee 双端点 + 存量迁移）
+- [x] `architecture/cleanpic/cleanup-stats.md` — 清理成果统计：按类型累计 + 统计页 + 首页入口（US-CP-27）
 
 ## 部署层
 
@@ -44,11 +45,13 @@
 - [x] `testing/scenarios/ep6-auto-update.md` — EP6 自动升级场景
 - [x] `testing/scenarios/tech-nfr.md` — NFR 性能/兼容性/安全
 - [x] `testing/scenarios/ep7-random-enhancement.md` — EP7 随机算法增强场景（US-CP-22/23）
+- [x] `testing/scenarios/ep8-cleanup-stats.md` — EP8 清理成果统计场景（US-CP-27）
 
 ## 设计 Spec
 
 - [x] `superpowers/specs/2026-04-04-ui-theme-redesign-design.md` — UI 主题重设计 Spec
 - [x] `superpowers/specs/2026-06-06-shuffle-bag-random-design.md` — 随机算法优化 Shuffle Bag 设计 Spec
+- [x] `superpowers/specs/2026-06-07-cleanup-stats-design.md` — 清理成果统计设计 Spec（含五主题 UI mockup）
 
 ## 实现计划
 
@@ -56,3 +59,4 @@
 - [x] `superpowers/plans/2026-04-04-ui-theme-redesign-plan-b-warm-theme.md` — Plan B 温暖主题端到端
 - [x] `superpowers/plans/2026-04-04-ui-theme-redesign-plan-c-remaining-themes.md` — Plan C 剩余 4 主题
 - [x] `superpowers/plans/2026-04-18-update-flavor-split.md` — 升级模块分发渠道隔离
+- [x] `superpowers/plans/2026-06-07-cleanup-stats.md` — 清理成果统计（阶段一）实现计划

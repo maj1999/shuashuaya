@@ -100,4 +100,5 @@ shared/src/commonTest/kotlin/com/cleanpic/
 | [scenarios/ep5-browsing-enhancement.md](scenarios/ep5-browsing-enhancement.md) | EP5 浏览体验增强 | E19a-E19c, E22a-E22e, E23a-E23c, U-UNDO-01~07 |
 | [scenarios/ep6-auto-update.md](scenarios/ep6-auto-update.md) | EP6 自动升级 | U-UPD-01~07, B-UPD-01~03（构建产物扫描）, E-UPD-01~15 |
 | [scenarios/ep7-random-enhancement.md](scenarios/ep7-random-enhancement.md) | EP7 随机算法增强 | U-RP-01~11, I-VM-01~06, E-RP-01~02 |
+| [scenarios/ep8-cleanup-stats.md](scenarios/ep8-cleanup-stats.md) | EP8 清理成果统计 | U-ST-CD/AG/QT-*, I-ST-01~04, E-ST-01~02 |
 | [scenarios/tech-nfr.md](scenarios/tech-nfr.md) | NFR + 权限 + 兼容性 | P01-P06, F01-F08, 兼容性矩阵 |

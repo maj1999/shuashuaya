@@ -140,4 +140,84 @@ class SvgPathParserTest {
         assertEquals("5.64", tokens[6])  // x
         assertEquals("5.64", tokens[7])  // y
     }
+
+    // ---- S/s 命令的 tokenizer 层测试（JVM 实跑，不依赖 Compose） ----
+
+    /**
+     * 测试 1：shield path 的 tokenize 验证。
+     *
+     * path: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4"
+     * 验证 `s` 命令 token 存在，及其后续 4 个数值参数被正确切出。
+     */
+    @Test fun tokenize_shield_path_contains_s_command_with_params() {
+        val data = "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4"
+        val tokens = tokenizeSvgPath(data)
+
+        // 应当包含 "s" 命令 token
+        assertTrue("tokenizer 应产出 's' 命令 token") { tokens.contains("s") }
+
+        // 找到 "s" 的位置，验证后续 4 个参数：8 -4 8 -10
+        val sIdx = tokens.indexOf("s")
+        assertTrue("'s' 后应至少有 4 个参数") { tokens.size > sIdx + 4 }
+        assertEquals("8",   tokens[sIdx + 1], "'s' 第1参数(dx2)应为 8")
+        assertEquals("-4",  tokens[sIdx + 2], "'s' 第2参数(dy2)应为 -4")
+        assertEquals("8",   tokens[sIdx + 3], "'s' 第3参数(dx)应为 8")
+        assertEquals("-10", tokens[sIdx + 4], "'s' 第4参数(dy)应为 -10")
+    }
+
+    /**
+     * 测试 2：S（绝对）和 s（相对）命令均能被识别，且每段 4 个参数。
+     *
+     * 对于 S/s，每段参数：x2 y2 x y（共 4 个）。
+     * 此测试构造最简路径，断言 token 结构正确。
+     */
+    @Test fun tokenize_absolute_S_and_relative_s_commands_recognized() {
+        // 绝对 S：S x2 y2 x y
+        val tokensS = tokenizeSvgPath("M0 0 S10 10 20 0")
+        val sIdx = tokensS.indexOf("S")
+        assertTrue("应包含 'S' 命令 token") { sIdx >= 0 }
+        assertEquals(4, tokensS.size - sIdx - 1, "S 后应有恰好 4 个数值 token")
+        assertEquals("10", tokensS[sIdx + 1])
+        assertEquals("10", tokensS[sIdx + 2])
+        assertEquals("20", tokensS[sIdx + 3])
+        assertEquals("0",  tokensS[sIdx + 4])
+
+        // 相对 s：s dx2 dy2 dx dy
+        val tokenss = tokenizeSvgPath("M0 0 s10 10 20 0")
+        val lsIdx = tokenss.indexOf("s")
+        assertTrue("应包含 's' 命令 token") { lsIdx >= 0 }
+        assertEquals(4, tokenss.size - lsIdx - 1, "s 后应有恰好 4 个数值 token")
+        assertEquals("10", tokenss[lsIdx + 1])
+        assertEquals("10", tokenss[lsIdx + 2])
+        assertEquals("20", tokenss[lsIdx + 3])
+        assertEquals("0",  tokenss[lsIdx + 4])
+    }
+
+    /**
+     * 测试 3：S/s 反射控制点的数值验证。
+     *
+     * 纯粹的反射计算（cp1 = 2*current - lastCtrl）只在 parseSvgPath 中对 Compose Path
+     * 调用 cubicTo 时体现，无法在纯 JVM 环境中直接断言 Path 的控制点数值。
+     * 因此此处改为验证：含 S 命令的完整 path 字符串可被正确 tokenize 且不抛异常，
+     * 并通过参数数量断言确保 S 后的显式参数（x2 y2 x y）被完整解析——
+     * 这覆盖了 S/s 崩溃的直接触发点（tokenizer 层未认识命令导致解析失败）。
+     *
+     * 若未来 Compose 可在 JVM 测试环境中使用，可在此补充 parseSvgPath 的控制点断言。
+     */
+    @Test fun tokenize_S_after_C_produces_correct_token_count() {
+        // "M0 0 C0 0 10 10 10 10 S20 0 20 10" — C 后跟 S
+        val tokens = tokenizeSvgPath("M0 0 C0 0 10 10 10 10 S20 0 20 10")
+        // 预期：M 0 0 C 0 0 10 10 10 10 S 20 0 20 10  → 15 个 token
+        assertEquals(
+            listOf("M", "0", "0", "C", "0", "0", "10", "10", "10", "10", "S", "20", "0", "20", "10"),
+            tokens,
+            "C 后跟 S 的 path 应被完整 tokenize"
+        )
+        // S 的位置及 4 个显式参数
+        val sIdx = tokens.indexOf("S")
+        assertEquals("20", tokens[sIdx + 1], "S x2")
+        assertEquals("0",  tokens[sIdx + 2], "S y2")
+        assertEquals("20", tokens[sIdx + 3], "S x")
+        assertEquals("10", tokens[sIdx + 4], "S y")
+    }
 }

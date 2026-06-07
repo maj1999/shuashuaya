@@ -20,6 +20,7 @@ fun parseSvgPath(data: String): Path {
     var subpathStartY = 0f
     var lastCommand = ' '
     // 上一个三次贝塞尔控制点（用于 S/s 命令的反射）
+    // 初始值 = currentX/Y（均为 0f），首个无前驱 S/s 自然退化为 cp1=current
     var lastCubicCtrlX = 0f
     var lastCubicCtrlY = 0f
 
@@ -176,7 +177,7 @@ fun parseSvgPath(data: String): Path {
             else -> throw IllegalArgumentException("SVG path: 不支持的命令 '$cmd'")
         }
         // 非三次贝塞尔命令后重置控制点（使 S/s 退化为二次曲线）
-        if (cmd !in listOf('C', 'c', 'S', 's')) {
+        if (cmd != 'C' && cmd != 'c' && cmd != 'S' && cmd != 's') {
             lastCubicCtrlX = currentX; lastCubicCtrlY = currentY
         }
         lastCommand = cmd

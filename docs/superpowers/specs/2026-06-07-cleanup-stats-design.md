@@ -133,11 +133,18 @@ interface StatsStore {
 4. **离线信任声明**：盾牌图标 +「全程离线 · 清理记录仅存本机，不上传」。
 5. （阶段二/三的徽章/趋势/月度回顾等暂不渲染，留结构。）
 
-**图标**：用 Lucide（lucide.dev，MIT）图标，**SVG path 内联**喂给现有 `icons/SvgPathParser`，不引网络依赖。阶段一用到：`chevron-left`(返回)、`image`(照片)、`film`(视频)、`hard-drive`(存储)、`shield-check`(离线)。描边粗细跟随各主题 `iconStrokeWidth` token（极简 1.4 / 几何 2.5 / 暖 1.8 / 活泼 2.2 / 杂志 1.1）。**不用任何 emoji**。语录前不加图标（避免 `sparkles` 类星形被误认为 emoji）。
+**图标**：用 Lucide（lucide.dev，MIT）图标，**SVG path 内联**喂给现有 `icons/SvgPathParser`，不引网络依赖。阶段一用到：`chevron-left`(返回)、`image`(照片)、`film`(视频)、`hard-drive`(存储)、`shield-check`(离线)、`bar-chart-3`(首页入口)。描边粗细跟随各主题 `iconStrokeWidth` token（极简 1.4 / 几何 2.5 / 暖 1.8 / 活泼 2.2 / 杂志 1.1）。**不用任何 emoji**。语录前不加图标（避免 `sparkles` 类星形被误认为 emoji）。
 
-### 6.2 首页入口
+### 6.2 首页入口（纯图标 · 与设置并排）
 
-`HomeScreen` 增加"清理成果"卡片/入口，导航到 `Route.Stats`。正反馈要显眼，不藏进设置。
+在首页**设置图标的邻位**新增一个统计图标（Lucide `bar-chart-3`），点击 `router.navigate(Route.Stats)`。纯图标、不露数字、不占首页版面，让主功能（清理照片/视频）保持主角。
+
+各主题按自身首页布局把图标放在设置图标旁（定稿见 `home-entry-mockup.html` / `home-entry-clean.png`）：
+- Minimal / Editorial：右上顶栏，设置图标左侧。
+- Warm：底部图标区，设置图标左侧并排。
+- Geometric / Playful：按各自首页的设置图标位置同侧放置。
+
+描边随各主题 `iconStrokeWidth`；与设置图标同尺寸同色。改动落在 5 个 `*HomeLayout.kt` + `HomeScreenState`（加 `onOpenStats` 回调）+ `HomeScreen.kt`（接 `Route.Stats` 导航）。
 
 ### 6.3 结果页升级 `ResultScreen`
 

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>刷刷鸭 · 首页「清理成果」纯图标入口</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Noto+Serif+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-font-smoothing:antialiased; }
+  body { background:#0c0c10; background-image:radial-gradient(circle at 20% 10%, #1b1b26 0%, #0c0c10 60%);
+    font-family:'Noto Sans SC',sans-serif; padding:46px 50px 56px; display:flex; flex-direction:column; align-items:center; gap:30px; }
+  .deck-title { color:#e8e8ef; font-size:25px; font-weight:700; letter-spacing:.03em; }
+  .deck-sub { color:#8a8a98; font-size:13.5px; margin-top:-18px; text-align:center; line-height:1.6; }
+  .deck-sub b { color:#ffb454; font-weight:600; }
+  .row { display:flex; gap:64px; align-items:flex-start; }
+  .lucide { width:16px; height:16px; stroke-width:2; flex:none; }
+
+  .phone { width:340px; height:720px; border-radius:42px; overflow:hidden; position:relative;
+    box-shadow:0 30px 70px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.04); display:flex; flex-direction:column; }
+  .stack { display:flex; flex-direction:column; align-items:center; position:relative; }
+  .label { color:#c9c9d6; font-size:14px; text-align:center; margin-top:14px; letter-spacing:.05em; }
+  .label small { color:#6c6c7a; display:block; font-size:11px; margin-top:3px; letter-spacing:.12em; text-transform:uppercase; }
+
+  .statusbar { height:40px; display:flex; align-items:center; justify-content:space-between; padding:0 22px; font-size:13px; font-weight:600; }
+  .statusbar .bat { width:22px; height:11px; border-radius:3px; border:1.4px solid currentColor; position:relative; opacity:.85;}
+  .statusbar .bat::after{ content:''; position:absolute; right:-3px; top:3px; width:2px; height:5px; background:currentColor; border-radius:0 1px 1px 0;}
+
+  .entry-ico { display:flex; align-items:center; justify-content:center; }
+
+  /* ========= WARM ========= */
+  .t-warm { background:#FFF8F0; color:#5D4037; display:flex; flex-direction:column; padding:0 24px; }
+  .t-warm .top { height:60px; }
+  .t-warm .h1 { font-family:'Noto Serif SC',serif; font-size:34px; font-weight:700; }
+  .t-warm .h2 { font-size:14px; color:#A1887F; margin-top:6px; }
+  .t-warm .grow { flex:1; }
+  .t-warm .card { background:#fff; border-radius:20px; box-shadow:0 2px 12px rgba(93,64,55,.12); padding:17px 18px; display:flex; align-items:center; gap:15px; }
+  .t-warm .card + .card { margin-top:14px; }
+  .t-warm .ico { width:46px; height:46px; border-radius:13px; background:#FBEEE6; display:flex; align-items:center; justify-content:center; flex:none; }
+  .t-warm .ico .lucide { width:23px; height:23px; color:#8D6E63; stroke-width:1.8; }
+  .t-warm .ttl { font-size:16.5px; font-weight:600; }
+  .t-warm .desc { font-size:12.5px; color:#A1887F; margin-top:2px; }
+  .t-warm .arr { color:#C8B3A8; font-size:23px; }
+  .t-warm .footbar { display:flex; justify-content:center; align-items:center; gap:30px; padding-bottom:34px; }
+  .t-warm .footbar .lucide { width:26px; height:26px; color:#8D6E63; stroke-width:1.8; }
+
+  /* ========= MINIMAL ========= */
+  .t-minimal { background:#FAFAFA; color:#333; display:flex; flex-direction:column; padding:0 32px; }
+  .t-minimal .top { height:54px; }
+  .t-minimal .bar { display:flex; align-items:center; justify-content:space-between; }
+  .t-minimal .brand { font-size:13px; letter-spacing:3px; color:#333; }
+  .t-minimal .acts { display:flex; align-items:center; gap:18px; }
+  .t-minimal .acts .lucide { width:20px; height:20px; color:#999; stroke-width:1.4; }
+  .t-minimal .divider { width:40px; height:1px; background:#333; margin-top:8px; }
+  .t-minimal .grow { flex:1; }
+  .t-minimal .tabs { display:flex; gap:24px; }
+  .t-minimal .tab { font-size:13px; color:#999; }
+  .t-minimal .tab.on { color:#333; font-weight:500; border-bottom:1px solid #333; padding-bottom:4px; }
+  .t-minimal .bigico { display:flex; justify-content:center; }
+  .t-minimal .bigico .lucide { width:54px; height:54px; color:#CCC; stroke-width:1.4; }
+  .t-minimal .startbtn { height:48px; border:1px solid #333; border-radius:2px; display:flex; align-items:center; justify-content:center; font-size:13px; letter-spacing:2px; }
+</style>
+</head>
+<body>
+  <div class="deck-title">刷刷鸭 · 首页「清理成果」入口（A 方案：纯图标 · 与设置并排）</div>
+  <div class="deck-sub">入口缩为一个<b>统计图标</b>，紧挨设置图标，不露数字、不占首页版面，主功能（清理照片/视频）保持主角。<br>橙色高亮圈处即入口图标，点击进入「清理成果」页。</div>
+
+  <div class="row">
+
+    <!-- WARM -->
+    <div class="stack">
+    <div class="phone t-warm">
+      <div class="statusbar"><span>9:41</span><span class="bat"></span></div>
+      <div class="top"></div>
+      <div class="h1">刷刷鸭</div>
+      <div class="h2">随机一刷，相册清爽</div>
+      <div class="grow"></div>
+
+      <div class="card">
+        <div class="ico"><i data-lucide="image"></i></div>
+        <div style="flex:1"><div class="ttl">清理照片</div><div class="desc">随机浏览，轻松决定</div></div>
+        <div class="arr">›</div>
+      </div>
+      <div class="card">
+        <div class="ico"><i data-lucide="film"></i></div>
+        <div style="flex:1"><div class="ttl">清理视频</div><div class="desc">随机浏览，轻松决定</div></div>
+        <div class="arr">›</div>
+      </div>
+
+      <div class="grow"></div>
+      <div class="footbar">
+        <div class="entry-ico"><i data-lucide="bar-chart-3"></i></div>
+        <i data-lucide="settings"></i>
+      </div>
+    </div>
+    <div class="label">温暖手工感<small>Warm · 底部图标并排</small></div>
+    </div>
+
+    <!-- MINIMAL -->
+    <div class="stack">
+    <div class="phone t-minimal">
+      <div class="statusbar"><span>9:41</span><span class="bat"></span></div>
+      <div class="top"></div>
+      <div class="bar">
+        <span class="brand">刷刷鸭</span>
+        <span class="acts">
+          <span class="entry-ico"><i data-lucide="bar-chart-3"></i></span>
+          <i data-lucide="settings"></i>
+        </span>
+      </div>
+      <div class="divider"></div>
+      <div class="grow"></div>
+
+      <div class="tabs"><span class="tab on">照片</span><span class="tab">视频</span></div>
+      <div style="height:40px"></div>
+      <div class="bigico"><i data-lucide="image"></i></div>
+
+      <div class="grow"></div>
+      <div class="startbtn">开始</div>
+      <div style="height:50px"></div>
+    </div>
+    <div class="label">克制极简<small>Minimal · 右上角图标并排</small></div>
+    </div>
+
+  </div>
+
+  <script>
+  var ICONS = {
+    'bar-chart-3': '<path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/>',
+    'image': '<rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>',
+    'film': '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/>',
+    'settings': '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>'
+  };
+  document.querySelectorAll('[data-lucide]').forEach(function(el){
+    var name = el.getAttribute('data-lucide'); if(!ICONS[name]) return;
+    var svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    svg.setAttribute('viewBox','0 0 24 24'); svg.setAttribute('fill','none'); svg.setAttribute('stroke','currentColor');
+    svg.setAttribute('stroke-linecap','round'); svg.setAttribute('stroke-linejoin','round');
+    svg.setAttribute('class', el.className + ' lucide'); svg.innerHTML = ICONS[name]; el.replaceWith(svg);
+  });
+  </script>
+</body>
+</html>

@@ -6,7 +6,7 @@ import kotlin.math.*
 /**
  * SVG path data 解析器——将 SVG path data 字符串解析为 Compose Path 对象。
  *
- * 支持命令：M/m, L/l, H/h, V/v, C/c, A/a, Z/z
+ * 支持命令：M/m, L/l, H/h, V/v, C/c, S/s, A/a, Z/z
  */
 fun parseSvgPath(data: String): Path {
     val path = Path()
@@ -19,6 +19,9 @@ fun parseSvgPath(data: String): Path {
     var subpathStartX = 0f
     var subpathStartY = 0f
     var lastCommand = ' '
+    // 上一个三次贝塞尔控制点（用于 S/s 命令的反射）
+    var lastCubicCtrlX = 0f
+    var lastCubicCtrlY = 0f
 
     fun nextFloat(): Float {
         if (i >= tokens.size) throw IllegalArgumentException("SVG path: 参数不足")
@@ -107,6 +110,7 @@ fun parseSvgPath(data: String): Path {
                     val x2 = nextFloat(); val y2 = nextFloat()
                     currentX = nextFloat(); currentY = nextFloat()
                     path.cubicTo(x1, y1, x2, y2, currentX, currentY)
+                    lastCubicCtrlX = x2; lastCubicCtrlY = y2
                 } while (hasMoreNumbers())
             }
             'c' -> {
@@ -114,11 +118,36 @@ fun parseSvgPath(data: String): Path {
                     val dx1 = nextFloat(); val dy1 = nextFloat()
                     val dx2 = nextFloat(); val dy2 = nextFloat()
                     val dx = nextFloat(); val dy = nextFloat()
+                    val ax2 = currentX + dx2; val ay2 = currentY + dy2
                     path.cubicTo(
                         currentX + dx1, currentY + dy1,
-                        currentX + dx2, currentY + dy2,
+                        ax2, ay2,
                         currentX + dx, currentY + dy
                     )
+                    lastCubicCtrlX = ax2; lastCubicCtrlY = ay2
+                    currentX += dx; currentY += dy
+                } while (hasMoreNumbers())
+            }
+            'S' -> {
+                do {
+                    // 第一控制点是上一个三次贝塞尔控制点关于当前点的反射
+                    val x1 = 2 * currentX - lastCubicCtrlX
+                    val y1 = 2 * currentY - lastCubicCtrlY
+                    val x2 = nextFloat(); val y2 = nextFloat()
+                    currentX = nextFloat(); currentY = nextFloat()
+                    path.cubicTo(x1, y1, x2, y2, currentX, currentY)
+                    lastCubicCtrlX = x2; lastCubicCtrlY = y2
+                } while (hasMoreNumbers())
+            }
+            's' -> {
+                do {
+                    val x1 = 2 * currentX - lastCubicCtrlX
+                    val y1 = 2 * currentY - lastCubicCtrlY
+                    val dx2 = nextFloat(); val dy2 = nextFloat()
+                    val dx = nextFloat(); val dy = nextFloat()
+                    val ax2 = currentX + dx2; val ay2 = currentY + dy2
+                    path.cubicTo(x1, y1, ax2, ay2, currentX + dx, currentY + dy)
+                    lastCubicCtrlX = ax2; lastCubicCtrlY = ay2
                     currentX += dx; currentY += dy
                 } while (hasMoreNumbers())
             }
@@ -145,6 +174,10 @@ fun parseSvgPath(data: String): Path {
                 currentX = subpathStartX; currentY = subpathStartY
             }
             else -> throw IllegalArgumentException("SVG path: 不支持的命令 '$cmd'")
+        }
+        // 非三次贝塞尔命令后重置控制点（使 S/s 退化为二次曲线）
+        if (cmd !in listOf('C', 'c', 'S', 's')) {
+            lastCubicCtrlX = currentX; lastCubicCtrlY = currentY
         }
         lastCommand = cmd
     }

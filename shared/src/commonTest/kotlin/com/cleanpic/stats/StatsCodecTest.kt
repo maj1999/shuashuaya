@@ -36,4 +36,15 @@ class StatsCodecTest {
         val snap = StatsSnapshot(lifetime = LifetimeStats(photo = MediaTypeStats(1L, 1, 1)))
         assertEquals(snap, StatsCodec.decode(StatsCodec.encode(snap)))
     }
+
+    @Test fun corrupt_daily_record_is_skipped_others_kept() {
+        val good = StatsSnapshot(
+            lifetime = LifetimeStats(photo = MediaTypeStats(1L, 1, 1)),
+            daily = listOf(DailyStat("2026-06-07", MediaTypeStats(10L, 1, 1))),
+        )
+        // 在合法编码串尾部追加一条字段数不足的非法 daily 记录（U+0002 分隔），decode 应跳过它、保留合法记录
+        val raw = StatsCodec.encode(good) + "" + "garbage-record"
+        val decoded = StatsCodec.decode(raw)
+        assertEquals(good, decoded)
+    }
 }

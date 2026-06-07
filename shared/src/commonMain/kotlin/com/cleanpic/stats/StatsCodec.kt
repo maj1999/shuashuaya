@@ -39,7 +39,7 @@ object StatsCodec {
         if (head.size != 8) return StatsSnapshot()
         val lifetime = LifetimeStats(
             photo = MediaTypeStats(
-                head[0].toLongOrNull() ?: return StatsSnapshot(),
+                head[0].toLongOrNull() ?: 0L,
                 head[1].toIntOrNull() ?: 0,
                 head[2].toIntOrNull() ?: 0,
             ),

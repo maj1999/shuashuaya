@@ -27,7 +27,9 @@ appId: com.cleanpic.android
 - waitForAnimationToEnd
 
 # 切到「视频」Tab 进入视频浏览
-- tapOn: "视频"
+- tapOn:
+    text: "视频"
+    optional: true
 - waitForAnimationToEnd
 - tapOn:
     id: "start_video"

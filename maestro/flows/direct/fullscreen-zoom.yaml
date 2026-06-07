@@ -63,6 +63,19 @@ appId: com.cleanpic.android
 # 仍在全屏、可正常退出
 - assertVisible:
     id: "fullscreen_viewer"
+# 双击缩放后沉浸式控件(chrome)显隐不确定：仅当 exit_button 不可见时单击媒体区唤出顶/底栏
+- runFlow:
+    when:
+      notVisible:
+        id: "exit_button"
+    commands:
+      - tapOn:
+          point: "50%,40%"
+      - waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: "exit_button"
+    timeout: 5000
 - tapOn:
     id: "exit_button"
 - waitForAnimationToEnd

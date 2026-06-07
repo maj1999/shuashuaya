@@ -3,7 +3,9 @@ package com.cleanpic.ui.stats
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -13,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlin.math.roundToInt
 import com.cleanpic.currentLocalDate
 import com.cleanpic.deviceStorage
 import com.cleanpic.epochToLocalDate
@@ -41,7 +44,7 @@ fun StatsScreen(router: AppRouter, theme: ThemeTokens) {
     val accent = Color(theme.colorAccent)
     val radius = theme.borderRadius.dp
 
-    Column(modifier = Modifier.fillMaxSize().background(bg).padding(horizontal = 20.dp)) {
+    Column(modifier = Modifier.fillMaxSize().background(bg).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp)) {
         Spacer(Modifier.height(50.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconPainter(
@@ -110,6 +113,7 @@ fun StatsScreen(router: AppRouter, theme: ThemeTokens) {
             Spacer(Modifier.width(8.dp))
             Text("全程离线 · 清理记录仅存本机，不上传", fontSize = 11.sp, color = sub)
         }
+        Spacer(Modifier.height(24.dp))
     }
 }
 
@@ -130,7 +134,7 @@ private fun TypeRow(icon: String, name: String, s: MediaTypeStats, totalBytes: L
             Spacer(Modifier.width(7.dp))
             Text(name, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = text)
         }
-        Text("占 ${(pct * 100).toInt()}%", fontSize = 12.sp, color = sub)
+        Text("占 ${(pct * 100).roundToInt()}%", fontSize = 12.sp, color = sub)
     }
     Spacer(Modifier.height(8.dp))
     Row {

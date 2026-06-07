@@ -58,7 +58,8 @@ class MainActivity : ComponentActivity() {
             settings = AndroidAppSettings(applicationContext),
             permission = androidPermission,
             player = AndroidVideoPlayer(),
-            pickStateStore = AndroidPickStateStore(applicationContext)
+            pickStateStore = AndroidPickStateStore(applicationContext),
+            statsStore = com.cleanpic.stats.AndroidStatsStore(applicationContext)
         )
 
         val hooks = UpdateWiring.provideHooks(this)

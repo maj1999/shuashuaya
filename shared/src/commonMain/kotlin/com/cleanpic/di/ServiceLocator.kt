@@ -18,6 +18,9 @@ object ServiceLocator {
     /** 浏览记忆持久化。平台侧可在 initialize 时注入；默认内存实现（测试/未接入平台）。 */
     var pickStateStore: PickStateStore = InMemoryPickStateStore()
 
+    /** 清理统计持久化。平台侧可在 initialize 时注入；默认内存实现。 */
+    var statsStore: com.cleanpic.stats.StatsStore = com.cleanpic.stats.InMemoryStatsStore()
+
     // 调试标记（平台侧设置）
     var isDebugBuild: Boolean = false
 
@@ -26,13 +29,15 @@ object ServiceLocator {
         settings: AppSettings,
         permission: PermissionManager,
         player: VideoPlayer,
-        pickStateStore: PickStateStore = InMemoryPickStateStore()
+        pickStateStore: PickStateStore = InMemoryPickStateStore(),
+        statsStore: com.cleanpic.stats.StatsStore = com.cleanpic.stats.InMemoryStatsStore()
     ) {
         mediaRepository = mediaRepo
         appSettings = settings
         permissionManager = permission
         videoPlayer = player
         this.pickStateStore = pickStateStore
+        this.statsStore = statsStore
         themeManager.switchTheme(settings.theme)
     }
 }

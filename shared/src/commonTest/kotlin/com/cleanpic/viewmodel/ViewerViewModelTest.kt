@@ -2,8 +2,10 @@ package com.cleanpic.viewmodel
 
 import com.cleanpic.di.ServiceLocator
 import com.cleanpic.mock.*
+import com.cleanpic.model.MediaItem
 import com.cleanpic.model.MediaType
 import com.cleanpic.model.OperationState
+import com.cleanpic.stats.InMemoryStatsStore
 import kotlinx.coroutines.test.runTest
 import kotlin.test.*
 
@@ -463,5 +465,56 @@ class ViewerViewModelTest {
         assertTrue(ServiceLocator.pickStateStore.load(MediaType.PHOTO).records.isEmpty())
         vm.loadMedia(MediaType.PHOTO)
         assertEquals(10, vm.items.value.size)
+    }
+
+    // ===== Task 9: 清理统计埋点 =====
+
+    @Test
+    fun confirm_delete_records_amount_into_stats() = runTest {
+        val stats = InMemoryStatsStore()
+        val photo1 = MediaItem(
+            id = "p1", type = MediaType.PHOTO, name = "a.jpg",
+            size = 100L, date = 1700000000000L, width = 100, height = 100
+        )
+        val photo2 = MediaItem(
+            id = "p2", type = MediaType.PHOTO, name = "b.jpg",
+            size = 200L, date = 1700000000000L, width = 100, height = 100
+        )
+        val repo = MockMediaRepository(photos = listOf(photo1, photo2))
+        ServiceLocator.initialize(
+            mediaRepo = repo,
+            settings = MockAppSettings(),
+            permission = MockPermissionManager(),
+            player = MockVideoPlayer(),
+            statsStore = stats
+        )
+        val localVm = ViewerViewModel()
+        localVm.loadMedia(MediaType.PHOTO)
+        // 两张都标记删除
+        localVm.markDelete()
+        localVm.markDelete()
+        localVm.confirmDelete()
+        val lifetime = stats.load().lifetime
+        assertEquals(2, lifetime.photo.count)
+        assertEquals(300L, lifetime.photo.bytes)
+    }
+
+    @Test
+    fun record_round_reached_is_idempotent_per_round() = runTest {
+        val stats = InMemoryStatsStore()
+        val repo = MockMediaRepository(photos = TestMediaFactory.photos(10))
+        ServiceLocator.initialize(
+            mediaRepo = repo,
+            settings = MockAppSettings(),
+            permission = MockPermissionManager(),
+            player = MockVideoPlayer(),
+            statsStore = stats
+        )
+        val localVm = ViewerViewModel()
+        localVm.loadMedia(MediaType.PHOTO)
+        // 同一轮调用两次，只应记一次
+        localVm.recordRoundReached()
+        localVm.recordRoundReached()
+        assertEquals(1, stats.load().lifetime.photo.rounds)
     }
 }

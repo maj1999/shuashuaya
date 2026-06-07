@@ -1,6 +1,7 @@
 package com.cleanpic.viewmodel
 
 import com.cleanpic.currentEpochMillis
+import com.cleanpic.currentLocalDate
 import com.cleanpic.di.ServiceLocator
 import com.cleanpic.media.RandomPicker
 import com.cleanpic.media.SeenRecord
@@ -12,6 +13,8 @@ class ViewerViewModel {
     private val repo get() = ServiceLocator.mediaRepository
     private val settings get() = ServiceLocator.appSettings
     private val pickStore get() = ServiceLocator.pickStateStore
+    private val statsStore get() = ServiceLocator.statsStore
+    private var roundCounted = false
 
     private val _items = MutableStateFlow<List<ViewerItem>>(emptyList())
     val items: StateFlow<List<ViewerItem>> = _items
@@ -52,6 +55,7 @@ class ViewerViewModel {
             return
         }
         currentType = type
+        roundCounted = false
         val state = pickStore.load(type)
         val result = RandomPicker.pick(all, settings.roundCount, state, now = currentEpochMillis())
         pickStore.save(type, result.state)
@@ -124,11 +128,27 @@ class ViewerViewModel {
         }
     }
 
+    /** 到达结果页时调用：本轮只记一次（进入清理→到结果页即一轮，无论删留）。 */
+    fun recordRoundReached() {
+        if (roundCounted) return
+        val type = currentType ?: return
+        roundCounted = true
+        statsStore.recordRoundReached(type, currentEpochMillis(), currentLocalDate())
+    }
+
     suspend fun confirmDelete(): Result<Int> {
         val items = pendingDeletes.map { it.media }
         if (items.isEmpty()) return Result.success(0)
+        val type = currentType
+        val bytes = items.sumOf { it.size }
+        val count = items.size
         val result = repo.deleteMediaItems(items)
-        if (result.isSuccess) forgetRecords(items.map { it.id })
+        if (result.isSuccess) {
+            forgetRecords(items.map { it.id })
+            if (type != null) {
+                statsStore.recordDeletion(type, currentEpochMillis(), currentLocalDate(), bytes, count)
+            }
+        }
         return result
     }
 

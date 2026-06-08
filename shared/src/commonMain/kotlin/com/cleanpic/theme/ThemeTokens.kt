@@ -85,5 +85,11 @@ data class ThemeTokens(
     val iconStrokeColor: Long = 0xFF333333,
     val iconStrokeCap: IconStrokeCap = IconStrokeCap.ROUND,
     val progressStyle: ProgressStyle = ProgressStyle.SOFT,
-    val buttonStyle: ButtonStyle = ButtonStyle.SHADOW
-)
+    val buttonStyle: ButtonStyle = ButtonStyle.SHADOW,
+    // 统计页数据可视化强调色：默认 null → 回退 colorAccent；某些主题（Geometric/Playful）的
+    // accent 在统计页深色/同色系背景上对比不足，单独覆盖一个更亮、更跳的色。
+    val colorStatsAccent: Long? = null
+) {
+    /** 统计页图表/徽章/占比条/连续天数用色：未单独指定则回退 colorAccent。 */
+    val statsAccent: Long get() = colorStatsAccent ?: colorAccent
+}

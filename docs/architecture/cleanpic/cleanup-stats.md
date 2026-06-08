@@ -199,3 +199,15 @@ commonMain 不可用 `java.time`，故自带零依赖日期运算（连续天数
 进页面时单个 `Animatable(0f)` 在 `LaunchedEffect(Unit)` 里 900ms `FastOutSlowInEasing` 动画到 1f（与结果页注脚同款），其值 `p` 驱动整页：累计大数字 / 文件数·轮次 / 环形图 sweep / 中心数字 / 各 `TypeRow` 的大小·占比%·占比条 / 设备存储条全部乘 `p`，从 0 增长到最终值；里程碑徽章、月度回顾保持静态避免眼花。`when(route)` 条件渲染保证每次进入都是全新 composition、动画必重触发。
 
 > 验证记录：0.9s 动画在本地 maestro+模拟器环境无法用截图/断言观测（图形抓取在动画期间卡帧、maestro 命令等动画 settle 后才读），最终靠 `screenrecord` 抓到进页面首帧为「0 B / 空环形」确认动画从 0 起步、确实生效。
+
+### 12.10 深色/同色系主题的图表配色（colorStatsAccent）
+
+Geometric（深蓝霓虹）、Playful（蓝紫玻璃）的 `colorAccent` 都是偏暗的紫，在统计页背景上对比不足、发闷：深紫 on 深蓝 → 闷；深紫 on 蓝紫 → 同色系糊一起。`ThemeTokens` 新增可选 `colorStatsAccent`（默认 null → computed `statsAccent` 回退 `colorAccent`），StatsScreen 的数据可视化（环形图 / 里程碑徽章 / 连续天数 / 占比条 / 分类图标）统一读 `theme.statsAccent`：
+
+| 主题 | colorStatsAccent | 说明 |
+|------|------------------|------|
+| Geometric | `0xFFFF5277` 亮玫红 | 深蓝霓虹背景上大胆醒目 |
+| Playful | `0xFFFF9ECF` 亮粉 | 蓝紫背景上活泼明快 |
+| 其余 3 主题 | 未设（null） | 沿用各自 colorAccent |
+
+仅作用于统计页数据色，不改主题在其他页面的强调色（按钮等）。色值定稿经实机预览迭代（首版 #E94560/#FF7EB3 偏深 → 提亮为 #FF5277/#FF9ECF）。

@@ -63,6 +63,10 @@ fun StatsScreen(router: AppRouter, theme: ThemeTokens) {
     val sub = Color(theme.colorTextSecondary)
     val accent = Color(theme.colorAccent)
     val radius = theme.borderRadius.dp
+    // 统计页数据可视化强调色：主题可单独覆盖（见 ThemeTokens.colorStatsAccent），未覆盖则回退
+    // colorAccent。Geometric/Playful 的 accent 紫在统计页背景上对比不足，各自覆盖了更亮的色。
+    val chartAccentLong: Long = theme.statsAccent
+    val chartAccent = Color(chartAccentLong)
 
     Column(modifier = Modifier.fillMaxSize().background(bg).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp)) {
         Spacer(Modifier.height(50.dp))
@@ -87,7 +91,7 @@ fun StatsScreen(router: AppRouter, theme: ThemeTokens) {
             Text("共 ${(l.totalCount * p).roundToInt()} 个文件 · 完成 ${(l.totalRounds * p).roundToInt()} 轮清理", fontSize = 12.sp, color = sub)
             if (streak > 0) {
                 Spacer(Modifier.height(5.dp))
-                Text("已连续清理 $streak 天", fontSize = 12.sp, fontWeight = FontWeight.Medium, color = accent)
+                Text("已连续清理 $streak 天", fontSize = 12.sp, fontWeight = FontWeight.Medium, color = chartAccent)
             }
             Spacer(Modifier.height(13.dp))
             Box(Modifier.fillMaxWidth().height(1.dp).background(sub.copy(alpha = 0.18f)))
@@ -105,7 +109,7 @@ fun StatsScreen(router: AppRouter, theme: ThemeTokens) {
             Spacer(Modifier.height(14.dp))
             badges.chunked(4).forEach { rowBadges ->
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    rowBadges.forEach { BadgeChip(it, theme, Modifier.weight(1f)) }
+                    rowBadges.forEach { BadgeChip(it, theme, Modifier.weight(1f), chartAccentLong) }
                     repeat(4 - rowBadges.size) { Spacer(Modifier.weight(1f)) }
                 }
                 Spacer(Modifier.height(12.dp))
@@ -121,8 +125,8 @@ fun StatsScreen(router: AppRouter, theme: ThemeTokens) {
                 CompositionDonut(
                     photoBytes = l.photo.bytes,
                     videoBytes = l.video.bytes,
-                    photoColor = accent,
-                    videoColor = accent.copy(alpha = 0.42f),
+                    photoColor = chartAccent,
+                    videoColor = chartAccent.copy(alpha = 0.42f),
                     trackColor = sub.copy(alpha = 0.15f),
                     centerText = formatBytes((l.totalBytes * p).toLong()),
                     textColor = text,
@@ -131,9 +135,9 @@ fun StatsScreen(router: AppRouter, theme: ThemeTokens) {
                 )
             }
             Spacer(Modifier.height(16.dp))
-            TypeRow("photo", "照片", l.photo, l.totalBytes, "张", theme, p)
+            TypeRow("photo", "照片", l.photo, l.totalBytes, "张", theme, p, chartAccentLong)
             Spacer(Modifier.height(14.dp))
-            TypeRow("video", "视频", l.video, l.totalBytes, "个", theme, p)
+            TypeRow("video", "视频", l.video, l.totalBytes, "个", theme, p, chartAccentLong)
         }
         Spacer(Modifier.height(12.dp))
 
@@ -170,7 +174,7 @@ fun StatsScreen(router: AppRouter, theme: ThemeTokens) {
             Spacer(Modifier.height(8.dp))
             val frac = if (storage.totalBytes > 0) (storage.usedBytes.toFloat() / storage.totalBytes).coerceIn(0f, 1f) else 0f
             Box(Modifier.fillMaxWidth().height(9.dp).clip(RoundedCornerShape(99.dp)).background(sub.copy(alpha = 0.18f))) {
-                Box(Modifier.fillMaxWidth(frac * p).height(9.dp).clip(RoundedCornerShape(99.dp)).background(accent))
+                Box(Modifier.fillMaxWidth(frac * p).height(9.dp).clip(RoundedCornerShape(99.dp)).background(chartAccent))
             }
         }
         Spacer(Modifier.height(12.dp))
@@ -190,10 +194,10 @@ fun StatsScreen(router: AppRouter, theme: ThemeTokens) {
 }
 
 @Composable
-private fun TypeRow(icon: String, name: String, s: MediaTypeStats, totalBytes: Long, unit: String, theme: ThemeTokens, progress: Float = 1f) {
+private fun TypeRow(icon: String, name: String, s: MediaTypeStats, totalBytes: Long, unit: String, theme: ThemeTokens, progress: Float = 1f, chartAccentLong: Long = theme.colorAccent) {
     val text = Color(theme.colorText)
     val sub = Color(theme.colorTextSecondary)
-    val accent = Color(theme.colorAccent)
+    val accent = Color(chartAccentLong)
     val pct = if (totalBytes > 0) (s.bytes.toFloat() / totalBytes).coerceIn(0f, 1f) else 0f
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -201,7 +205,7 @@ private fun TypeRow(icon: String, name: String, s: MediaTypeStats, totalBytes: L
                 name = icon,
                 theme = theme,
                 size = 16.dp,
-                colorOverride = theme.colorAccent
+                colorOverride = chartAccentLong
             )
             Spacer(Modifier.width(7.dp))
             Text(name, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = text)
@@ -238,13 +242,13 @@ private fun formatMonthLabel(yearMonth: String): String {
 }
 
 @Composable
-private fun BadgeChip(badge: Badge, theme: ThemeTokens, modifier: Modifier) {
-    val accent = Color(theme.colorAccent)
+private fun BadgeChip(badge: Badge, theme: ThemeTokens, modifier: Modifier, chartAccentLong: Long = theme.colorAccent) {
+    val accent = Color(chartAccentLong)
     val sub = Color(theme.colorTextSecondary)
     val on = badge.achieved
     // colorOverride 需 ARGB Long：未达成用 colorTextSecondary 降到 0x66 透明度。
     val dimLong = (0x66L shl 24) or (theme.colorTextSecondary and 0xFFFFFFL)
-    val iconColorLong = if (on) theme.colorAccent else dimLong
+    val iconColorLong = if (on) chartAccentLong else dimLong
     val tint = if (on) accent else sub.copy(alpha = 0.4f)
     Column(
         modifier = modifier,

@@ -14,5 +14,6 @@ val GeometricTheme = ThemeTokens(
     animButtonPress = ButtonPressAnim.SCALE,
     layoutId = ThemeLayoutId.GEOMETRIC, iconStrokeWidth = 2.5f,
     iconStrokeColor = 0xFFFFFFFF, iconStrokeCap = IconStrokeCap.BUTT,
-    progressStyle = ProgressStyle.BOLD, buttonStyle = ButtonStyle.FILLED
+    progressStyle = ProgressStyle.BOLD, buttonStyle = ButtonStyle.FILLED,
+    colorStatsAccent = 0xFFFF5277  // 亮玫红：深蓝霓虹背景上大胆醒目（accent 紫太闷）
 )

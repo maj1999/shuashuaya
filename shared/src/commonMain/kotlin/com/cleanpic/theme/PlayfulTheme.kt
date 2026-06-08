@@ -14,5 +14,6 @@ val PlayfulTheme = ThemeTokens(
     animButtonPress = ButtonPressAnim.BOUNCE,
     layoutId = ThemeLayoutId.PLAYFUL, iconStrokeWidth = 2.0f,
     iconStrokeColor = 0xFFFFFFFF, iconStrokeCap = IconStrokeCap.ROUND,
-    progressStyle = ProgressStyle.GLASS, buttonStyle = ButtonStyle.GLASS
+    progressStyle = ProgressStyle.GLASS, buttonStyle = ButtonStyle.GLASS,
+    colorStatsAccent = 0xFFFF9ECF  // 亮粉：蓝紫背景上活泼明快（accent 紫与背景同色系糊一起）
 )

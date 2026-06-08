@@ -1,5 +1,6 @@
 package com.cleanpic.ui.stats
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,7 +13,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlin.math.roundToInt
@@ -22,7 +26,11 @@ import com.cleanpic.epochToLocalDate
 import com.cleanpic.di.ServiceLocator
 import com.cleanpic.icons.IconPainter
 import com.cleanpic.model.MediaTypeStats
+import com.cleanpic.stats.Badge
 import com.cleanpic.stats.CleanupQuotes
+import com.cleanpic.stats.Milestones
+import com.cleanpic.stats.MonthlyReview
+import com.cleanpic.stats.StatsStreak
 import com.cleanpic.theme.ThemeTokens
 import com.cleanpic.ui.navigation.AppRouter
 import com.cleanpic.ui.viewer.formatBytes
@@ -36,6 +44,10 @@ fun StatsScreen(router: AppRouter, theme: ThemeTokens) {
         l.lastCleanupAt > 0L && epochToLocalDate(l.lastCleanupAt) == currentLocalDate()
     }
     val quote = remember { CleanupQuotes.pick(l, isStreak, seed = l.totalRounds) }
+    val streak = remember { StatsStreak.current(snapshot.daily, currentLocalDate()) }
+    val badges = remember { Milestones.evaluate(l) }
+    val achievedCount = badges.count { it.achieved }
+    val months = remember { MonthlyReview.byMonth(snapshot.daily) }
 
     val bg = Color(theme.colorBackground)
     val surface = Color(theme.colorSurface)
@@ -65,6 +77,10 @@ fun StatsScreen(router: AppRouter, theme: ThemeTokens) {
             Text(formatBytes(l.totalBytes), fontSize = 44.sp, fontWeight = FontWeight.Black, color = text)
             Spacer(Modifier.height(7.dp))
             Text("共 ${l.totalCount} 个文件 · 完成 ${l.totalRounds} 轮清理", fontSize = 12.sp, color = sub)
+            if (streak > 0) {
+                Spacer(Modifier.height(5.dp))
+                Text("已连续清理 $streak 天", fontSize = 12.sp, fontWeight = FontWeight.Medium, color = accent)
+            }
             Spacer(Modifier.height(13.dp))
             Box(Modifier.fillMaxWidth().height(1.dp).background(sub.copy(alpha = 0.18f)))
             Spacer(Modifier.height(13.dp))
@@ -72,14 +88,61 @@ fun StatsScreen(router: AppRouter, theme: ThemeTokens) {
         }
         Spacer(Modifier.height(12.dp))
 
+        // 里程碑徽章（阶段二）
+        Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(radius)).background(surface).padding(18.dp)) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Text("里程碑", fontSize = 11.sp, color = sub, fontWeight = FontWeight.Medium)
+                Text("$achievedCount / ${badges.size}", fontSize = 11.sp, color = sub)
+            }
+            Spacer(Modifier.height(14.dp))
+            badges.chunked(4).forEach { rowBadges ->
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    rowBadges.forEach { BadgeChip(it, theme, Modifier.weight(1f)) }
+                    repeat(4 - rowBadges.size) { Spacer(Modifier.weight(1f)) }
+                }
+                Spacer(Modifier.height(12.dp))
+            }
+        }
+        Spacer(Modifier.height(12.dp))
+
+        // 分类构成（阶段二：构成饼图 + 三元组占比条）
         Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(radius)).background(surface).padding(18.dp)) {
             Text("分类构成", fontSize = 11.sp, color = sub, fontWeight = FontWeight.Medium)
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(14.dp))
+            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                CompositionDonut(
+                    photoBytes = l.photo.bytes,
+                    videoBytes = l.video.bytes,
+                    photoColor = accent,
+                    videoColor = accent.copy(alpha = 0.42f),
+                    trackColor = sub.copy(alpha = 0.15f),
+                    centerText = formatBytes(l.totalBytes),
+                    textColor = text,
+                    subColor = sub,
+                )
+            }
+            Spacer(Modifier.height(16.dp))
             TypeRow("photo", "照片", l.photo, l.totalBytes, "张", theme)
             Spacer(Modifier.height(14.dp))
             TypeRow("video", "视频", l.video, l.totalBytes, "个", theme)
         }
         Spacer(Modifier.height(12.dp))
+
+        // 月度回顾（阶段三）：按自然月聚合的清理汇总
+        if (months.isNotEmpty()) {
+            Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(radius)).background(surface).padding(18.dp)) {
+                Text("月度回顾", fontSize = 11.sp, color = sub, fontWeight = FontWeight.Medium)
+                Spacer(Modifier.height(12.dp))
+                months.take(3).forEachIndexed { i, m ->
+                    if (i > 0) Spacer(Modifier.height(12.dp))
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                        Text(formatMonthLabel(m.yearMonth), fontSize = 13.sp, fontWeight = FontWeight.Medium, color = text)
+                        Text("${formatBytes(m.totalBytes)} · ${m.totalCount} 个 · ${m.totalRounds} 轮", fontSize = 12.sp, color = sub)
+                    }
+                }
+            }
+            Spacer(Modifier.height(12.dp))
+        }
 
         Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(radius)).background(surface).padding(18.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
@@ -153,5 +216,106 @@ private fun Metric(value: String, label: String, theme: ThemeTokens) {
     Column {
         Text(value, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(theme.colorText))
         Text(label, fontSize = 11.sp, color = Color(theme.colorTextSecondary))
+    }
+}
+
+/** "2026-06" → "2026 年 6 月"。 */
+private fun formatMonthLabel(yearMonth: String): String {
+    val parts = yearMonth.split("-")
+    if (parts.size != 2) return yearMonth
+    val y = parts[0]
+    val m = parts[1].toIntOrNull() ?: return yearMonth
+    return "$y 年 $m 月"
+}
+
+@Composable
+private fun BadgeChip(badge: Badge, theme: ThemeTokens, modifier: Modifier) {
+    val accent = Color(theme.colorAccent)
+    val sub = Color(theme.colorTextSecondary)
+    val on = badge.achieved
+    // colorOverride 需 ARGB Long：未达成用 colorTextSecondary 降到 0x66 透明度。
+    val dimLong = (0x66L shl 24) or (theme.colorTextSecondary and 0xFFFFFFL)
+    val iconColorLong = if (on) theme.colorAccent else dimLong
+    val tint = if (on) accent else sub.copy(alpha = 0.4f)
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Box(
+            modifier = Modifier
+                .size(44.dp)
+                .clip(RoundedCornerShape(99.dp))
+                .background(if (on) accent.copy(alpha = 0.14f) else sub.copy(alpha = 0.08f)),
+            contentAlignment = Alignment.Center,
+        ) {
+            IconPainter(name = badge.icon, theme = theme, size = 20.dp, colorOverride = iconColorLong)
+        }
+        Spacer(Modifier.height(5.dp))
+        Text(
+            badge.label,
+            fontSize = 9.sp,
+            color = tint,
+            textAlign = TextAlign.Center,
+            fontWeight = if (on) FontWeight.Medium else FontWeight.Normal,
+        )
+    }
+}
+
+/** 照片/视频按字节构成的环形图；总量为 0 时画一圈灰底轨道。 */
+@Composable
+private fun CompositionDonut(
+    photoBytes: Long,
+    videoBytes: Long,
+    photoColor: Color,
+    videoColor: Color,
+    trackColor: Color,
+    centerText: String,
+    textColor: Color,
+    subColor: Color,
+) {
+    val total = photoBytes + videoBytes
+    val photoFrac = if (total > 0) (photoBytes.toFloat() / total).coerceIn(0f, 1f) else 0f
+    Box(Modifier.size(132.dp), contentAlignment = Alignment.Center) {
+        Canvas(Modifier.size(132.dp)) {
+            val stroke = 18.dp.toPx()
+            val inset = stroke / 2f
+            val arcSize = androidx.compose.ui.geometry.Size(size.width - stroke, size.height - stroke)
+            val topLeft = androidx.compose.ui.geometry.Offset(inset, inset)
+            // 轨道底
+            drawArc(
+                color = trackColor,
+                startAngle = 0f,
+                sweepAngle = 360f,
+                useCenter = false,
+                topLeft = topLeft,
+                size = arcSize,
+                style = Stroke(width = stroke),
+            )
+            if (total > 0) {
+                val photoSweep = photoFrac * 360f
+                drawArc(
+                    color = photoColor,
+                    startAngle = -90f,
+                    sweepAngle = photoSweep,
+                    useCenter = false,
+                    topLeft = topLeft,
+                    size = arcSize,
+                    style = Stroke(width = stroke, cap = StrokeCap.Butt),
+                )
+                drawArc(
+                    color = videoColor,
+                    startAngle = -90f + photoSweep,
+                    sweepAngle = 360f - photoSweep,
+                    useCenter = false,
+                    topLeft = topLeft,
+                    size = arcSize,
+                    style = Stroke(width = stroke, cap = StrokeCap.Butt),
+                )
+            }
+        }
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(centerText, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = textColor)
+            Text("总计", fontSize = 10.sp, color = subColor)
+        }
     }
 }

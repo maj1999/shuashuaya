@@ -53,14 +53,17 @@ do_e2e() {
     echo "--- 运行 Maestro E2E 测试 (direct，全量基准) ---"
     _maestro_ok || return 0
     # 全量 = direct/ 顶层(25) + direct/video/(7)，共 32 个 flow。
-    # ⚠️ Maestro 的 `test <dir>` 不递归子目录，必须显式带上 video/ 路径，否则
-    #    视频类 7 个 flow 会被静默漏跑（曾导致"全量"只跑 25 个的覆盖洞）。
-    # store/ 的 13 个与 direct 同名、仅断言文案差异，应对 store flavor 包单独跑，见 e2e-store。
+    # ⚠️ Maestro 2.4.0 路径展开有两个坑，必须用 find 显式枚举文件来规避：
+    #    1) `test <单目录>` 不递归子目录 → 直接传 direct/ 会漏跑 video/ 下 7 个 flow；
+    #    2) `test <父目录> <子目录>`（曾用的双路径写法）会让父目录转入递归模式，
+    #       于是 video flow 既被 direct/ 递归到、又被 direct/video/ 显式带到，重复跑一遍。
+    #    传「显式文件列表」则每个 flow 恰好跑一次，确定性最强。store 同理，见 e2e-store。
     if [ -d "$PROJECT_ROOT/maestro/flows/direct" ]; then
-        maestro test \
-            "$PROJECT_ROOT/maestro/flows/direct/" \
-            "$PROJECT_ROOT/maestro/flows/direct/video/" \
-            2>&1 | tee -a "$LOG_FILE"
+        local flows=()
+        while IFS= read -r f; do flows+=("$f"); done \
+            < <(find "$PROJECT_ROOT/maestro/flows/direct" -name '*.yaml' | sort)
+        echo "全量 ${#flows[@]} 个 flow" | tee -a "$LOG_FILE"
+        maestro test "${flows[@]}" 2>&1 | tee -a "$LOG_FILE"
     else
         echo "提示: maestro/flows/direct/ 目录不存在，跳过 E2E 测试。"
     fi
@@ -72,8 +75,14 @@ do_e2e_store() {
     echo "    注意: store flows 验证 store flavor 包的渠道差异（无自动更新入口等），"
     echo "    请先用 scripts/build-store.sh 构建并安装 store 包，再跑本命令。"
     _maestro_ok || return 0
+    # 全量 = store/ 顶层(16) + store/video/(5)，共 21 个 flow。
+    # 同 do_e2e：用 find 显式枚举文件，规避 Maestro 单目录不递归 / 父子双路径重复跑两个坑。
     if [ -d "$PROJECT_ROOT/maestro/flows/store" ]; then
-        maestro test "$PROJECT_ROOT/maestro/flows/store/" 2>&1 | tee -a "$LOG_FILE"
+        local flows=()
+        while IFS= read -r f; do flows+=("$f"); done \
+            < <(find "$PROJECT_ROOT/maestro/flows/store" -name '*.yaml' | sort)
+        echo "全量 ${#flows[@]} 个 flow" | tee -a "$LOG_FILE"
+        maestro test "${flows[@]}" 2>&1 | tee -a "$LOG_FILE"
     else
         echo "提示: maestro/flows/store/ 目录不存在，跳过。"
     fi

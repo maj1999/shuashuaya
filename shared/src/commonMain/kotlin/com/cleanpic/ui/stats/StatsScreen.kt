@@ -1,5 +1,8 @@
 package com.cleanpic.ui.stats
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -49,6 +52,11 @@ fun StatsScreen(router: AppRouter, theme: ThemeTokens) {
     val achievedCount = badges.count { it.achieved }
     val months = remember { MonthlyReview.byMonth(snapshot.daily) }
 
+    // 入场动画：进页面时数字滚动、环形扫弧、条形展开（0.9s，与结果页注脚同节奏 FastOutSlowInEasing）
+    val intro = remember { Animatable(0f) }
+    LaunchedEffect(Unit) { intro.animateTo(1f, tween(durationMillis = 900, easing = FastOutSlowInEasing)) }
+    val p = intro.value
+
     val bg = Color(theme.colorBackground)
     val surface = Color(theme.colorSurface)
     val text = Color(theme.colorText)
@@ -74,9 +82,9 @@ fun StatsScreen(router: AppRouter, theme: ThemeTokens) {
         Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(radius)).background(surface).padding(18.dp)) {
             Text("累计已清理", fontSize = 13.sp, color = sub)
             Spacer(Modifier.height(6.dp))
-            Text(formatBytes(l.totalBytes), fontSize = 44.sp, fontWeight = FontWeight.Black, color = text)
+            Text(formatBytes((l.totalBytes * p).toLong()), fontSize = 44.sp, fontWeight = FontWeight.Black, color = text)
             Spacer(Modifier.height(7.dp))
-            Text("共 ${l.totalCount} 个文件 · 完成 ${l.totalRounds} 轮清理", fontSize = 12.sp, color = sub)
+            Text("共 ${(l.totalCount * p).roundToInt()} 个文件 · 完成 ${(l.totalRounds * p).roundToInt()} 轮清理", fontSize = 12.sp, color = sub)
             if (streak > 0) {
                 Spacer(Modifier.height(5.dp))
                 Text("已连续清理 $streak 天", fontSize = 12.sp, fontWeight = FontWeight.Medium, color = accent)
@@ -116,15 +124,16 @@ fun StatsScreen(router: AppRouter, theme: ThemeTokens) {
                     photoColor = accent,
                     videoColor = accent.copy(alpha = 0.42f),
                     trackColor = sub.copy(alpha = 0.15f),
-                    centerText = formatBytes(l.totalBytes),
+                    centerText = formatBytes((l.totalBytes * p).toLong()),
                     textColor = text,
                     subColor = sub,
+                    progress = p,
                 )
             }
             Spacer(Modifier.height(16.dp))
-            TypeRow("photo", "照片", l.photo, l.totalBytes, "张", theme)
+            TypeRow("photo", "照片", l.photo, l.totalBytes, "张", theme, p)
             Spacer(Modifier.height(14.dp))
-            TypeRow("video", "视频", l.video, l.totalBytes, "个", theme)
+            TypeRow("video", "视频", l.video, l.totalBytes, "个", theme, p)
         }
         Spacer(Modifier.height(12.dp))
 
@@ -161,7 +170,7 @@ fun StatsScreen(router: AppRouter, theme: ThemeTokens) {
             Spacer(Modifier.height(8.dp))
             val frac = if (storage.totalBytes > 0) (storage.usedBytes.toFloat() / storage.totalBytes).coerceIn(0f, 1f) else 0f
             Box(Modifier.fillMaxWidth().height(9.dp).clip(RoundedCornerShape(99.dp)).background(sub.copy(alpha = 0.18f))) {
-                Box(Modifier.fillMaxWidth(frac).height(9.dp).clip(RoundedCornerShape(99.dp)).background(accent))
+                Box(Modifier.fillMaxWidth(frac * p).height(9.dp).clip(RoundedCornerShape(99.dp)).background(accent))
             }
         }
         Spacer(Modifier.height(12.dp))
@@ -181,7 +190,7 @@ fun StatsScreen(router: AppRouter, theme: ThemeTokens) {
 }
 
 @Composable
-private fun TypeRow(icon: String, name: String, s: MediaTypeStats, totalBytes: Long, unit: String, theme: ThemeTokens) {
+private fun TypeRow(icon: String, name: String, s: MediaTypeStats, totalBytes: Long, unit: String, theme: ThemeTokens, progress: Float = 1f) {
     val text = Color(theme.colorText)
     val sub = Color(theme.colorTextSecondary)
     val accent = Color(theme.colorAccent)
@@ -197,17 +206,17 @@ private fun TypeRow(icon: String, name: String, s: MediaTypeStats, totalBytes: L
             Spacer(Modifier.width(7.dp))
             Text(name, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = text)
         }
-        Text("占 ${(pct * 100).roundToInt()}%", fontSize = 12.sp, color = sub)
+        Text("占 ${(pct * 100 * progress).roundToInt()}%", fontSize = 12.sp, color = sub)
     }
     Spacer(Modifier.height(8.dp))
     Row {
-        Metric(formatBytes(s.bytes), "大小", theme); Spacer(Modifier.width(20.dp))
-        Metric("${s.count}", unit, theme); Spacer(Modifier.width(20.dp))
-        Metric("${s.rounds}", "轮", theme)
+        Metric(formatBytes((s.bytes * progress).toLong()), "大小", theme); Spacer(Modifier.width(20.dp))
+        Metric("${(s.count * progress).roundToInt()}", unit, theme); Spacer(Modifier.width(20.dp))
+        Metric("${(s.rounds * progress).roundToInt()}", "轮", theme)
     }
     Spacer(Modifier.height(8.dp))
     Box(Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(99.dp)).background(sub.copy(alpha = 0.18f))) {
-        Box(Modifier.fillMaxWidth(pct).height(8.dp).clip(RoundedCornerShape(99.dp)).background(accent))
+        Box(Modifier.fillMaxWidth(pct * progress).height(8.dp).clip(RoundedCornerShape(99.dp)).background(accent))
     }
 }
 
@@ -272,6 +281,7 @@ private fun CompositionDonut(
     centerText: String,
     textColor: Color,
     subColor: Color,
+    progress: Float = 1f,
 ) {
     val total = photoBytes + videoBytes
     val photoFrac = if (total > 0) (photoBytes.toFloat() / total).coerceIn(0f, 1f) else 0f
@@ -292,7 +302,9 @@ private fun CompositionDonut(
                 style = Stroke(width = stroke),
             )
             if (total > 0) {
-                val photoSweep = photoFrac * 360f
+                // 入场时两段弧一起从 -90° 扫开，progress=1 时拼满整圈
+                val photoSweep = photoFrac * 360f * progress
+                val videoSweep = (360f - photoFrac * 360f) * progress
                 drawArc(
                     color = photoColor,
                     startAngle = -90f,
@@ -305,7 +317,7 @@ private fun CompositionDonut(
                 drawArc(
                     color = videoColor,
                     startAngle = -90f + photoSweep,
-                    sweepAngle = 360f - photoSweep,
+                    sweepAngle = videoSweep,
                     useCenter = false,
                     topLeft = topLeft,
                     size = arcSize,

@@ -130,6 +130,22 @@ fun EditorialResultLayout(state: ResultScreenState) {
             Spacer(modifier = Modifier.height(28.dp))
         }
 
+        // 成果注脚（完成态）：本次 + 累计滚动动画 + 语录
+        if (!confirm) {
+            item {
+                ResultCumulativeBlock(
+                    roundBytes = state.freedBytes,
+                    lifetimeBytes = state.lifetimeBytes,
+                    quote = state.quote,
+                    textColor = EditorialText,
+                    subColor = EditorialSecondary,
+                    surfaceColor = Color(0xFFFCFAF2),
+                    serif = true,
+                )
+                Spacer(modifier = Modifier.height(28.dp))
+            }
+        }
+
         // 待删除预览
         if (state.pendingDeleteItems.isNotEmpty()) {
             item {

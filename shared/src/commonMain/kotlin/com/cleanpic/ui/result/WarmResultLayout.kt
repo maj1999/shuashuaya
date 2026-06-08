@@ -120,6 +120,21 @@ fun WarmResultLayout(state: ResultScreenState) {
             }
         }
 
+        // 成果注脚（完成态）：本次 + 累计滚动动画 + 语录
+        if (!confirm) {
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+                ResultCumulativeBlock(
+                    roundBytes = state.freedBytes,
+                    lifetimeBytes = state.lifetimeBytes,
+                    quote = state.quote,
+                    textColor = Color(theme.colorText),
+                    subColor = Color(theme.colorTextSecondary),
+                    surfaceColor = Color.White,
+                )
+            }
+        }
+
         // 待删除预览
         if (state.pendingDeleteItems.isNotEmpty()) {
             item {

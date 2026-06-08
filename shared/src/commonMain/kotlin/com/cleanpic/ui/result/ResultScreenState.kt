@@ -17,6 +17,12 @@ data class ResultScreenState(
     val deletedCount: Int,
     val keptCount: Int,
     val freedSpace: String,
+    /** 本轮真实清理字节（完成态滚动动画用），与 freedSpace 同源。 */
+    val freedBytes: Long = 0L,
+    /** 累计已清理字节（含本轮），完成态成果注脚展示。 */
+    val lifetimeBytes: Long = 0L,
+    /** 完成态语录（治愈温柔·情境化选句）；待确认态为 null。 */
+    val quote: String? = null,
     val pendingDeleteItems: List<MediaItem>,
     val isDeleting: Boolean,
     val deleteResult: String?,

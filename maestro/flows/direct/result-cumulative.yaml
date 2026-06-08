@@ -1,0 +1,60 @@
+# maestro/flows/direct/result-cumulative.yaml
+#
+# E2E: 结果页成果注脚（spec §6.3）
+# 全保留走完一轮 → 结果页完成态 → 验证「本次清理 / 累计已清理」滚动注脚 + 语录可见
+# 对应: feat/cleanup-stats 阶段一·结果页升级
+#
+appId: com.cleanpic.android
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 30000
+- waitForAnimationToEnd
+
+# 确保轮播模式 + 轮次 5
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+- tapOn: "轮播相册"
+- waitForAnimationToEnd
+- tapOn: "5"
+- waitForAnimationToEnd
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd
+
+# 进入照片浏览
+- tapOn:
+    id: "start_photo"
+- waitForAnimationToEnd
+- tapOn:
+    text: "授权"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Allow"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    id: "start_photo"
+    optional: true
+- waitForAnimationToEnd
+
+# 全保留 5 张 → 到达结果页完成态（无待删除项）
+- repeat:
+    times: 5
+    commands:
+      - tapOn:
+          id: "keep_button"
+      - waitForAnimationToEnd
+
+# 验证成果注脚（完成态独有；位于结果页下方，滚动揭示）
+- scrollUntilVisible:
+    element:
+      text: "本次清理"
+    direction: DOWN
+- assertVisible: "累计已清理"
+- takeScreenshot: maestro/screenshots/result-cumulative

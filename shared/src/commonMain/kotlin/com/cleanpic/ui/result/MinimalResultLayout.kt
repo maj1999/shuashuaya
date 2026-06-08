@@ -100,6 +100,21 @@ fun MinimalResultLayout(state: ResultScreenState) {
             Spacer(modifier = Modifier.height(32.dp))
         }
 
+        // 成果注脚（完成态）：本次 + 累计滚动动画 + 语录
+        if (!confirm) {
+            item {
+                ResultCumulativeBlock(
+                    roundBytes = state.freedBytes,
+                    lifetimeBytes = state.lifetimeBytes,
+                    quote = state.quote,
+                    textColor = Color(0xFF333333),
+                    subColor = Color(0xFF999999),
+                    surfaceColor = Color(0xFFFFFFFF),
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+        }
+
         // 待删除缩略图
         if (state.pendingDeleteItems.isNotEmpty()) {
             item {

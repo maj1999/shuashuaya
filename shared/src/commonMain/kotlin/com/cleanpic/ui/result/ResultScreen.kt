@@ -1,8 +1,12 @@
 package com.cleanpic.ui.result
 
 import androidx.compose.runtime.*
+import com.cleanpic.currentLocalDate
+import com.cleanpic.di.ServiceLocator
+import com.cleanpic.epochToLocalDate
 import com.cleanpic.model.MediaType
 import com.cleanpic.model.OperationState
+import com.cleanpic.stats.CleanupQuotes
 import com.cleanpic.theme.ThemeLayoutId
 import com.cleanpic.theme.ThemeTokens
 import com.cleanpic.ui.navigation.AppRouter
@@ -30,6 +34,15 @@ fun ResultScreen(
 
     val phase = resolveResultPhase(pendingDeletes.size, deleteConfirmed)
 
+    // 完成态成果注脚：累计统计随删除落库后刷新；语录情境化选句。
+    // 轮次已在到达结果页时记入；删除在 confirmDelete 落库，故 deleteConfirmed 翻转后重读。
+    val lifetime = remember(deleteConfirmed) { ServiceLocator.statsStore.load().lifetime }
+    val quote = remember(deleteConfirmed) {
+        val isStreak = lifetime.lastCleanupAt > 0L &&
+            epochToLocalDate(lifetime.lastCleanupAt) == currentLocalDate()
+        CleanupQuotes.pick(lifetime, isStreak, seed = lifetime.totalRounds)
+    }
+
     val state = ResultScreenState(
         theme = theme,
         phase = phase,
@@ -38,6 +51,9 @@ fun ResultScreen(
         deletedCount = pendingDeletes.size,
         keptCount = keptCount,
         freedSpace = formatBytes(releasedBytes),
+        freedBytes = releasedBytes,
+        lifetimeBytes = lifetime.totalBytes,
+        quote = if (phase == ResultPhase.DONE) quote else null,
         pendingDeleteItems = if (!deleteConfirmed) pendingDeletes.map { it.media } else emptyList(),
         isDeleting = isDeleting,
         deleteResult = confirmResult,

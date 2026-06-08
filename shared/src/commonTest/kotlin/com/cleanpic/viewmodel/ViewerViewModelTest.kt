@@ -517,4 +517,28 @@ class ViewerViewModelTest {
         localVm.recordRoundReached()
         assertEquals(1, stats.load().lifetime.photo.rounds)
     }
+
+    @Test
+    fun cancelled_or_failed_delete_does_not_record_amount() = runTest {
+        // 诚实性红线：系统回收站弹窗取消 / 删除失败时，清理量绝不入账。
+        val stats = InMemoryStatsStore()
+        val repo = MockMediaRepository(photos = TestMediaFactory.photos(10))
+        ServiceLocator.initialize(
+            mediaRepo = repo,
+            settings = MockAppSettings(),
+            permission = MockPermissionManager(),
+            player = MockVideoPlayer(),
+            statsStore = stats
+        )
+        val localVm = ViewerViewModel()
+        localVm.loadMedia(MediaType.PHOTO)
+        localVm.markDelete()
+        localVm.markDelete()
+        repo.shouldFail = true   // 模拟系统弹窗取消 / 删除失败
+        val result = localVm.confirmDelete()
+        assertTrue(result.isFailure)
+        // 清理量保持为 0（轮次另算，此处只校验"量不注水"）
+        assertEquals(0, stats.load().lifetime.totalCount)
+        assertEquals(0L, stats.load().lifetime.totalBytes)
+    }
 }

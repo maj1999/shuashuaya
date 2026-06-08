@@ -174,7 +174,9 @@ commonMain 不可用 `java.time`，故自带零依赖日期运算（连续天数
 
 ### 12.6 结果页即时成果反馈 `ui/result/ResultCumulativeBlock.kt`（US-CP-28）
 
-结果页「完成」态注脚：`本次清理 X` + `累计已清理 Y` + 语录。`Animatable` 单插值 0→1，900ms `FastOutSlowInEasing`：本次从 0 滚到 `roundBytes`，累计从 `prevLifetime = (lifetimeBytes − roundBytes)` 滚到 `lifetimeBytes`，**强调本轮增量**。5 个结果布局视觉各异，故配色由调用方传入，本块只统一结构 + 动画；接线见各 `*ResultLayout.kt` + `ResultScreen(State)`。
+结果页「完成」态注脚：`累计已清理 Y` + 语录。`Animatable` 单插值 0→1，900ms `FastOutSlowInEasing`：累计从 `prevLifetime = (lifetimeBytes − roundBytes)` 滚到 `lifetimeBytes`，**强调本轮增量**。5 个结果布局视觉各异，故配色由调用方传入，本块只统一结构 + 动画；接线见各 `*ResultLayout.kt` + `ResultScreen(State)`。
+
+> 去重：本轮单次清理字节（`freedBytes`，与顶部三宫格「已释放」`freedSpace` 同源）原在注脚再展示一行「本次清理」，与顶部重复，故移除；注脚专讲长期累计 + 情绪价值。`roundBytes` 入参保留，仅用于算累计动画起点 `prevLifetime`。
 
 ### 12.7 诚实性红线（回归补强）
 

@@ -1,7 +1,8 @@
 # maestro/flows/direct/result-cumulative.yaml
 #
 # E2E: 结果页成果注脚（spec §6.3）
-# 全保留走完一轮 → 结果页完成态 → 验证「本次清理 / 累计已清理」滚动注脚 + 语录可见
+# 全保留走完一轮 → 结果页完成态 → 验证「累计已清理」滚动注脚可见
+# （本轮量由顶部三宫格「已释放」展示，注脚不再重复「本次清理」）
 # 对应: feat/cleanup-stats 阶段一·结果页升级
 #
 appId: com.cleanpic.android
@@ -54,7 +55,7 @@ appId: com.cleanpic.android
 # 验证成果注脚（完成态独有；位于结果页下方，滚动揭示）
 - scrollUntilVisible:
     element:
-      text: "本次清理"
+      text: "累计已清理"
     direction: DOWN
 - assertVisible: "累计已清理"
 - takeScreenshot: maestro/screenshots/result-cumulative

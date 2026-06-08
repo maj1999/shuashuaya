@@ -22,11 +22,11 @@ import com.cleanpic.ui.viewer.formatBytes
 
 /**
  * 结果页「完成」态的成果注脚（spec §6.3）：
- * 本次清理 X + 累计已清理 Y（数字滚动动画）+ 一句语录。
+ * 累计已清理 Y（数字滚动动画）+ 一句语录。
  *
  * 5 个布局视觉各异，故配色由调用方传入；本块只负责结构 + 动画一致。
- * 累计数字从「上一次累计（Y − 本次）」滚动到「Y」，强调本轮带来的增量；
- * 本次数字从 0 滚动到 X。
+ * 累计数字从「上一次累计（Y − 本次）」滚动到「Y」，强调本轮带来的增量。
+ * 本轮量已由顶部三宫格「已释放」展示，此处不再重复，专讲长期累计 + 情绪价值。
  */
 @Composable
 fun ResultCumulativeBlock(
@@ -48,7 +48,6 @@ fun ResultCumulativeBlock(
         anim.animateTo(1f, tween(durationMillis = 900, easing = FastOutSlowInEasing))
     }
     val frac = anim.value
-    val roundShown = (roundBytes * frac).toLong()
     val lifeShown = prevLifetime + ((lifetimeBytes - prevLifetime) * frac).toLong()
 
     Column(
@@ -59,21 +58,6 @@ fun ResultCumulativeBlock(
             .padding(horizontal = 18.dp, vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(
-            text = "本次清理",
-            fontSize = 11.sp,
-            fontFamily = font,
-            color = subColor,
-        )
-        Spacer(Modifier.height(2.dp))
-        Text(
-            text = formatBytes(roundShown),
-            fontSize = 17.sp,
-            fontFamily = font,
-            fontWeight = FontWeight.Medium,
-            color = textColor,
-        )
-        Spacer(Modifier.height(12.dp))
         Text(
             text = "累计已清理",
             fontSize = 11.sp,

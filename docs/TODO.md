@@ -29,7 +29,7 @@
 - [x] `architecture/cleanpic/viewer-video-playback.md` — 全屏视频播放：静音统一 + 单播放器 + 拖拽进度条（US-CP-18/25）
 - [x] `architecture/cleanpic/viewer-immersive.md` — 全屏沉浸模式：单击隐藏/显示界面（US-CP-26）
 - [x] `architecture/cleanpic/auto-update-china-gitee.md` — 国内自动升级分发（Gitee 双端点 + 存量迁移）
-- [x] `architecture/cleanpic/cleanup-stats.md` — 清理成果统计：按类型累计 + 统计页 + 首页入口（US-CP-27）
+- [x] `architecture/cleanpic/cleanup-stats.md` — 清理成果统计：按类型累计 + 统计页 + 首页入口 + 阶段二/三（连续天数/里程碑/环形图/月度回顾/结果页累计，§12）（US-CP-27/28）
 
 ## 部署层
 
@@ -45,7 +45,7 @@
 - [x] `testing/scenarios/ep6-auto-update.md` — EP6 自动升级场景
 - [x] `testing/scenarios/tech-nfr.md` — NFR 性能/兼容性/安全
 - [x] `testing/scenarios/ep7-random-enhancement.md` — EP7 随机算法增强场景（US-CP-22/23）
-- [x] `testing/scenarios/ep8-cleanup-stats.md` — EP8 清理成果统计场景（US-CP-27）
+- [x] `testing/scenarios/ep8-cleanup-stats.md` — EP8 清理成果统计场景（US-CP-27/28，含连续天数/里程碑/月度/日期运算单测 + 结果页累计 E2E）
 
 ## 设计 Spec
 

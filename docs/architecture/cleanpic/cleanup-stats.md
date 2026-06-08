@@ -1,14 +1,14 @@
 # 清理成果统计 — 按类型累计 + 统计页 + 首页入口
 
-|文档状态| 初稿 | 2026-06-07 |
+|文档状态| 阶段一~三已实现 | 2026-06-08 |
 
-> 父文档: [overview.md](overview.md) ｜ 关联 US: US-CP-27 ｜ 设计稿: [../../superpowers/specs/2026-06-07-cleanup-stats-design.md](../../superpowers/specs/2026-06-07-cleanup-stats-design.md) ｜ 实现计划: [../../superpowers/plans/2026-06-07-cleanup-stats.md](../../superpowers/plans/2026-06-07-cleanup-stats.md)
+> 父文档: [overview.md](overview.md) ｜ 关联 US: US-CP-27、US-CP-28 ｜ 设计稿: [../../superpowers/specs/2026-06-07-cleanup-stats-design.md](../../superpowers/specs/2026-06-07-cleanup-stats-design.md) ｜ 实现计划: [../../superpowers/plans/2026-06-07-cleanup-stats.md](../../superpowers/plans/2026-06-07-cleanup-stats.md)
 
 ## 1. 目标
 
 把用户真实清理掉的照片/视频（大小·数量·完成轮次，**照片/视频完全拆分**）持久化累计，新增「清理成果」统计页 + 首页入口，形成"清理 → 记录 → 查看成果"闭环。原则：数字**绝不注水**（只记真实删除成功的），**全程离线、记录仅存本机**，**零新依赖**（仿 `PickStateCodec` 紧凑编码，不引入 serialization-json 运行时）。
 
-本文覆盖**阶段一**。阶段二（里程碑徽章/连续天数/构成饼图）、阶段三（月度回顾/分享/本地备份）见设计稿路线图，后续单独立文档。
+§1~11 覆盖**阶段一**（按类型累计 + 统计页 + 首页入口）。阶段二（里程碑徽章/连续天数/构成环形图）、阶段三（月度回顾）已实现，见 **§12**；剩余路线图项（分享/本地备份）仍待做。
 
 ## 2. 两个独立指标
 
@@ -131,4 +131,63 @@ interface StatsStore {
 ## 11. 测试 / 版本
 
 - 测试：[../../testing/scenarios/ep8-cleanup-stats.md](../../testing/scenarios/ep8-cleanup-stats.md)（U-ST-* 单元 / I-ST-* 集成 / E-ST-* E2E）。
-- 版本：新增用户可见功能 → MINOR（下一发布版本号按当时基线 +MINOR）。
+- 版本：新增用户可见功能 → MINOR（阶段一 1.x；阶段二/三随 1.14.0 发布）。
+
+---
+
+## 12. 阶段二 / 三实现（连续天数 · 里程碑 · 构成环形图 · 月度回顾 · 结果页累计）
+
+延续阶段一原则：**零新依赖、全程离线、数字绝不注水**。逻辑全部落在 commonMain 纯函数（`stats/` 新增 4 个 object），数据底子复用阶段一就开始采集的 `daily` 明细，故历史可回溯、无需迁移。
+
+### 12.1 纯日期运算 `stats/DateMath.kt`
+
+commonMain 不可用 `java.time`，故自带零依赖日期运算（连续天数与月度聚合的共同底座）：
+
+| 函数 | 作用 | 关键点 |
+|------|------|--------|
+| `epochDay("yyyy-MM-dd"): Int?` | 日期 → 自 1970-01-01 起的天序号（可负） | Howard Hinnant `days_from_civil` 算法，覆盖闰年/世纪规则；非法格式回 null |
+| `yearMonth("yyyy-MM-dd"): String?` | → 「yyyy-MM」月份键 | 月份补零；非法回 null |
+
+### 12.2 连续清理天数 `stats/StatsStreak.kt`
+
+`current(daily, today): Int` —— 把 `daily` 日期映射成 `epochDay` 集合，从今天起向前数连续命中的天数。**口径**：今天有清理则从今天起算；今天未清理但昨天清理过则从昨天起算（避免"今天还没打开"就清零）；今天和昨天都没有则为 0。
+
+### 12.3 里程碑徽章 `stats/Milestones.kt`
+
+`evaluate(lifetime): List<Badge>` —— 对固定的 8 个阈值定义判定达成，**全部返回**（含未达成，UI 灰显），顺序固定便于稳定渲染与测试。`achievedCount()` 供「X / Y」概览。
+
+| 维度 | 阈值 |
+|------|------|
+| 累计字节 `totalBytes` | 1 GB / 10 GB / 100 GB（GB 按 1e9） |
+| 累计文件 `totalCount` | 100 / 1000 |
+| 完成轮次 `totalRounds` | 10 / 50 / 100 |
+
+`Badge(id, label, icon, achieved)`，icon 复用 `storage`/`photo`/`stats` 现有 path。
+
+### 12.4 月度回顾 `stats/MonthlyReview.kt`
+
+`byMonth(daily): List<MonthStat>` —— 把 `daily` 按 `yearMonth` 聚合（照片/视频各自累加），**按月份倒序**（最近月在前）。`forMonth(daily, ym)` 取指定月、无数据回 null。`MonthStat` 暴露 `totalBytes/Count/Rounds`。
+
+### 12.5 构成环形图（统计页 `ui/stats/StatsScreen.kt`）
+
+阶段一「分类构成」的占比条升级为 **Canvas 环形图**，按字节占比绘制照片/视频两段弧。单 Composable 读 `ThemeTokens` 适配 5 主题，沿用阶段一不滚动单屏；里程碑徽章网格、连续天数、月度回顾卡均接入本页。
+
+### 12.6 结果页即时成果反馈 `ui/result/ResultCumulativeBlock.kt`（US-CP-28）
+
+结果页「完成」态注脚：`本次清理 X` + `累计已清理 Y` + 语录。`Animatable` 单插值 0→1，900ms `FastOutSlowInEasing`：本次从 0 滚到 `roundBytes`，累计从 `prevLifetime = (lifetimeBytes − roundBytes)` 滚到 `lifetimeBytes`，**强调本轮增量**。5 个结果布局视觉各异，故配色由调用方传入，本块只统一结构 + 动画；接线见各 `*ResultLayout.kt` + `ResultScreen(State)`。
+
+### 12.7 诚实性红线（回归补强）
+
+`ViewerViewModelTest.cancelled_or_failed_delete_does_not_record_amount`：模拟系统回收站弹窗取消 / 删除失败（`confirmDelete` 不成功），断言**清理量绝不入账**——结果页累计与统计页同口径，不注水。
+
+### 12.8 接线表（阶段二/三新增）
+
+| 组件 | 改动 |
+|------|------|
+| `stats/DateMath.kt`（新） | 零依赖日期运算 |
+| `stats/StatsStreak.kt`（新） | 连续清理天数纯函数 |
+| `stats/Milestones.kt`（新） | 8 徽章评估纯函数 |
+| `stats/MonthlyReview.kt`（新） | daily → 按月聚合纯函数 |
+| `ui/stats/StatsScreen.kt` | 环形图 + 徽章网格 + 连续天数 + 月度回顾卡 |
+| `ui/result/ResultCumulativeBlock.kt`（新） | 结果页本次/累计滚动注脚 |
+| `ui/result/ResultScreen(State).kt` + 5×`*ResultLayout.kt` | 接入注脚 + 传各主题配色 |

@@ -9,4 +9,4 @@
 | US-CP-12, 18, 19, 20, 21, 24, 25, 26 | EP5: 浏览体验增强 | cleanpic | [cleanpic.md](cleanpic.md) | ⚙️ 进行中 |
 | US-CP-13 ~ 17 | EP6: 自动升级 | cleanpic | [cleanpic.md](cleanpic.md) | 待开始 |
 | US-CP-22, 23 | EP7: 随机算法增强 | cleanpic | [cleanpic.md](cleanpic.md) | ⚙️ 进行中 |
-| US-CP-27 | EP8: 清理成果统计 | cleanpic | [cleanpic.md](cleanpic.md) | ⚙️ 进行中 |
+| US-CP-27 ~ 28 | EP8: 清理成果统计 | cleanpic | [cleanpic.md](cleanpic.md) | ✅ 已实现 |

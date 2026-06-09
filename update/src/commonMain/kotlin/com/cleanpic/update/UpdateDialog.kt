@@ -42,7 +42,7 @@ fun UpdateDialog(
             modifier = Modifier
                 .widthIn(max = 320.dp)
                 .clip(RoundedCornerShape(theme.borderRadius.dp))
-                .background(Color(theme.colorSurface))
+                .background(Color(dialogSurfaceColor(theme)))
                 .clickable(enabled = false) {} // 防止穿透点击
                 .padding(24.dp)
                 .testTag("update_dialog"),
@@ -61,7 +61,7 @@ fun UpdateDialog(
                 text = "v${updateInfo.version}",
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Medium,
-                color = Color(theme.colorPrimary),
+                color = Color(dialogAccentColor(theme)),
                 modifier = Modifier.testTag("update_version")
             )
 
@@ -146,7 +146,7 @@ fun DownloadProgressDialog(
             modifier = Modifier
                 .widthIn(max = 280.dp)
                 .clip(RoundedCornerShape(theme.borderRadius.dp))
-                .background(Color(theme.colorSurface))
+                .background(Color(dialogSurfaceColor(theme)))
                 .clickable(
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() },
@@ -207,7 +207,7 @@ fun InstallingDialog(theme: ThemeTokens) {
             modifier = Modifier
                 .widthIn(max = 280.dp)
                 .clip(RoundedCornerShape(theme.borderRadius.dp))
-                .background(Color(theme.colorSurface))
+                .background(Color(dialogSurfaceColor(theme)))
                 .clickable(
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() },
@@ -251,7 +251,7 @@ fun UpdateFailedDialog(
             modifier = Modifier
                 .widthIn(max = 280.dp)
                 .clip(RoundedCornerShape(theme.borderRadius.dp))
-                .background(Color(theme.colorSurface))
+                .background(Color(dialogSurfaceColor(theme)))
                 .clickable(enabled = false) {}
                 .padding(24.dp)
                 .testTag("update_failed_dialog"),

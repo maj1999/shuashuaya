@@ -57,3 +57,6 @@ test-assets/**/*.mp4
 
 # Store flavor 构建产出（手动上架渠道，不入版本控制）
 dist/
+
+# cc-connect 本地附件/草稿目录（不入库）
+.cc-connect/

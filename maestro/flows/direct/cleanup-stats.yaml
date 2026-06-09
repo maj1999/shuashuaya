@@ -44,3 +44,6 @@ appId: com.cleanpic.android
     element:
       text: "全程离线 · 清理记录仅存本机，不上传"
     direction: DOWN
+
+# 标题栏吸顶守门：滚动到页面底部后，「清理成果」标题仍固定可见（不随内容滚走）
+- assertVisible: "清理成果"

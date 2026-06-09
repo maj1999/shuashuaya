@@ -68,9 +68,15 @@ fun StatsScreen(router: AppRouter, theme: ThemeTokens) {
     val chartAccentLong: Long = theme.statsAccent
     val chartAccent = Color(chartAccentLong)
 
-    Column(modifier = Modifier.fillMaxSize().background(bg).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp)) {
-        Spacer(Modifier.height(50.dp))
-        Row(verticalAlignment = Alignment.CenterVertically) {
+    Column(modifier = Modifier.fillMaxSize().background(bg)) {
+        // 固定标题栏：清理成果页向下滚动时常驻顶部，返回箭头与标题始终可见/可点
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+                .padding(top = 50.dp, bottom = 14.dp)
+        ) {
             IconPainter(
                 name = "back",
                 theme = theme,
@@ -81,7 +87,15 @@ fun StatsScreen(router: AppRouter, theme: ThemeTokens) {
             Spacer(Modifier.width(12.dp))
             Text("清理成果", fontSize = 19.sp, fontWeight = FontWeight.Bold, color = text)
         }
-        Spacer(Modifier.height(14.dp))
+
+        // 成果内容滚动区：标题栏以下的所有卡片随手势滚动
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 20.dp)
+        ) {
 
         Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(radius)).background(surface).padding(18.dp)) {
             Text("累计已清理", fontSize = 13.sp, color = sub)
@@ -190,6 +204,7 @@ fun StatsScreen(router: AppRouter, theme: ThemeTokens) {
             Text("全程离线 · 清理记录仅存本机，不上传", fontSize = 11.sp, color = sub)
         }
         Spacer(Modifier.height(24.dp))
+        }
     }
 }
 

@@ -1,5 +1,7 @@
 package com.cleanpic.di
 
+import co.touchlab.kermit.LogWriter
+import com.cleanpic.log.LogConfig
 import com.cleanpic.media.InMemoryPickStateStore
 import com.cleanpic.media.MediaRepository
 import com.cleanpic.media.PickStateStore
@@ -30,7 +32,8 @@ object ServiceLocator {
         permission: PermissionManager,
         player: VideoPlayer,
         pickStateStore: PickStateStore = InMemoryPickStateStore(),
-        statsStore: com.cleanpic.stats.StatsStore = com.cleanpic.stats.InMemoryStatsStore()
+        statsStore: com.cleanpic.stats.StatsStore = com.cleanpic.stats.InMemoryStatsStore(),
+        logWriters: List<LogWriter> = emptyList()
     ) {
         mediaRepository = mediaRepo
         appSettings = settings
@@ -39,5 +42,6 @@ object ServiceLocator {
         this.pickStateStore = pickStateStore
         this.statsStore = statsStore
         themeManager.switchTheme(settings.theme)
+        LogConfig.init(isDebugBuild, logWriters)
     }
 }

@@ -58,12 +58,22 @@ class AndroidUpdateInstaller internal constructor(
         downloadJob?.cancel()
         downloadJob = scope.launch {
             val dir = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
-            // 清理旧残留，避免占空间/混淆
-            dir?.listFiles()
-                ?.filter { it.name.startsWith("cleanpic-") && it.name.endsWith(".apk") }
-                ?.forEach { it.delete() }
-
             val destFile = File(dir, "cleanpic-${updateInfo.version}.apk")
+
+            // 快路径：本地已存在该版本且完整性校验通过（防篡改）→ 免重复下载，直接安装。
+            // 仅删除其他版本残留，保留本次复用的包；被篡改/损坏则下方走正常下载。
+            if (ApkIntegrity.canReuseLocalApk(destFile, updateInfo.sha256, updateInfo.size)) {
+                cleanStaleApks(dir, keep = destFile)
+                if (_downloadState.value != DownloadState.DOWNLOADING) return@launch
+                _downloadProgress.value = 1f
+                _downloadState.value = DownloadState.DOWNLOADED
+                installApk(destFile)
+                return@launch
+            }
+
+            // 清理旧残留（含本次目标的损坏/不完整文件），避免占空间/混淆
+            cleanStaleApks(dir, keep = null)
+
             val ok = downloadApk(
                 client = httpClient,
                 candidates = candidates,
@@ -89,6 +99,13 @@ class AndroidUpdateInstaller internal constructor(
                 _downloadState.value = DownloadState.FAILED
             }
         }
+    }
+
+    /** 清理 downloads 目录下的旧安装包残留；[keep] 指定的文件（本次要复用的包）保留不删。 */
+    private fun cleanStaleApks(dir: File?, keep: File?) {
+        dir?.listFiles()
+            ?.filter { it.name.startsWith("cleanpic-") && it.name.endsWith(".apk") && it != keep }
+            ?.forEach { it.delete() }
     }
 
     private fun installApk(file: File) {

@@ -26,6 +26,16 @@ internal object ApkIntegrity {
         return true
     }
 
+    /**
+     * 能否复用本地已下载的安装包（免重复下载）。
+     *
+     * 仅当 version.json 提供了 **sha256** 时才允许复用：sha256 是防篡改的强校验，
+     * 缺失时（兜底/旧 version.json）ZIP 魔数+大小校验过弱，宁可重新下载也不冒险装本地包。
+     * 本地包被篡改/损坏 → sha256 不匹配 → 返回 false → 调用方回退重新下载。
+     */
+    fun canReuseLocalApk(file: File, expectedSha256: String, expectedSize: Long): Boolean =
+        expectedSha256.isNotBlank() && file.exists() && verify(file, expectedSha256, expectedSize)
+
     private fun hasZipMagic(file: File): Boolean {
         val head = ByteArray(ZIP_MAGIC.size)
         file.inputStream().use { input ->

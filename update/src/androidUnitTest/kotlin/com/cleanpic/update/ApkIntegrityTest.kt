@@ -76,4 +76,36 @@ class ApkIntegrityTest {
         val f = writeFile("digest", validApkBytes)
         assertEquals(sha256(validApkBytes), ApkIntegrity.sha256Hex(f))
     }
+
+    // ---- canReuseLocalApk：本地已下载包复用判定（免重复下载 + 防篡改）----
+
+    @Test
+    fun reuse_local_apk_when_present_and_hash_matches() {
+        // 本地存在、sha256/大小匹配 → 复用（不再重新下载）
+        val f = writeFile("reuse-ok", validApkBytes)
+        assertTrue(ApkIntegrity.canReuseLocalApk(f, sha256(validApkBytes), validApkBytes.size.toLong()))
+    }
+
+    @Test
+    fun do_not_reuse_tampered_local_apk() {
+        // 本地包被篡改：仍是合法 ZIP、大小不变，但内容改了 → sha256 不匹配 → 不复用，回退重下
+        val original = validApkBytes
+        val tampered = validApkBytes.copyOf().also { it[10] = (it[10] + 1).toByte() }
+        val f = writeFile("reuse-tampered", tampered)
+        assertFalse(ApkIntegrity.canReuseLocalApk(f, sha256(original), original.size.toLong()))
+    }
+
+    @Test
+    fun do_not_reuse_when_sha256_absent() {
+        // version.json 无 sha256（兜底/旧版）：校验过弱，宁可重新下载也不复用本地包
+        val f = writeFile("reuse-no-sha", validApkBytes)
+        assertFalse(ApkIntegrity.canReuseLocalApk(f, "", validApkBytes.size.toLong()))
+    }
+
+    @Test
+    fun do_not_reuse_when_file_absent() {
+        // 本地没下载过 → 不复用
+        val f = File.createTempFile("reuse-absent", ".bin").also { it.delete() }
+        assertFalse(ApkIntegrity.canReuseLocalApk(f, sha256(validApkBytes), validApkBytes.size.toLong()))
+    }
 }

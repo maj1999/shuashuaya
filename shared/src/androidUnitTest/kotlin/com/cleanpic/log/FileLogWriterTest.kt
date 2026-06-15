@@ -20,6 +20,7 @@ class FileLogWriterTest {
         assertTrue("日志文件应存在", logFile.exists())
         assertTrue("应包含写入内容", logFile.readText().contains("hello-line"))
         assertTrue("应包含 tag", logFile.readText().contains("Tag"))
+        assertTrue("应包含 severity 前缀", logFile.readText().contains("W/"))
     }
 
     @Test

@@ -14,11 +14,14 @@ object LogExporter {
         return "刷刷鸭-日志-${fmt.format(Date(nowMillis))}.log"
     }
 
-    /** 拼装日志内容：历史(app.log.1) 在前，当前(app.log) 在后；都不存在则空串。 */
+    /**
+     * 拼装日志内容：历史(app.log.1) 在前，当前(app.log) 在后；都不存在则空串。
+     * 内存占用：一次性持有的内容总量 ≤ 2 × FileLogWriter.maxBytes（默认约 2MB）。
+     */
     fun collect(logsDir: File): String {
         val sb = StringBuilder()
-        File(logsDir, "app.log.1").takeIf { it.exists() }?.let { sb.append(it.readText()) }
-        File(logsDir, "app.log").takeIf { it.exists() }?.let { sb.append(it.readText()) }
+        File(logsDir, "app.log.1").takeIf { it.exists() }?.let { sb.append(it.readText(Charsets.UTF_8)) }
+        File(logsDir, "app.log").takeIf { it.exists() }?.let { sb.append(it.readText(Charsets.UTF_8)) }
         return sb.toString()
     }
 }

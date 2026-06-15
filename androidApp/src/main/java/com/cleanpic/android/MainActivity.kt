@@ -50,12 +50,21 @@ class MainActivity : ComponentActivity() {
     private val exportLauncher = registerForActivityResult(
         ActivityResultContracts.CreateDocument("text/plain")
     ) { uri: Uri? ->
-        if (uri == null) { log.i { "导出取消" }; return@registerForActivityResult }
+        if (uri == null) {
+            log.i { "导出取消" }
+            return@registerForActivityResult
+        }
+        val out = contentResolver.openOutputStream(uri)
+        if (out == null) {
+            log.w { "导出失败：openOutputStream 返回 null" }
+            return@registerForActivityResult
+        }
         runCatching {
-            contentResolver.openOutputStream(uri)?.use { out ->
+            out.use {
                 val content = LogExporter.collect(logsDir).ifEmpty { "(暂无日志)" }
-                out.write(content.toByteArray())
+                it.write(content.toByteArray())
             }
+            log.i { "导出成功" }
         }.onFailure { log.e(it) { "导出写入失败" } }
     }
 

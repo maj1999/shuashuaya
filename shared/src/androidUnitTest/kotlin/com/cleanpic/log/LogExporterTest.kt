@@ -33,4 +33,18 @@ class LogExporterTest {
         val dir = Files.createTempDirectory("exp2").toFile()
         assertEquals("", LogExporter.collect(dir))
     }
+
+    @Test
+    fun collect_only_current_when_no_rotated() {
+        val dir = Files.createTempDirectory("exp3").toFile()
+        File(dir, "app.log").writeText("ONLY-CURRENT\n")
+        assertEquals("ONLY-CURRENT\n", LogExporter.collect(dir))
+    }
+
+    @Test
+    fun collect_only_rotated_when_no_current() {
+        val dir = Files.createTempDirectory("exp4").toFile()
+        File(dir, "app.log.1").writeText("ONLY-ROTATED\n")
+        assertEquals("ONLY-ROTATED\n", LogExporter.collect(dir))
+    }
 }

@@ -155,7 +155,7 @@ class ViewerViewModel {
             }
         }
         result.onSuccess { log.i { "确认删除成功 count=${redactCount(it)}" } }
-            .onFailure { log.e(it) { "确认删除失败" } }
+            .onFailure { log.e { "确认删除失败: ${it::class.simpleName}" } }
         return result
     }
 

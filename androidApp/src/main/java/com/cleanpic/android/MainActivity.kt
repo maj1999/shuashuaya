@@ -65,7 +65,7 @@ class MainActivity : ComponentActivity() {
                 it.write(content.toByteArray())
             }
             log.i { "导出成功" }
-        }.onFailure { log.e(it) { "导出写入失败" } }
+        }.onFailure { log.e { "导出写入失败: ${it::class.simpleName}" } }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

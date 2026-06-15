@@ -14,7 +14,7 @@ class AndroidVideoPlayer : VideoPlayer {
         // TODO: 使用 ExoPlayer 通过 ContentResolver 加载媒体 URI
         _prepared = true
         _duration = 30_000L // 占位值
-        log.i { "prepare 完成 prepared=$_prepared" }
+        log.i { "prepare 完成" }
     }
 
     override fun play() {
@@ -28,13 +28,13 @@ class AndroidVideoPlayer : VideoPlayer {
 
     override fun pause() {
         _isPlaying = false
-        log.i { "pause" }
+        log.i { "暂停" }
     }
 
     override fun release() {
         _isPlaying = false
         _prepared = false
-        log.i { "release" }
+        log.i { "释放" }
     }
 
     override fun setMuted(muted: Boolean) {

@@ -6,6 +6,7 @@ import com.cleanpic.log.LogConfig
 import com.cleanpic.model.MediaItem
 import com.cleanpic.model.MediaType
 import kotlinx.coroutines.runBlocking
+import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -31,6 +32,12 @@ class DeleteLauncherLoggingTest {
     fun setup() {
         AndroidMediaRepository.deleteLauncher = null
         LogConfig.init(debug = true, extraWriters = listOf(rec))
+    }
+
+    @After
+    fun tearDown() {
+        AndroidMediaRepository.deleteLauncher = null
+        LogConfig.init(debug = false, extraWriters = emptyList())
     }
 
     @Test

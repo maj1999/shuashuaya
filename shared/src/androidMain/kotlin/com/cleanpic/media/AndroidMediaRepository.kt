@@ -9,6 +9,7 @@ import android.os.Build
 import android.provider.MediaStore
 import com.cleanpic.log.logger
 import com.cleanpic.log.redactCount
+import com.cleanpic.log.redactType
 import com.cleanpic.model.MediaItem
 import com.cleanpic.model.MediaType
 import kotlin.coroutines.resume
@@ -98,7 +99,7 @@ class AndroidMediaRepository(private val context: Context) : MediaRepository {
     private suspend fun requestSystemDelete(uris: List<Uri>, count: Int): Result<Int> {
         val launcher = deleteLauncher
         if (launcher == null) {
-            log.e { "deleteLauncher not registered（删除请求数=${redactCount(count)}）" }
+            log.e { "deleteLauncher 未注册（删除请求数=${redactCount(count)}）" }
             return Result.failure(IllegalStateException("deleteLauncher not registered"))
         }
         val pendingIntent = MediaStore.createDeleteRequest(context.contentResolver, uris)
@@ -174,7 +175,7 @@ class AndroidMediaRepository(private val context: Context) : MediaRepository {
                     )
                 }
             }
-        log.d { "查询媒体 type=${type.name} 命中=${redactCount(items.size)}" }
+        log.d { "查询媒体 type=${redactType(type)} 命中=${redactCount(items.size)}" }
         return items
     }
 }

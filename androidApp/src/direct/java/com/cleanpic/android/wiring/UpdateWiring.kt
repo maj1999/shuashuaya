@@ -32,6 +32,7 @@ import com.cleanpic.update.AndroidUpdateInstaller
 import com.cleanpic.update.DownloadProgressDialog
 import com.cleanpic.update.DownloadState
 import com.cleanpic.update.InstallingDialog
+import com.cleanpic.update.ResetInstallStateOnResume
 import com.cleanpic.update.UpdateChecker
 import com.cleanpic.update.UpdateCheckResult
 import com.cleanpic.update.UpdateDialog
@@ -129,6 +130,9 @@ private fun HomeUpdateOverlay(
             )
         }
     }
+
+    // 从系统安装器取消返回后，清掉残留的"正在启动安装器"遮罩，避免卡死
+    ResetInstallStateOnResume(installer)
 
     val downloadState by installer.downloadState.collectAsState()
     val downloadProgress by installer.downloadProgress.collectAsState()

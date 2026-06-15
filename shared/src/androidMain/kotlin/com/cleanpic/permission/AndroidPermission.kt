@@ -8,12 +8,14 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.core.content.ContextCompat
+import com.cleanpic.log.logger
 import kotlin.coroutines.resume
 import kotlinx.coroutines.suspendCancellableCoroutine
 
 class AndroidPermission(private val context: Context) : PermissionManager {
 
     private var pendingCallback: ((PermissionStatus) -> Unit)? = null
+    private val log = logger("Permission")
 
     override suspend fun requestPhotoPermission(): PermissionStatus {
         if (checkPermissionStatus() == PermissionStatus.GRANTED) {
@@ -23,8 +25,10 @@ class AndroidPermission(private val context: Context) : PermissionManager {
             pendingCallback = { status -> cont.resume(status) }
             val launcher = permissionLauncher
             if (launcher != null) {
+                log.i { "请求相册权限" }
                 launcher(requiredPermissions())
             } else {
+                log.w { "permissionLauncher 未注册，直接 DENIED" }
                 cont.resume(PermissionStatus.DENIED)
                 pendingCallback = null
             }
@@ -33,6 +37,7 @@ class AndroidPermission(private val context: Context) : PermissionManager {
 
     fun onPermissionResult(granted: Map<String, Boolean>) {
         val allGranted = granted.values.all { it }
+        log.i { "权限回调 granted=$allGranted" }
         val status = if (allGranted) PermissionStatus.GRANTED
             else PermissionStatus.DENIED
         pendingCallback?.invoke(status)

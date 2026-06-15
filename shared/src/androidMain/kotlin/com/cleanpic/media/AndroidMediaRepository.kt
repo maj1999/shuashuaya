@@ -7,6 +7,8 @@ import android.content.IntentSender
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import com.cleanpic.log.logger
+import com.cleanpic.log.redactCount
 import com.cleanpic.model.MediaItem
 import com.cleanpic.model.MediaType
 import kotlin.coroutines.resume
@@ -18,6 +20,7 @@ import java.util.concurrent.CancellationException
 class AndroidMediaRepository(private val context: Context) : MediaRepository {
 
     private var pendingDeleteCallback: ((Boolean) -> Unit)? = null
+    private val log = logger("MediaRepo")
 
     override suspend fun queryPhotos(): List<MediaItem> = withContext(Dispatchers.IO) {
         queryMedia(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, MediaType.PHOTO)
@@ -64,6 +67,7 @@ class AndroidMediaRepository(private val context: Context) : MediaRepository {
 
     override suspend fun deleteMediaItems(items: List<MediaItem>): Result<Int> =
         withContext(Dispatchers.IO) {
+            log.i { "发起系统删除：数量=${redactCount(items.size)}" }
             try {
                 val uris = items.map { item ->
                     val baseUri = when (item.type) {
@@ -92,9 +96,12 @@ class AndroidMediaRepository(private val context: Context) : MediaRepository {
     }
 
     private suspend fun requestSystemDelete(uris: List<Uri>, count: Int): Result<Int> {
-        val pendingIntent = MediaStore.createDeleteRequest(context.contentResolver, uris)
         val launcher = deleteLauncher
-            ?: return Result.failure(IllegalStateException("deleteLauncher not registered"))
+        if (launcher == null) {
+            log.e { "deleteLauncher not registered（删除请求数=${redactCount(count)}）" }
+            return Result.failure(IllegalStateException("deleteLauncher not registered"))
+        }
+        val pendingIntent = MediaStore.createDeleteRequest(context.contentResolver, uris)
         return suspendCancellableCoroutine { cont ->
             pendingDeleteCallback = { granted ->
                 if (granted) {
@@ -167,6 +174,7 @@ class AndroidMediaRepository(private val context: Context) : MediaRepository {
                     )
                 }
             }
+        log.d { "查询媒体 type=${type.name} 命中=${redactCount(items.size)}" }
         return items
     }
 }

@@ -117,6 +117,8 @@ class MainActivity : ComponentActivity() {
 
             CleanPicApp(hooks = hooks)
         }
+
+        log.i { "MainActivity onCreate：launcher 已注册" }
     }
 
     override fun onDestroy() {
@@ -124,5 +126,6 @@ class MainActivity : ComponentActivity() {
         AndroidPermission.permissionLauncher = null
         AndroidMediaRepository.deleteLauncher = null
         LogExportController.onRequestExport = null
+        log.i { "MainActivity onDestroy：launcher 注销" }
     }
 }

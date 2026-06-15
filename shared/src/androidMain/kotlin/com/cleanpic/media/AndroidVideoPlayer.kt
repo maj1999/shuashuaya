@@ -1,29 +1,40 @@
 package com.cleanpic.media
 
+import com.cleanpic.log.logger
+
 class AndroidVideoPlayer : VideoPlayer {
     private var _isPlaying = false
     private var _muted = false
     private var _currentPosition = 0L
     private var _duration = 0L
     private var _prepared = false
+    private val log = logger("VideoPlayer")
 
     override fun prepare(mediaId: String) {
         // TODO: 使用 ExoPlayer 通过 ContentResolver 加载媒体 URI
         _prepared = true
         _duration = 30_000L // 占位值
+        log.i { "prepare 完成 prepared=$_prepared" }
     }
 
     override fun play() {
-        if (_prepared) _isPlaying = true
+        if (_prepared) {
+            _isPlaying = true
+            log.i { "play 开始" }
+        } else {
+            log.e { "play 失败：未 prepared" }
+        }
     }
 
     override fun pause() {
         _isPlaying = false
+        log.i { "pause" }
     }
 
     override fun release() {
         _isPlaying = false
         _prepared = false
+        log.i { "release" }
     }
 
     override fun setMuted(muted: Boolean) {

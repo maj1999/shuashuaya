@@ -87,6 +87,8 @@ kotlin {
         dependsOn(commonMain)
         dependencies {
             implementation("androidx.core:core-ktx:1.12.0")
+            // activity-compose：提供 BackHandler（系统返回键/手势拦截），供 PlatformBackHandler 的 Android actual 使用
+            implementation("androidx.activity:activity-compose:1.8.2")
             // Coil 3: 图片加载 + 视频帧解码
             implementation("io.coil-kt.coil3:coil-compose:${Versions.COIL}")
             implementation("io.coil-kt.coil3:coil-video:${Versions.COIL}")

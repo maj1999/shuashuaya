@@ -1,0 +1,50 @@
+# maestro/flows/direct/back-navigation.yaml
+#
+# E2E: 系统返回键在 App 内逐级返回（而非任意界面直接退出 App）
+# 设置页返回 → 回首页；浏览页返回 → 回首页
+#
+appId: com.cleanpic.android
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "settings_button"
+    timeout: 30000
+- waitForAnimationToEnd
+
+# ===== 设置页：系统返回应回到首页，而非退出 App =====
+- tapOn:
+    id: "settings_button"
+- waitForAnimationToEnd
+- assertVisible:
+    id: "back_button"
+- pressKey: Back
+- waitForAnimationToEnd
+- assertVisible:
+    id: "start_photo"
+- takeScreenshot: maestro/screenshots/back-settings-to-home
+
+# ===== 浏览页：系统返回应回到首页 =====
+- tapOn:
+    id: "start_photo"
+- waitForAnimationToEnd
+- tapOn:
+    text: "授权"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Allow"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    id: "start_photo"
+    optional: true
+- waitForAnimationToEnd
+- assertVisible:
+    id: "exit_button"
+- pressKey: Back
+- waitForAnimationToEnd
+- assertVisible:
+    id: "start_photo"
+- takeScreenshot: maestro/screenshots/back-viewer-to-home

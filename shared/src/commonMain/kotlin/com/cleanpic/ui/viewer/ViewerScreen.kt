@@ -16,6 +16,7 @@ import com.cleanpic.model.InteractionMode
 import androidx.compose.ui.platform.testTag
 import com.cleanpic.model.MediaType
 import com.cleanpic.theme.ThemeTokens
+import com.cleanpic.ui.PlatformBackHandler
 import com.cleanpic.ui.common.EmptyStateScreen
 import com.cleanpic.ui.navigation.AppRouter
 import com.cleanpic.ui.navigation.Route
@@ -57,6 +58,9 @@ fun ViewerScreen(
             // 轮播/卡片模式下点击媒体进入的全屏叠层；全屏上下滑模式本就全屏，不使用
             var showFullscreen by remember { mutableStateOf(false) }
             LaunchedEffect(currentIndex) { showFullscreen = false }
+            // 全屏叠层打开时，系统返回先退出全屏（而非退出整个浏览页）。
+            // 内层 handler 比 App 级路由返回优先级高，仅在叠层打开时启用。
+            PlatformBackHandler(enabled = showFullscreen) { showFullscreen = false }
             // 静音状态上提到 ViewerScreen 统一持有，底层模式与全屏叠层共享同一份：
             // 放大前在轮播页取消静音后，进入全屏仍保持有声，不再各自为政导致"放大后又变静音"。
             var isMuted by remember { mutableStateOf(true) }

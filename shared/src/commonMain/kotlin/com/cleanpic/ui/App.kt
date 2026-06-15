@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import com.cleanpic.di.ServiceLocator
 import com.cleanpic.ui.navigation.AppRouter
 import com.cleanpic.ui.navigation.Route
+import com.cleanpic.ui.navigation.consumesBack
 import com.cleanpic.ui.navigation.rememberAppRouter
 import com.cleanpic.ui.splash.SplashScreen
 import com.cleanpic.ui.home.HomeScreen
@@ -22,6 +23,12 @@ fun CleanPicApp(hooks: AppHooks = AppHooks.Empty) {
     val theme by themeManager.currentTheme.collectAsState()
     val router = rememberAppRouter()
     val viewerViewModel = remember { ViewerViewModel() }
+
+    // 系统返回键/手势：非首页界面逐级返回上一级，首页则放行给系统（退出 App）。
+    // 之前未接返回键，导致任意界面按返回都直接退出 App。
+    PlatformBackHandler(enabled = router.currentRoute.consumesBack()) {
+        router.popBackStack()
+    }
 
     Box(modifier = Modifier.fillMaxSize().enableTestTagsAsResourceId()) {
         when (val route = router.currentRoute) {

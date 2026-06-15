@@ -44,6 +44,12 @@ class AppRouter {
     }
 }
 
+/**
+ * App 内是否应拦截系统返回键/手势：
+ * 首页与启动页放行给系统（→ 退出 App），其余界面逐级返回上一级。
+ */
+fun Route.consumesBack(): Boolean = this !is Route.Home && this !is Route.Splash
+
 @Composable
 fun rememberAppRouter(): AppRouter {
     return remember { AppRouter() }

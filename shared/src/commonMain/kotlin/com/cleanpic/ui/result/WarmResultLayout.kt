@@ -16,7 +16,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -82,7 +81,7 @@ fun WarmResultLayout(state: ResultScreenState) {
             Text(
                 text = subtitle,
                 fontSize = 15.sp,
-                fontStyle = FontStyle.Italic,
+                letterSpacing = 2.sp,
                 color = if (confirm) Color(theme.colorDanger) else Color(theme.colorTextSecondary)
             )
             Spacer(modifier = Modifier.height(28.dp))

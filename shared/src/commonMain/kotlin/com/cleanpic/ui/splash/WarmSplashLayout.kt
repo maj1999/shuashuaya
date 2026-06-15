@@ -13,7 +13,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cleanpic.icons.LogoPainter
@@ -75,7 +74,7 @@ fun WarmSplashLayout(state: SplashScreenState) {
             Text(
                 text = "随机一刷，相册清爽",
                 fontSize = 11.sp,
-                fontStyle = FontStyle.Italic,
+                letterSpacing = 1.5.sp,
                 color = Color(theme.colorTextSecondary)
             )
         }

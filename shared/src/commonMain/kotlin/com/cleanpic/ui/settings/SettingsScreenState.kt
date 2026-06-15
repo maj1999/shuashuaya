@@ -16,6 +16,8 @@ data class SettingsScreenState(
     val onCountChange: (Int) -> Unit,
     /** 重置浏览记录（US-CP-23）：清空全部浏览/保留记忆 */
     val onResetHistory: () -> Unit,
+    /** 导出诊断日志（SAF 下载） */
+    val onExportLogs: () -> Unit = {},
     val onBack: () -> Unit,
     /** 由宿主 flavor 注入的额外区块（如升级 UI），默认空 */
     val extras: @Composable () -> Unit = {}

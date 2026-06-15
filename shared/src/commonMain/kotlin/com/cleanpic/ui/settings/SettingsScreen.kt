@@ -1,6 +1,7 @@
 package com.cleanpic.ui.settings
 
 import androidx.compose.runtime.*
+import com.cleanpic.log.LogExportController
 import com.cleanpic.theme.ThemeTokens
 import com.cleanpic.ui.AppHooks
 import com.cleanpic.ui.navigation.AppRouter
@@ -36,6 +37,7 @@ fun SettingsScreen(
             viewModel.setRoundCount(count)
         },
         onResetHistory = { viewModel.resetBrowsingHistory() },
+        onExportLogs = { LogExportController.export() },
         onBack = { router.popBackStack() },
         extras = { hooks.SettingsExtras() }
     )

@@ -125,6 +125,7 @@ fun SharedSettingsLayout(state: SettingsScreenState) {
             item {
                 SectionTitle("浏览记录", theme, titleFont)
                 ResetHistoryButton(theme) { showResetDialog = true }
+                ExportLogsButton(theme) { state.onExportLogs() }
                 Spacer(modifier = Modifier.height(28.dp))
             }
 
@@ -191,6 +192,27 @@ private fun ResetHistoryButton(theme: ThemeTokens, onClick: () -> Unit) {
             fontSize = 14.sp,
             color = Color(theme.colorText)
         )
+    }
+}
+
+// ── 导出诊断日志按钮 ──────────────────────────────────────────────
+
+@Composable
+private fun ExportLogsButton(theme: ThemeTokens, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 10.dp)
+            .testTag("export_logs_button")
+            .clip(RoundedCornerShape(theme.borderRadius.dp))
+            .background(cardBackground(theme))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconPainter(name = "back", theme = theme, size = 18.dp, colorOverride = theme.iconStrokeColor)
+        Spacer(modifier = Modifier.width(10.dp))
+        Text(text = "导出诊断日志", fontSize = 14.sp, color = Color(theme.colorText))
     }
 }
 

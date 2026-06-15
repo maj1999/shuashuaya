@@ -3,6 +3,8 @@ package com.cleanpic.viewmodel
 import com.cleanpic.currentEpochMillis
 import com.cleanpic.currentLocalDate
 import com.cleanpic.di.ServiceLocator
+import com.cleanpic.log.logger
+import com.cleanpic.log.redactCount
 import com.cleanpic.media.RandomPicker
 import com.cleanpic.media.SeenRecord
 import com.cleanpic.model.*
@@ -11,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 class ViewerViewModel {
     private val repo get() = ServiceLocator.mediaRepository
+    private val log = logger("ViewerVM")
     private val settings get() = ServiceLocator.appSettings
     private val pickStore get() = ServiceLocator.pickStateStore
     private val statsStore get() = ServiceLocator.statsStore
@@ -52,6 +55,7 @@ class ViewerViewModel {
         if (all.isEmpty()) {
             _isEmpty.value = true
             _isLoading.value = false
+            log.i { "loadMedia type=${type.name} 相册为空" }
             return
         }
         currentType = type
@@ -60,6 +64,7 @@ class ViewerViewModel {
         val result = RandomPicker.pick(all, settings.roundCount, state, now = currentEpochMillis())
         pickStore.save(type, result.state)
         _items.value = result.items.map { ViewerItem(it) }
+        log.i { "loadMedia type=${type.name} 抽取=${redactCount(result.items.size)}" }
         _currentIndex.value = 0
         _isLoading.value = false
         resetUndo()
@@ -149,6 +154,8 @@ class ViewerViewModel {
                 statsStore.recordDeletion(type, currentEpochMillis(), currentLocalDate(), bytes, count)
             }
         }
+        result.onSuccess { log.i { "确认删除成功 count=${redactCount(it)}" } }
+            .onFailure { log.e(it) { "确认删除失败" } }
         return result
     }
 

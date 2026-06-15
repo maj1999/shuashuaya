@@ -1,6 +1,7 @@
 package com.cleanpic.android
 
 import android.app.Activity
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,6 +14,10 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import com.cleanpic.android.wiring.UpdateWiring
 import com.cleanpic.di.ServiceLocator
+import com.cleanpic.log.FileLogWriter
+import com.cleanpic.log.LogExportController
+import com.cleanpic.log.LogExporter
+import com.cleanpic.log.logger
 import com.cleanpic.media.AndroidMediaRepository
 import com.cleanpic.media.AndroidPickStateStore
 import com.cleanpic.media.AndroidVideoPlayer
@@ -20,6 +25,7 @@ import com.cleanpic.permission.AndroidPermission
 import com.cleanpic.settings.AndroidAppSettings
 import com.cleanpic.theme.isLightColor
 import com.cleanpic.ui.CleanPicApp
+import java.io.File
 
 class MainActivity : ComponentActivity() {
 
@@ -38,6 +44,21 @@ class MainActivity : ComponentActivity() {
             ?.onDeleteResult(granted)
     }
 
+    private val logsDir by lazy { File(filesDir, "logs") }
+    private val log = logger("MainActivity")
+
+    private val exportLauncher = registerForActivityResult(
+        ActivityResultContracts.CreateDocument("text/plain")
+    ) { uri: Uri? ->
+        if (uri == null) { log.i { "导出取消" }; return@registerForActivityResult }
+        runCatching {
+            contentResolver.openOutputStream(uri)?.use { out ->
+                val content = LogExporter.collect(logsDir).ifEmpty { "(暂无日志)" }
+                out.write(content.toByteArray())
+            }
+        }.onFailure { log.e(it) { "导出写入失败" } }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -53,13 +74,18 @@ class MainActivity : ComponentActivity() {
 
         ServiceLocator.isDebugBuild = BuildConfig.DEBUG
 
+        LogExportController.onRequestExport = {
+            exportLauncher.launch(LogExporter.exportFileName(System.currentTimeMillis()))
+        }
+
         ServiceLocator.initialize(
             mediaRepo = AndroidMediaRepository(applicationContext),
             settings = AndroidAppSettings(applicationContext),
             permission = androidPermission,
             player = AndroidVideoPlayer(),
             pickStateStore = AndroidPickStateStore(applicationContext),
-            statsStore = com.cleanpic.stats.AndroidStatsStore(applicationContext)
+            statsStore = com.cleanpic.stats.AndroidStatsStore(applicationContext),
+            logWriters = listOf(FileLogWriter(logsDir))
         )
 
         val hooks = UpdateWiring.provideHooks(this)
@@ -88,5 +114,6 @@ class MainActivity : ComponentActivity() {
         super.onDestroy()
         AndroidPermission.permissionLauncher = null
         AndroidMediaRepository.deleteLauncher = null
+        LogExportController.onRequestExport = null
     }
 }

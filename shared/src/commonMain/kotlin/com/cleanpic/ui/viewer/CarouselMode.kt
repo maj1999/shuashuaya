@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -34,8 +35,11 @@ import com.cleanpic.ui.media.MediaImage
 import com.cleanpic.ui.media.VideoPlayerView
 import com.cleanpic.viewmodel.ViewerViewModel
 
-// 左右滑动切换前后媒体的触发阈值
-private const val CAROUSEL_SWIPE_THRESHOLD_DP = 72
+// 左右滑动切换前后媒体的触发阈值（慢拖时需达到的位移）
+private const val CAROUSEL_SWIPE_THRESHOLD_DP = 56
+// 甩动（fling）触发阈值：快速轻扫即使位移不足也按此速度触发切换（dp/s）。
+// 轮播翻错代价低（再甩回来即可），取较低值以求跟手灵敏。
+private const val CAROUSEL_FLING_VELOCITY_DP = 250
 // 完成一次切换所需的滑动距离占容器宽度的比例（用于视觉过渡映射）
 private const val CAROUSEL_FULL_SWIPE_RATIO = 0.55f
 // 相邻槽位中心相对容器中心的水平间距占宽度的比例
@@ -93,8 +97,11 @@ fun CarouselMode(
                 // 否则切换动画期间连续发起的下一次滑动会落入重建窗口被吞掉（表现为「有时没反应」）。
                 // 切换条件所需的最新 currentIndex / 数量改为在松手时直接读 StateFlow.value。
                 .pointerInput(Unit) {
+                    // 跟手期间累积触点轨迹，松手时算出甩动速度，配合位移阈值判定切换
+                    val velocityTracker = VelocityTracker()
                     detectHorizontalDragGestures(
                         onDragStart = {
+                            velocityTracker.resetTracking()
                             // 上一次松手动画未完用户又拖：接管为跟手，停掉旧动画的副作用（见各分支 isSettling 守卫）。
                             if (isSettling) {
                                 dragOffset = settleAnim.value
@@ -111,18 +118,25 @@ fun CarouselMode(
                             val idx = viewerViewModel.currentIndex.value
                             val count = viewerViewModel.items.value.size
                             val isLastItem = idx == count - 1
-                            val thresholdPx = CAROUSEL_SWIPE_THRESHOLD_DP.dp.toPx()
                             val off = dragOffset
+                            // 位移够 OR 甩得够快（同方向）即触发，解决「快速轻扫位移不足被回弹」
+                            val velocity = velocityTracker.calculateVelocity().x
+                            val direction = decideSwipeDirection(
+                                offsetPx = off,
+                                velocityPxPerSec = velocity,
+                                distanceThresholdPx = CAROUSEL_SWIPE_THRESHOLD_DP.dp.toPx(),
+                                flingThresholdPxPerSec = CAROUSEL_FLING_VELOCITY_DP.dp.toPx()
+                            )
                             when {
                                 // 末张往后：整卡滑出屏幕 → 触发本轮完成进结果页（未决策默认保留）
-                                off <= -thresholdPx && isLastItem -> scope.launch {
+                                direction == SwipeDirection.LEFT && isLastItem -> scope.launch {
                                     isSettling = true
                                     settleAnim.snapTo(off)
                                     settleAnim.animateTo(-exitOff, tween(CAROUSEL_TRANSITION_MS))
                                     if (isSettling) viewerViewModel.goNext()
                                 }
                                 // 向左滑：当前卡滑出、下一张过渡到主位（未决策默认保留）
-                                off <= -thresholdPx -> scope.launch {
+                                direction == SwipeDirection.LEFT -> scope.launch {
                                     isSettling = true
                                     settleAnim.snapTo(off)
                                     settleAnim.animateTo(-full, tween(CAROUSEL_TRANSITION_MS))
@@ -137,7 +151,7 @@ fun CarouselMode(
                                     }
                                 }
                                 // 向右滑：当前卡滑出、上一张过渡到主位（保持原决策）
-                                off >= thresholdPx && idx > 0 -> scope.launch {
+                                direction == SwipeDirection.RIGHT && idx > 0 -> scope.launch {
                                     isSettling = true
                                     settleAnim.snapTo(off)
                                     settleAnim.animateTo(full, tween(CAROUSEL_TRANSITION_MS))
@@ -171,7 +185,8 @@ fun CarouselMode(
                                 }
                             }
                         }
-                    ) { _, dragAmount ->
+                    ) { change, dragAmount ->
+                        velocityTracker.addPosition(change.uptimeMillis, change.position)
                         // 跟手 1:1：同步累加，不经协程，彻底消除并发竞态与调度滞后
                         dragOffset += dragAmount
                     }

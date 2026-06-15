@@ -16,6 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -30,6 +31,9 @@ import com.cleanpic.viewmodel.ViewerViewModel
 import kotlinx.coroutines.launch
 
 private const val SWIPE_THRESHOLD_DP = 150
+// 甩动（fling）触发阈值（dp/s）：快速决断式轻扫即使位移不足也触发删除/保留。
+// 删除/保留误判代价高，取较高值——只有明确的甩动才算数，慢拖探看仍需拖够位移。
+private const val SWIPE_FLING_VELOCITY_DP = 450
 private const val DISMISS_TARGET = 1000f
 
 @Composable
@@ -53,6 +57,7 @@ fun SwipeCardMode(
     var isSettling by remember { mutableStateOf(false) }
     val density = LocalDensity.current
     val thresholdPx = with(density) { SWIPE_THRESHOLD_DP.dp.toPx() }
+    val flingPx = with(density) { SWIPE_FLING_VELOCITY_DP.dp.toPx() }
 
     val canUndo by viewerViewModel.canUndo.collectAsState()
     var isPlaying by remember { mutableStateOf(false) }
@@ -174,8 +179,11 @@ fun SwipeCardMode(
                     }
                     // key=Unit：避免决策切换时取消重建手势检测器而吞掉紧接着的下一次拖动
                     .pointerInput(Unit) {
+                        // 跟手期间累积触点轨迹，松手时算出甩动速度，配合位移阈值判定决策
+                        val velocityTracker = VelocityTracker()
                         detectHorizontalDragGestures(
                             onDragStart = {
+                                velocityTracker.resetTracking()
                                 // 上一次飞出/回弹动画未完用户又拖：接管为跟手，旧动画副作用由 isSettling 守卫放弃
                                 if (isSettling) {
                                     dragOffset = settleAnim.value
@@ -183,10 +191,18 @@ fun SwipeCardMode(
                                 }
                             },
                             onDragEnd = {
-                                when {
-                                    dragOffset < -thresholdPx -> onSwipeComplete(true)
-                                    dragOffset > thresholdPx -> onSwipeComplete(false)
-                                    else -> scope.launch {
+                                // 位移够 OR 甩得够快（同方向）即决策，解决「快速轻扫位移不足被回弹」
+                                val velocity = velocityTracker.calculateVelocity().x
+                                val direction = decideSwipeDirection(
+                                    offsetPx = dragOffset,
+                                    velocityPxPerSec = velocity,
+                                    distanceThresholdPx = thresholdPx,
+                                    flingThresholdPxPerSec = flingPx
+                                )
+                                when (direction) {
+                                    SwipeDirection.LEFT -> onSwipeComplete(true)
+                                    SwipeDirection.RIGHT -> onSwipeComplete(false)
+                                    SwipeDirection.NONE -> scope.launch {
                                         isSettling = true
                                         settleAnim.snapTo(dragOffset)
                                         settleAnim.animateTo(0f, tween(200))
@@ -208,7 +224,8 @@ fun SwipeCardMode(
                                     }
                                 }
                             }
-                        ) { _, dragAmount ->
+                        ) { change, dragAmount ->
+                            velocityTracker.addPosition(change.uptimeMillis, change.position)
                             // 跟手 1:1：同步累加，不经协程，彻底消除并发竞态与调度滞后
                             dragOffset += dragAmount
                         }

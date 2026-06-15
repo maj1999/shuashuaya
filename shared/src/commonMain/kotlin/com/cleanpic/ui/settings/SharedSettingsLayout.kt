@@ -185,8 +185,6 @@ private fun ResetHistoryButton(theme: ThemeTokens, onClick: () -> Unit) {
             .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconPainter(name = "back", theme = theme, size = 18.dp, colorOverride = theme.iconStrokeColor)
-        Spacer(modifier = Modifier.width(10.dp))
         Text(
             text = "重置浏览记录",
             fontSize = 14.sp,
@@ -210,8 +208,6 @@ private fun ExportLogsButton(theme: ThemeTokens, onClick: () -> Unit) {
             .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconPainter(name = "back", theme = theme, size = 18.dp, colorOverride = theme.iconStrokeColor)
-        Spacer(modifier = Modifier.width(10.dp))
         Text(text = "导出诊断日志", fontSize = 14.sp, color = Color(theme.colorText))
     }
 }

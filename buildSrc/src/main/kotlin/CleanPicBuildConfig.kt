@@ -53,8 +53,8 @@ object Deps {
 object AppConfig {
     const val APPLICATION_ID = "com.cleanpic.android"
     const val GROUP = "com.cleanpic"
-    const val VERSION_NAME = "1.17.1"
-    const val VERSION_CODE = 52
+    const val VERSION_NAME = "1.17.2"
+    const val VERSION_CODE = 53
     const val UPDATE_API_URL = "https://cleanpic-update.maj1946027533.workers.dev"
     // 国内主端点：Gitee raw 静态 version.json（国内可达、海外亦可达）。客户端优先读此处，失败再回退 UPDATE_API_URL。
     const val UPDATE_API_URL_CN =

@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cleanpic.android.BuildConfig
 import com.cleanpic.di.ServiceLocator
+import com.cleanpic.log.logger
 import com.cleanpic.theme.ThemeTokens
 import com.cleanpic.ui.AppHooks
 import com.cleanpic.update.AndroidUpdateInstaller
@@ -40,6 +42,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+
+private val log = logger("Update")
 
 object UpdateWiring {
 
@@ -67,8 +71,17 @@ object UpdateWiring {
         override fun onAppStart() {
             if (!ServiceLocator.appSettings.autoCheckUpdate) return
             updateScope.launch {
+                log.i { "更新检测开始" }
                 runCatching {
-                    UpdateResultCache.update(checker.checkForUpdate())
+                    val result = checker.checkForUpdate()
+                    UpdateResultCache.update(result)
+                    if (result.status == UpdateStatus.UP_TO_DATE) {
+                        log.i { "更新检测：已是最新" }
+                    } else {
+                        log.i { "更新检测：发现新版本 ${result.updateInfo?.version}" }
+                    }
+                }.onFailure {
+                    log.w { "更新检测失败：${it::class.simpleName}" }
                 }
             }
         }
@@ -109,6 +122,7 @@ private fun HomeUpdateOverlay(
                 isForceUpdate = updateResult.status == UpdateStatus.FORCE_UPDATE,
                 onUpdate = {
                     showDialog = false
+                    log.i { "更新下载开始" }
                     installer.startUpdate(info)
                 },
                 onDismiss = { showDialog = false }
@@ -119,6 +133,15 @@ private fun HomeUpdateOverlay(
     val downloadState by installer.downloadState.collectAsState()
     val downloadProgress by installer.downloadProgress.collectAsState()
 
+    // 仅在下载状态发生变化时记录终态一次，避免重组期重复打点
+    LaunchedEffect(downloadState) {
+        when (downloadState) {
+            DownloadState.DOWNLOADED -> log.i { "更新下载完成" }
+            DownloadState.FAILED -> log.e { "更新下载失败" }
+            else -> {}
+        }
+    }
+
     when (downloadState) {
         DownloadState.DOWNLOADING -> DownloadProgressDialog(theme = theme, progress = downloadProgress)
         DownloadState.INSTALLING -> InstallingDialog(theme = theme)
@@ -128,7 +151,10 @@ private fun HomeUpdateOverlay(
                 theme = theme,
                 onRetry = {
                     installer.resetState()
-                    if (info != null) installer.startUpdate(info)
+                    if (info != null) {
+                        log.i { "更新下载开始" }
+                        installer.startUpdate(info)
+                    }
                 },
                 onDismiss = { installer.resetState() }
             )
@@ -167,16 +193,23 @@ private fun SettingsUpdateSection(
             scope.launch {
                 isCheckingUpdate = true
                 checkResultMessage = null
+                log.i { "更新检测开始" }
                 runCatching {
                     val result = checker.checkForUpdate()
                     UpdateResultCache.update(result)
                     manualCheckResult = result
+                    if (result.status == UpdateStatus.UP_TO_DATE) {
+                        log.i { "更新检测：已是最新" }
+                    } else {
+                        log.i { "更新检测：发现新版本 ${result.updateInfo?.version}" }
+                    }
                     checkResultMessage = when (result.status) {
                         UpdateStatus.UP_TO_DATE -> "已是最新版本"
                         UpdateStatus.OPTIONAL_UPDATE -> "发现新版本 v${result.updateInfo?.version}"
                         UpdateStatus.FORCE_UPDATE -> "发现新版本 v${result.updateInfo?.version}（需要更新）"
                     }
                 }.onFailure {
+                    log.w { "更新检测失败：${it::class.simpleName}" }
                     checkResultMessage = "网络不可用，请稍后再试"
                 }
                 isCheckingUpdate = false
@@ -186,6 +219,7 @@ private fun SettingsUpdateSection(
         checkResultMessage = checkResultMessage,
         onStartUpdate = {
             val info = updateResult?.updateInfo ?: return@UpdateSectionUi
+            log.i { "更新下载开始" }
             installer.startUpdate(info)
         },
         isDebugBuild = ServiceLocator.isDebugBuild,

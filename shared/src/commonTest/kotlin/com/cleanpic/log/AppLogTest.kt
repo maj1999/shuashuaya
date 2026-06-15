@@ -19,7 +19,7 @@ private class RecordingWriter : LogWriter() {
 class AppLogTest {
     @AfterTest
     fun tearDown() {
-        LogConfig.init(debug = true, extraWriters = emptyList())
+        LogConfig.init(debug = false, extraWriters = emptyList())
     }
 
     @Test

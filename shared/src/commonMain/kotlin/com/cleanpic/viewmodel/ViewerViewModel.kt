@@ -5,6 +5,7 @@ import com.cleanpic.currentLocalDate
 import com.cleanpic.di.ServiceLocator
 import com.cleanpic.log.logger
 import com.cleanpic.log.redactCount
+import com.cleanpic.log.redactType
 import com.cleanpic.media.RandomPicker
 import com.cleanpic.media.SeenRecord
 import com.cleanpic.model.*
@@ -55,7 +56,7 @@ class ViewerViewModel {
         if (all.isEmpty()) {
             _isEmpty.value = true
             _isLoading.value = false
-            log.i { "loadMedia type=${type.name} 相册为空" }
+            log.i { "loadMedia type=${redactType(type)} 相册为空" }
             return
         }
         currentType = type
@@ -64,7 +65,7 @@ class ViewerViewModel {
         val result = RandomPicker.pick(all, settings.roundCount, state, now = currentEpochMillis())
         pickStore.save(type, result.state)
         _items.value = result.items.map { ViewerItem(it) }
-        log.i { "loadMedia type=${type.name} 抽取=${redactCount(result.items.size)}" }
+        log.i { "loadMedia type=${redactType(type)} 抽取=${redactCount(result.items.size)}" }
         _currentIndex.value = 0
         _isLoading.value = false
         resetUndo()

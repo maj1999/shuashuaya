@@ -45,7 +45,12 @@ fun SwipeCardMode(
     if (items.isEmpty() || currentIndex >= items.size) return
 
     val scope = rememberCoroutineScope()
-    val offsetX = remember { Animatable(0f) }
+    // 跟手位移：同步状态直接累加，避免「每个拖动增量都 launch 协程去 snapTo」的并发竞态
+    // （多协程并发读同一 offset 会丢量、调度延迟会滞后，且会与松手动画争用 Animatable 互相取消）。
+    var dragOffset by remember { mutableStateOf(0f) }
+    // 松手后的飞出/回弹动画；仅 isSettling 期间生效，与跟手位移分离互不干扰。
+    val settleAnim = remember { Animatable(0f) }
+    var isSettling by remember { mutableStateOf(false) }
     val density = LocalDensity.current
     val thresholdPx = with(density) { SWIPE_THRESHOLD_DP.dp.toPx() }
 
@@ -54,15 +59,25 @@ fun SwipeCardMode(
 
     // 每次 index 变化时重置偏移与播放状态
     LaunchedEffect(currentIndex) {
-        offsetX.snapTo(0f)
+        dragOffset = 0f
+        isSettling = false
+        settleAnim.snapTo(0f)
         isPlaying = false
     }
 
     fun onSwipeComplete(toLeft: Boolean) {
         scope.launch {
+            isSettling = true
+            settleAnim.snapTo(dragOffset)
             val target = if (toLeft) -DISMISS_TARGET else DISMISS_TARGET
-            offsetX.animateTo(target, tween(200))
-            if (toLeft) viewerViewModel.markDelete() else viewerViewModel.markKept()
+            settleAnim.animateTo(target, tween(200))
+            // isSettling 守卫：若拖动途中被新手势接管(onDragStart 置 false)则放弃本次决策
+            if (isSettling) {
+                if (toLeft) viewerViewModel.markDelete() else viewerViewModel.markKept()
+                settleAnim.snapTo(0f)
+                dragOffset = 0f
+                isSettling = false
+            }
         }
     }
 
@@ -114,8 +129,10 @@ fun SwipeCardMode(
                 )
             }
 
+            // 有效偏移：拖动中跟手 dragOffset，松手后由 settleAnim 平滑过渡
+            val effectiveOffset = if (isSettling) settleAnim.value else dragOffset
             // 滑动方向指示
-            val progress = (offsetX.value / thresholdPx).coerceIn(-1f, 1f)
+            val progress = (effectiveOffset / thresholdPx).coerceIn(-1f, 1f)
             if (progress < -0.2f) {
                 SwipeIndicator(
                     text = "删除",
@@ -132,8 +149,8 @@ fun SwipeCardMode(
             }
 
             // 前景可拖拽卡片
-            val rotation = offsetX.value * 0.05f
-            val cardAlpha = 1f - (kotlin.math.abs(offsetX.value) / thresholdPx * 0.5f)
+            val rotation = effectiveOffset * 0.05f
+            val cardAlpha = 1f - (kotlin.math.abs(effectiveOffset) / thresholdPx * 0.5f)
                 .coerceIn(0f, 0.5f)
 
             CardContent(
@@ -148,29 +165,52 @@ fun SwipeCardMode(
                     .fillMaxWidth(0.85f)
                     .testTag("media_card")
                     .graphicsLayer {
-                        translationX = offsetX.value
+                        translationX = effectiveOffset
                         rotationZ = rotation
                         alpha = cardAlpha
                     }
                     .pointerInput(currentIndex) {
                         detectTapGestures(onTap = { onMediaClick() })
                     }
-                    .pointerInput(currentIndex) {
+                    // key=Unit：避免决策切换时取消重建手势检测器而吞掉紧接着的下一次拖动
+                    .pointerInput(Unit) {
                         detectHorizontalDragGestures(
+                            onDragStart = {
+                                // 上一次飞出/回弹动画未完用户又拖：接管为跟手，旧动画副作用由 isSettling 守卫放弃
+                                if (isSettling) {
+                                    dragOffset = settleAnim.value
+                                    isSettling = false
+                                }
+                            },
                             onDragEnd = {
-                                if (offsetX.value < -thresholdPx) {
-                                    onSwipeComplete(true)
-                                } else if (offsetX.value > thresholdPx) {
-                                    onSwipeComplete(false)
-                                } else {
-                                    scope.launch { offsetX.animateTo(0f, tween(200)) }
+                                when {
+                                    dragOffset < -thresholdPx -> onSwipeComplete(true)
+                                    dragOffset > thresholdPx -> onSwipeComplete(false)
+                                    else -> scope.launch {
+                                        isSettling = true
+                                        settleAnim.snapTo(dragOffset)
+                                        settleAnim.animateTo(0f, tween(200))
+                                        if (isSettling) {
+                                            dragOffset = 0f
+                                            isSettling = false
+                                        }
+                                    }
                                 }
                             },
                             onDragCancel = {
-                                scope.launch { offsetX.animateTo(0f, tween(200)) }
+                                scope.launch {
+                                    isSettling = true
+                                    settleAnim.snapTo(dragOffset)
+                                    settleAnim.animateTo(0f, tween(200))
+                                    if (isSettling) {
+                                        dragOffset = 0f
+                                        isSettling = false
+                                    }
+                                }
                             }
                         ) { _, dragAmount ->
-                            scope.launch { offsetX.snapTo(offsetX.value + dragAmount) }
+                            // 跟手 1:1：同步累加，不经协程，彻底消除并发竞态与调度滞后
+                            dragOffset += dragAmount
                         }
                     }
             )

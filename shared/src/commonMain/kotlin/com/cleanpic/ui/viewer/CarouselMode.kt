@@ -19,7 +19,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -62,15 +61,20 @@ fun CarouselMode(
 
     val canUndo by viewerViewModel.canUndo.collectAsState()
     val scope = rememberCoroutineScope()
-    // 拖动偏移；用 Animatable 以便松手时平滑过渡到完成位/回弹位
-    val offsetX = remember { Animatable(0f) }
+    // 跟手位移：同步状态直接累加，避免「每个拖动增量都 launch 一个协程去 snapTo」的并发竞态
+    // （多协程并发读同一 offset 会丢量、调度延迟会滞后，且会与松手动画争用 Animatable 互相取消）。
+    var dragOffset by remember { mutableStateOf(0f) }
+    // 松手后的过渡/回弹动画；仅 isSettling 期间生效，与跟手位移分离互不干扰。
+    val settleAnim = remember { Animatable(0f) }
+    var isSettling by remember { mutableStateOf(false) }
     var containerWidth by remember { mutableStateOf(0f) }
     var isPlaying by remember { mutableStateOf(false) }
-    val thresholdPx = with(LocalDensity.current) { CAROUSEL_SWIPE_THRESHOLD_DP.dp.toPx() }
 
     // 切换到下一项时复位偏移与播放状态
     LaunchedEffect(currentIndex) {
-        offsetX.snapTo(0f)
+        dragOffset = 0f
+        isSettling = false
+        settleAnim.snapTo(0f)
         isPlaying = false
     }
 
@@ -85,46 +89,91 @@ fun CarouselMode(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp)
                 .onSizeChanged { containerWidth = it.width.toFloat() }
-                .pointerInput(currentIndex, items.size) {
+                // key 用 Unit 而非 currentIndex：避免每次切换都取消重建手势检测器，
+                // 否则切换动画期间连续发起的下一次滑动会落入重建窗口被吞掉（表现为「有时没反应」）。
+                // 切换条件所需的最新 currentIndex / 数量改为在松手时直接读 StateFlow.value。
+                .pointerInput(Unit) {
                     detectHorizontalDragGestures(
+                        onDragStart = {
+                            // 上一次松手动画未完用户又拖：接管为跟手，停掉旧动画的副作用（见各分支 isSettling 守卫）。
+                            if (isSettling) {
+                                dragOffset = settleAnim.value
+                                isSettling = false
+                            }
+                        },
                         onDragEnd = {
                             val width = if (containerWidth > 0f) containerWidth else 1f
                             // 一次完整切换的目标偏移：当前卡滑出、相邻卡滑入主位
                             val full = width * CAROUSEL_FULL_SWIPE_RATIO
                             // 末张往后无下一张可补位：整卡直接平移滑出屏幕，目标取容器宽度多一点确保完全划出
                             val exitOff = width * 1.05f
-                            val isLastItem = currentIndex == items.size - 1
-                            val off = offsetX.value
+                            // 实时读取最新索引/数量（不依赖闭包捕获，配合 key=Unit）
+                            val idx = viewerViewModel.currentIndex.value
+                            val count = viewerViewModel.items.value.size
+                            val isLastItem = idx == count - 1
+                            val thresholdPx = CAROUSEL_SWIPE_THRESHOLD_DP.dp.toPx()
+                            val off = dragOffset
                             when {
                                 // 末张往后：整卡滑出屏幕 → 触发本轮完成进结果页（未决策默认保留）
                                 off <= -thresholdPx && isLastItem -> scope.launch {
-                                    offsetX.animateTo(-exitOff, tween(CAROUSEL_TRANSITION_MS))
-                                    viewerViewModel.goNext()
+                                    isSettling = true
+                                    settleAnim.snapTo(off)
+                                    settleAnim.animateTo(-exitOff, tween(CAROUSEL_TRANSITION_MS))
+                                    if (isSettling) viewerViewModel.goNext()
                                 }
                                 // 向左滑：当前卡滑出、下一张过渡到主位（未决策默认保留）
                                 off <= -thresholdPx -> scope.launch {
-                                    offsetX.animateTo(-full, tween(CAROUSEL_TRANSITION_MS))
-                                    // 换页与偏移归零在同一协程内同步完成，确保同一帧生效：
-                                    // 否则换页后 offsetX 仍为 -full 会有一帧把"未加载的下一张"错映到中心而闪屏
-                                    viewerViewModel.goNext()
-                                    offsetX.snapTo(0f)
+                                    isSettling = true
+                                    settleAnim.snapTo(off)
+                                    settleAnim.animateTo(-full, tween(CAROUSEL_TRANSITION_MS))
+                                    // isSettling 守卫：若拖动途中被新手势接管(onDragStart 置 false)则放弃本次切换。
+                                    // 换页与偏移归零在同一协程内同步完成，确保同一帧生效，否则换页后偏移仍为
+                                    // -full 会有一帧把"未加载的下一张"错映到中心而闪屏。
+                                    if (isSettling) {
+                                        viewerViewModel.goNext()
+                                        settleAnim.snapTo(0f)
+                                        dragOffset = 0f
+                                        isSettling = false
+                                    }
                                 }
                                 // 向右滑：当前卡滑出、上一张过渡到主位（保持原决策）
-                                off >= thresholdPx && currentIndex > 0 -> scope.launch {
-                                    offsetX.animateTo(full, tween(CAROUSEL_TRANSITION_MS))
-                                    viewerViewModel.goPrevious()
-                                    offsetX.snapTo(0f)
+                                off >= thresholdPx && idx > 0 -> scope.launch {
+                                    isSettling = true
+                                    settleAnim.snapTo(off)
+                                    settleAnim.animateTo(full, tween(CAROUSEL_TRANSITION_MS))
+                                    if (isSettling) {
+                                        viewerViewModel.goPrevious()
+                                        settleAnim.snapTo(0f)
+                                        dragOffset = 0f
+                                        isSettling = false
+                                    }
                                 }
                                 // 未达阈值或已到首张：回弹复位
-                                else -> scope.launch { offsetX.animateTo(0f, tween(CAROUSEL_SETTLE_MS)) }
+                                else -> scope.launch {
+                                    isSettling = true
+                                    settleAnim.snapTo(off)
+                                    settleAnim.animateTo(0f, tween(CAROUSEL_SETTLE_MS))
+                                    if (isSettling) {
+                                        dragOffset = 0f
+                                        isSettling = false
+                                    }
+                                }
                             }
                         },
                         onDragCancel = {
-                            scope.launch { offsetX.animateTo(0f, tween(CAROUSEL_SETTLE_MS)) }
+                            scope.launch {
+                                isSettling = true
+                                settleAnim.snapTo(dragOffset)
+                                settleAnim.animateTo(0f, tween(CAROUSEL_SETTLE_MS))
+                                if (isSettling) {
+                                    dragOffset = 0f
+                                    isSettling = false
+                                }
+                            }
                         }
                     ) { _, dragAmount ->
-                        // 跟手 1:1 移动，避免主卡滞后于手指
-                        scope.launch { offsetX.snapTo(offsetX.value + dragAmount) }
+                        // 跟手 1:1：同步累加，不经协程，彻底消除并发竞态与调度滞后
+                        dragOffset += dragAmount
                     }
                 },
             contentAlignment = Alignment.Center
@@ -132,8 +181,10 @@ fun CarouselMode(
             val safeWidth = if (containerWidth > 0f) containerWidth else 1f
             val fullSwipe = safeWidth * CAROUSEL_FULL_SWIPE_RATIO
             val slotSpacing = safeWidth * CAROUSEL_SLOT_SPACING_RATIO
+            // 有效偏移：拖动中跟手 dragOffset，松手后由 settleAnim 平滑过渡
+            val effectiveOffset = if (isSettling) settleAnim.value else dragOffset
             // 拖动进度：正=右滑（看上一张），负=左滑（看下一张），范围 [-1, 1]
-            val drag = (offsetX.value / fullSwipe).coerceIn(-1f, 1f)
+            val drag = (effectiveOffset / fullSwipe).coerceIn(-1f, 1f)
             // 末张：往后无下一张可补位，主卡随手指整卡平移滑出（不缩小到侧边）
             val isLastItem = currentIndex == items.size - 1
 
@@ -157,15 +208,15 @@ fun CarouselMode(
                             lerp(CAROUSEL_SIDE_ALPHA, 0f, (kotlin.math.abs(v) - 1f).coerceIn(0f, 1f))
                         }
 
-                        // 末张主卡往后滑（offsetX<0）时：整卡 1:1 跟手平移滑出，保持原尺寸不缩小
+                        // 末张主卡往后滑（offset<0）时：整卡 1:1 跟手平移滑出，保持原尺寸不缩小
                         val slideOff = focused && isLastItem
                         var cardModifier = Modifier
                             .fillMaxHeight(0.85f)
                             .fillMaxWidth(0.78f)
                             .zIndex(1f - kotlin.math.abs(v))
                             .graphicsLayer {
-                                if (slideOff && offsetX.value < 0f) {
-                                    translationX = offsetX.value
+                                if (slideOff && effectiveOffset < 0f) {
+                                    translationX = effectiveOffset
                                     scaleX = 1f
                                     scaleY = 1f
                                     alpha = 1f

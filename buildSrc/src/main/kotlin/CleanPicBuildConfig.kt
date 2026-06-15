@@ -28,6 +28,9 @@ object Versions {
     // Network
     const val KTOR = "3.1.1"
     const val KOTLINX_SERIALIZATION = "1.7.3"
+
+    // Logging
+    const val KERMIT = "2.0.4"
 }
 
 object Deps {

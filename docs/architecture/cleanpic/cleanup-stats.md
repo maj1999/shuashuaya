@@ -172,11 +172,30 @@ commonMain 不可用 `java.time`，故自带零依赖日期运算（连续天数
 
 阶段一「分类构成」的占比条升级为 **Canvas 环形图**，按字节占比绘制照片/视频两段弧。单 Composable 读 `ThemeTokens` 适配 5 主题，沿用阶段一不滚动单屏；里程碑徽章网格、连续天数、月度回顾卡均接入本页。
 
-### 12.6 结果页即时成果反馈 `ui/result/ResultCumulativeBlock.kt`（US-CP-28）
+### 12.6 结果页成果统一卡 `ui/result/ResultCumulativeBlock.kt`（US-CP-03 / US-CP-06 / US-CP-28）
 
-结果页「完成」态注脚：`累计已清理 Y` + 语录。`Animatable` 单插值 0→1，900ms `FastOutSlowInEasing`：累计从 `prevLifetime = (lifetimeBytes − roundBytes)` 滚到 `lifetimeBytes`，**强调本轮增量**。5 个结果布局视觉各异，故配色由调用方传入，本块只统一结构 + 动画；接线见各 `*ResultLayout.kt` + `ResultScreen(State)`。
+结果页的「待确认」「完成」两态共用一张**统一成果卡**（同骨架，措辞/陪衬随态切换），消除原「三宫格 + 独立累计卡」里本轮字节重复出现的问题。骨架自上而下：小标签 + **主角大数字 `X`**（`bytes`，30sp 粗体居中）+ 一行明细计数 + 状态专属陪衬。
 
-> 去重：本轮单次清理字节（`freedBytes`，与顶部三宫格「已释放」`freedSpace` 同源）原在注脚再展示一行「本次清理」，与顶部重复，故移除；注脚专讲长期累计 + 情绪价值。`roundBytes` 入参保留，仅用于算累计动画起点 `prevLifetime`。
+| 态 | 标签 | 主角 `X` | 明细行 | 陪衬 |
+|----|------|----------|--------|------|
+| 待确认 | `即将释放` | `freedSpace`（可释放量，静态） | `待删除 N · 拟保留 M` | 缩略图列表（**左对齐**）+「确认删除」按钮 + 不可撤销提示；**无累计/语录** |
+| 完成 | `本轮清理` | `roundBytes`（本轮量，滚动 0→X） | `已删除 N · 已保留 M` | 淡分隔 + 小字注脚 `累计已清理 Y`（`lifetimeBytes`，静态）+ 语录 |
+
+动画：完成态 `Animatable` 单插值 0→1，900ms `FastOutSlowInEasing`，**主角本轮量从 `0` 滚到 `roundBytes`**，给当下行为最强即时正反馈；累计注脚静态（不滚动，避免抢节奏）。待确认态主角静态展示。标题：待确认「即将删除」、完成「本轮清理完成」（**均不含 emoji**）。
+
+**结构统一、风格各异**：卡片骨架共用，但容器装饰（`OutcomeCardDecoration`）/圆角/字重/字间距/衬线/主角色由各主题布局传入，让 5 个主题在保持主次对调结构的同时各自呈现视觉签名：
+
+| 主题 | 装饰 | 圆角 | 主角字重/色 | 备注 |
+|------|------|------|-------------|------|
+| Minimal | `FLAT`（扁平+细线框） | 2dp | Medium·**单色深灰**（不用绿，守极简克制） | 标签字间距 2sp |
+| Geometric | `SOLID`（霓虹实心色块） | 16dp | `FontWeight(900)`·霓虹绿 | 标签字间距 1.5sp |
+| Warm | `SHADOW`（柔和暖阴影白卡） | 16dp | Bold·暖绿 | — |
+| Playful | `BORDER`（毛玻璃+描边） | 20dp | Bold·亮绿 | — |
+| Editorial | `RULES`（无框+上下细分割线） | 0 | Normal·深绿 | serif，标签字间距 2sp |
+
+> 主角色强制 `alpha = 1f`：部分主题 `colorSuccess` 带低 alpha（Playful `0x4D…`），不拉满会让最重要的数字糊在背景上。
+
+> 主次对调（US-CP-28 改版）：原设计以「累计已清理」为放大主角、本轮量单列在三宫格「已释放」`freedSpace`。改版后**本轮量升为放大主角**、删/留计数降为明细行、累计降为注脚，「已释放」并入主角不再单列——同一数字只出现一次。`prevLifetime`/累计滚动逻辑移除，动画改驱动主角 0→`roundBytes`。完成态原顶部三宫格被统一卡取代；待确认态三宫格同样并入统一卡。
 
 ### 12.7 诚实性红线（回归补强）
 
@@ -191,8 +210,8 @@ commonMain 不可用 `java.time`，故自带零依赖日期运算（连续天数
 | `stats/Milestones.kt`（新） | 8 徽章评估纯函数 |
 | `stats/MonthlyReview.kt`（新） | daily → 按月聚合纯函数 |
 | `ui/stats/StatsScreen.kt` | 环形图 + 徽章网格 + 连续天数 + 月度回顾卡 |
-| `ui/result/ResultCumulativeBlock.kt`（新） | 结果页本次/累计滚动注脚 |
-| `ui/result/ResultScreen(State).kt` + 5×`*ResultLayout.kt` | 接入注脚 + 传各主题配色 |
+| `ui/result/ResultCumulativeBlock.kt` | 结果页成果统一卡（待确认/完成两态：主角大数字 + 明细行 + 陪衬）；改版前为累计滚动注脚 |
+| `ui/result/ResultScreen(State).kt` + 5×`*ResultLayout.kt` | 两态接入统一卡、原三宫格并入；传各主题配色 + 缩略图左对齐 |
 
 ### 12.9 统计页入场动画
 

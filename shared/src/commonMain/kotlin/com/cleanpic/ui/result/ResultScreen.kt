@@ -46,7 +46,7 @@ fun ResultScreen(
     val state = ResultScreenState(
         theme = theme,
         phase = phase,
-        confirmTitle = "即将删除 ${pendingDeletes.size} 项",
+        confirmTitle = "即将删除",
         irreversibleHint = "删除后不可在 App 内撤销",
         deletedCount = pendingDeletes.size,
         keptCount = keptCount,

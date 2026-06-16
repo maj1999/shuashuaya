@@ -59,7 +59,7 @@ appId: com.cleanpic.android
       - tapOn:
           id: "keep_button"
       - waitForAnimationToEnd
-- assertVisible: ".*即将删除 2 项.*"
+- assertVisible: ".*即将删除.*"
 # 关键断言：点缩略图必须进入全屏预览（而非误触发取消删除）
 - tapOn:
     id: "delete_thumb"
@@ -72,4 +72,4 @@ appId: com.cleanpic.android
 - tapOn:
     id: "preview_back_button"
 - waitForAnimationToEnd
-- assertVisible: ".*即将删除 2 项.*"
+- assertVisible: ".*即将删除.*"

@@ -31,9 +31,6 @@ fun MinimalResultLayout(state: ResultScreenState) {
     val theme = state.theme
     val confirm = state.phase == ResultPhase.CONFIRM
     val title = if (confirm) state.confirmTitle else "本轮清理完成"
-    val delLabel = if (confirm) "待删除" else "已删除"
-    val keepLabel = if (confirm) "拟保留" else "已保留"
-    val freeLabel = if (confirm) "可释放" else "已释放"
 
     LazyColumn(
         modifier = Modifier
@@ -88,31 +85,27 @@ fun MinimalResultLayout(state: ResultScreenState) {
             Spacer(modifier = Modifier.height(24.dp))
         }
 
-        // 统计行
+        // 成果统一卡（两态共用）：主角大数字 + 明细计数行 + 完成态注脚/语录
         item {
-            MinimalStatRow(label = delLabel, value = "${state.deletedCount}", valueColor = Color(0xFFCC3333))
-            MinimalDivider()
-            MinimalStatRow(label = keepLabel, value = "${state.keptCount}", valueColor = Color(0xFF333333))
-            MinimalDivider()
-            MinimalStatRow(label = freeLabel, value = state.freedSpace, valueColor = Color(0xFF666666))
-            MinimalDivider()
-
-            Spacer(modifier = Modifier.height(32.dp))
-        }
-
-        // 成果注脚（完成态）：本次 + 累计滚动动画 + 语录
-        if (!confirm) {
-            item {
-                ResultCumulativeBlock(
-                    roundBytes = state.freedBytes,
-                    lifetimeBytes = state.lifetimeBytes,
-                    quote = state.quote,
-                    textColor = Color(0xFF333333),
-                    subColor = Color(0xFF999999),
-                    surfaceColor = Color(0xFFFFFFFF),
-                )
-                Spacer(modifier = Modifier.height(24.dp))
-            }
+            ResultOutcomeCard(
+                confirm = confirm,
+                freedSpace = state.freedSpace,
+                roundBytes = state.freedBytes,
+                deletedCount = state.deletedCount,
+                keptCount = state.keptCount,
+                lifetimeBytes = state.lifetimeBytes,
+                quote = state.quote,
+                textColor = Color(0xFF333333),
+                heroColor = Color(0xFF333333),          // 极简克制：主角单色深灰，不用绿
+                subColor = Color(0xFF999999),
+                surfaceColor = Color(0xFFFAFAFA),
+                decoration = OutcomeCardDecoration.FLAT, // 扁平 + 细线描边
+                cornerRadius = 2.dp,
+                borderColor = Color(0xFFE0E0E0),
+                heroWeight = FontWeight.Medium,
+                labelLetterSpacing = 2.sp,
+            )
+            Spacer(modifier = Modifier.height(24.dp))
         }
 
         // 待删除缩略图
@@ -208,40 +201,6 @@ fun MinimalResultLayout(state: ResultScreenState) {
             Spacer(modifier = Modifier.height(56.dp))
         }
     }
-}
-
-@Composable
-private fun MinimalStatRow(label: String, value: String, valueColor: Color) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 14.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = label,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Normal,
-            color = Color(0xFF333333)
-        )
-        Text(
-            text = value,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Normal,
-            color = valueColor
-        )
-    }
-}
-
-@Composable
-private fun MinimalDivider() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(1.dp)
-            .background(Color(0xFFE0E0E0))
-    )
 }
 
 @Composable

@@ -55,8 +55,8 @@ appId: com.cleanpic.android
           id: "keep_button"
       - waitForAnimationToEnd
 
-# 结果页待确认态：标题"即将删除 2 项"
-- assertVisible: ".*即将删除 2 项.*"
+# 结果页待确认态：标题"即将删除"
+- assertVisible: ".*即将删除.*"
 
 # 点击待删除缩略图 → 全屏预览
 - tapOn:

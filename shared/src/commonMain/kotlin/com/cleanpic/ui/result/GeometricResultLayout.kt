@@ -84,51 +84,25 @@ fun GeometricResultLayout(state: ResultScreenState) {
             Spacer(modifier = Modifier.height(28.dp))
         }
 
-        // 统计色块卡片
+        // 成果统一卡（两态共用）：主角大数字 + 明细计数行 + 完成态注脚/语录
         item {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(IntrinsicSize.Max),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                GeometricStatCard(
-                    label = "DELETE",
-                    value = "${state.deletedCount}",
-                    valueColor = Color(0xFFE94560),
-                    bgColor = Color(0x26E94560),
-                    modifier = Modifier.weight(1f)
-                )
-                GeometricStatCard(
-                    label = "KEEP",
-                    value = "${state.keptCount}",
-                    valueColor = Color(0xFF4CAF50),
-                    bgColor = Color(0x264CAF50),
-                    modifier = Modifier.weight(1f)
-                )
-                GeometricStatCard(
-                    label = "MB FREE",
-                    value = state.freedSpace,
-                    valueColor = Color(0xFF9C6FDB),
-                    bgColor = Color(0x33533483),
-                    modifier = Modifier.weight(1f)
-                )
-            }
-        }
-
-        // 成果注脚（完成态）：本次 + 累计滚动动画 + 语录
-        if (!confirm) {
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-                ResultCumulativeBlock(
-                    roundBytes = state.freedBytes,
-                    lifetimeBytes = state.lifetimeBytes,
-                    quote = state.quote,
-                    textColor = Color.White,
-                    subColor = Color(0xB3FFFFFF),
-                    surfaceColor = Color(0x1AFFFFFF),
-                )
-            }
+            ResultOutcomeCard(
+                confirm = confirm,
+                freedSpace = state.freedSpace,
+                roundBytes = state.freedBytes,
+                deletedCount = state.deletedCount,
+                keptCount = state.keptCount,
+                lifetimeBytes = state.lifetimeBytes,
+                quote = state.quote,
+                textColor = Color.White,
+                heroColor = Color(state.theme.colorSuccess),  // 霓虹绿
+                subColor = Color(0xB3FFFFFF),
+                surfaceColor = Color(0x14E94560),              // 霓虹粉实心色块
+                decoration = OutcomeCardDecoration.SOLID,
+                cornerRadius = 16.dp,
+                heroWeight = FontWeight(900),                  // 黑体重字
+                labelLetterSpacing = 1.5.sp,
+            )
         }
 
         // 待删除预览
@@ -235,40 +209,6 @@ fun GeometricResultLayout(state: ResultScreenState) {
             )
             Spacer(modifier = Modifier.height(48.dp))
         }
-    }
-}
-
-@Composable
-private fun GeometricStatCard(
-    label: String,
-    value: String,
-    valueColor: Color,
-    bgColor: Color,
-    modifier: Modifier
-) {
-    Column(
-        modifier = modifier
-            .fillMaxHeight()
-            .clip(RoundedCornerShape(16.dp))
-            .background(bgColor)
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = value,
-            fontSize = 22.sp,
-            fontWeight = FontWeight(900),
-            color = valueColor
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = label,
-            fontSize = 10.sp,
-            fontWeight = FontWeight.Medium,
-            color = valueColor.copy(alpha = 0.7f),
-            letterSpacing = 0.5.sp
-        )
     }
 }
 

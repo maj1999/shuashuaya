@@ -32,9 +32,6 @@ fun PlayfulResultLayout(state: ResultScreenState) {
     )
     val confirm = state.phase == ResultPhase.CONFIRM
     val title = if (confirm) state.confirmTitle else "本轮清理完成"
-    val delLabel = if (confirm) "待删除" else "已删除"
-    val keepLabel = if (confirm) "拟保留" else "已保留"
-    val freeLabel = if (confirm) "可释放" else "已释放"
 
     Box(
         modifier = Modifier
@@ -89,48 +86,25 @@ fun PlayfulResultLayout(state: ResultScreenState) {
                 Spacer(modifier = Modifier.height(28.dp))
             }
 
-            // 3 个毛玻璃统计卡片
+            // 成果统一卡（两态共用）：主角大数字 + 明细计数行 + 完成态注脚/语录
             item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(IntrinsicSize.Max),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    PlayfulStatCard(
-                        label = delLabel,
-                        value = "${state.deletedCount}",
-                        valueColor = Color(0xFFFF8A80),
-                        modifier = Modifier.weight(1f)
-                    )
-                    PlayfulStatCard(
-                        label = keepLabel,
-                        value = "${state.keptCount}",
-                        valueColor = Color(0xFF80FFB4),
-                        modifier = Modifier.weight(1f)
-                    )
-                    PlayfulStatCard(
-                        label = freeLabel,
-                        value = state.freedSpace,
-                        valueColor = Color(0xFFE0D0FF),
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-            }
-
-            // 成果注脚（完成态）：本次 + 累计滚动动画 + 语录
-            if (!confirm) {
-                item {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    ResultCumulativeBlock(
-                        roundBytes = state.freedBytes,
-                        lifetimeBytes = state.lifetimeBytes,
-                        quote = state.quote,
-                        textColor = Color.White,
-                        subColor = Color(0xB3FFFFFF),
-                        surfaceColor = Color(0x1AFFFFFF),
-                    )
-                }
+                ResultOutcomeCard(
+                    confirm = confirm,
+                    freedSpace = state.freedSpace,
+                    roundBytes = state.freedBytes,
+                    deletedCount = state.deletedCount,
+                    keptCount = state.keptCount,
+                    lifetimeBytes = state.lifetimeBytes,
+                    quote = state.quote,
+                    textColor = Color.White,
+                    heroColor = Color(state.theme.colorSuccess),   // 亮绿（卡内强制不透明）
+                    subColor = Color(0xB3FFFFFF),
+                    surfaceColor = Color(0x1AFFFFFF),
+                    decoration = OutcomeCardDecoration.BORDER,      // 毛玻璃 + 描边
+                    cornerRadius = 20.dp,
+                    borderColor = Color(0x26FFFFFF),
+                    heroWeight = FontWeight.Bold,
+                )
             }
 
             // 待删除预览
@@ -232,38 +206,6 @@ fun PlayfulResultLayout(state: ResultScreenState) {
                 Spacer(modifier = Modifier.height(48.dp))
             }
         }
-    }
-}
-
-@Composable
-private fun PlayfulStatCard(
-    label: String,
-    value: String,
-    valueColor: Color,
-    modifier: Modifier
-) {
-    Column(
-        modifier = modifier
-            .fillMaxHeight()
-            .clip(RoundedCornerShape(16.dp))
-            .background(Color(0x1AFFFFFF))
-            .border(1.dp, Color(0x26FFFFFF), RoundedCornerShape(16.dp))
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = value,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = valueColor
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = label,
-            fontSize = 12.sp,
-            color = Color(0xB3FFFFFF)
-        )
     }
 }
 

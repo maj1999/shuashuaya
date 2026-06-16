@@ -91,59 +91,27 @@ fun EditorialResultLayout(state: ResultScreenState) {
             Spacer(modifier = Modifier.height(28.dp))
         }
 
-        // 表格式统计
+        // 成果统一卡（两态共用）：主角大数字 + 明细计数行 + 完成态注脚/语录
         item {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(1.dp, EditorialDivider, RectangleShape)
-            ) {
-                EditorialStatCell(
-                    value = "${state.deletedCount}",
-                    label = "DISCARD",
-                    modifier = Modifier.weight(1f)
-                )
-                Box(
-                    modifier = Modifier
-                        .width(1.dp)
-                        .height(72.dp)
-                        .background(EditorialDivider)
-                )
-                EditorialStatCell(
-                    value = "${state.keptCount}",
-                    label = "KEEP",
-                    modifier = Modifier.weight(1f)
-                )
-                Box(
-                    modifier = Modifier
-                        .width(1.dp)
-                        .height(72.dp)
-                        .background(EditorialDivider)
-                )
-                EditorialStatCell(
-                    value = state.freedSpace,
-                    label = "MB FREED",
-                    modifier = Modifier.weight(1f)
-                )
-            }
-
+            ResultOutcomeCard(
+                confirm = confirm,
+                freedSpace = state.freedSpace,
+                roundBytes = state.freedBytes,
+                deletedCount = state.deletedCount,
+                keptCount = state.keptCount,
+                lifetimeBytes = state.lifetimeBytes,
+                quote = state.quote,
+                textColor = EditorialText,
+                heroColor = Color(state.theme.colorSuccess),  // 深绿（衬线）
+                subColor = EditorialSecondary,
+                surfaceColor = Color.Transparent,
+                decoration = OutcomeCardDecoration.RULES,      // 无框 + 上下细分割线表格感
+                cornerRadius = 0.dp,
+                heroWeight = FontWeight.Normal,
+                labelLetterSpacing = 2.sp,
+                serif = true,
+            )
             Spacer(modifier = Modifier.height(28.dp))
-        }
-
-        // 成果注脚（完成态）：本次 + 累计滚动动画 + 语录
-        if (!confirm) {
-            item {
-                ResultCumulativeBlock(
-                    roundBytes = state.freedBytes,
-                    lifetimeBytes = state.lifetimeBytes,
-                    quote = state.quote,
-                    textColor = EditorialText,
-                    subColor = EditorialSecondary,
-                    surfaceColor = Color(0xFFFCFAF2),
-                    serif = true,
-                )
-                Spacer(modifier = Modifier.height(28.dp))
-            }
         }
 
         // 待删除预览
@@ -265,39 +233,6 @@ fun EditorialResultLayout(state: ResultScreenState) {
 
             Spacer(modifier = Modifier.height(48.dp))
         }
-    }
-}
-
-@Composable
-private fun EditorialStatCell(
-    value: String,
-    label: String,
-    modifier: Modifier
-) {
-    Column(
-        modifier = modifier
-            .height(72.dp)
-            .padding(vertical = 10.dp, horizontal = 8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = value,
-            fontSize = 18.sp,
-            fontFamily = FontFamily.Serif,
-            fontWeight = FontWeight.Normal,
-            color = EditorialText,
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = label,
-            fontSize = 8.sp,
-            fontFamily = FontFamily.Serif,
-            color = EditorialSecondary,
-            letterSpacing = 1.sp,
-            textAlign = TextAlign.Center
-        )
     }
 }
 

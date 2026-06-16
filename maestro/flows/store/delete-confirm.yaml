@@ -70,8 +70,8 @@ appId: com.cleanpic.android
 # 确认删除前（待确认态）：标题应为"本轮清理完成"
 - assertVisible: ".*即将删除.*"
 - assertNotVisible: ".*本轮清理完成.*"
-# 待删除区域和确认按钮可见
-- assertVisible: "待删除项目"
+# 待删除区域和确认按钮可见（区域标题随主题不同："待删除"/"待删除项目"，用正则兼容）
+- assertVisible: ".*待删除.*"
 - assertVisible: ".*确认删除.*"
 - takeScreenshot: maestro/screenshots/delete-confirm-before
 
@@ -90,7 +90,7 @@ appId: com.cleanpic.android
 - waitForAnimationToEnd
 
 # 确认删除后（完成态）：待删除区域和确认按钮消失，标题切换为"本轮清理完成"
-- assertNotVisible: "待删除项目"
+- assertNotVisible: ".*待删除.*"
 - assertNotVisible: ".*确认删除.*"
 - assertVisible: ".*已成功删除.*"
 - assertVisible: ".*本轮清理完成.*"

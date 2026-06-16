@@ -23,6 +23,12 @@ appId: com.cleanpic.android
     id: "back_button"
 - waitForAnimationToEnd
 
+# 切到「视频」Tab（首页默认照片 Tab，start_video 仅在视频 Tab 下出现）
+- tapOn:
+    text: "视频"
+    optional: true
+- waitForAnimationToEnd
+
 # 进入视频浏览
 - tapOn:
     id: "start_video"

@@ -30,9 +30,6 @@ fun WarmResultLayout(state: ResultScreenState) {
     val confirm = state.phase == ResultPhase.CONFIRM
     val title = if (confirm) state.confirmTitle else "本轮清理完成！"
     val subtitle = if (confirm) state.irreversibleHint else "干得漂亮！"
-    val delLabel = if (confirm) "待删除" else "已删除"
-    val keepLabel = if (confirm) "拟保留" else "已保留"
-    val freeLabel = if (confirm) "可释放" else "已释放"
 
     LazyColumn(
         modifier = Modifier
@@ -87,51 +84,24 @@ fun WarmResultLayout(state: ResultScreenState) {
             Spacer(modifier = Modifier.height(28.dp))
         }
 
-        // 统计卡片
+        // 成果统一卡（两态共用）：主角大数字 + 明细计数行 + 完成态注脚/语录
         item {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(IntrinsicSize.Max),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                WarmStatCard(
-                    label = delLabel,
-                    value = "${state.deletedCount}",
-                    valueColor = Color(theme.colorDanger),
-                    theme = theme,
-                    modifier = Modifier.weight(1f)
-                )
-                WarmStatCard(
-                    label = keepLabel,
-                    value = "${state.keptCount}",
-                    valueColor = Color(theme.colorSuccess),
-                    theme = theme,
-                    modifier = Modifier.weight(1f)
-                )
-                WarmStatCard(
-                    label = freeLabel,
-                    value = state.freedSpace,
-                    valueColor = Color(0xFF8D6E63),
-                    theme = theme,
-                    modifier = Modifier.weight(1f)
-                )
-            }
-        }
-
-        // 成果注脚（完成态）：本次 + 累计滚动动画 + 语录
-        if (!confirm) {
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-                ResultCumulativeBlock(
-                    roundBytes = state.freedBytes,
-                    lifetimeBytes = state.lifetimeBytes,
-                    quote = state.quote,
-                    textColor = Color(theme.colorText),
-                    subColor = Color(theme.colorTextSecondary),
-                    surfaceColor = Color.White,
-                )
-            }
+            ResultOutcomeCard(
+                confirm = confirm,
+                freedSpace = state.freedSpace,
+                roundBytes = state.freedBytes,
+                deletedCount = state.deletedCount,
+                keptCount = state.keptCount,
+                lifetimeBytes = state.lifetimeBytes,
+                quote = state.quote,
+                textColor = Color(theme.colorText),
+                heroColor = Color(theme.colorSuccess),
+                subColor = Color(theme.colorTextSecondary),
+                surfaceColor = Color.White,
+                decoration = OutcomeCardDecoration.SHADOW,     // 柔和暖阴影白卡
+                cornerRadius = 16.dp,
+                heroWeight = FontWeight.Bold,
+            )
         }
 
         // 待删除预览
@@ -233,44 +203,6 @@ fun WarmResultLayout(state: ResultScreenState) {
             )
             Spacer(modifier = Modifier.height(48.dp))
         }
-    }
-}
-
-@Composable
-private fun WarmStatCard(
-    label: String,
-    value: String,
-    valueColor: Color,
-    theme: com.cleanpic.theme.ThemeTokens,
-    modifier: Modifier
-) {
-    Column(
-        modifier = modifier
-            .fillMaxHeight()
-            .shadow(
-                elevation = 3.dp,
-                shape = RoundedCornerShape(16.dp),
-                ambientColor = Color(0x1F5D4037),
-                spotColor = Color(0x1F5D4037)
-            )
-            .clip(RoundedCornerShape(16.dp))
-            .background(Color.White)
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = value,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = valueColor
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = label,
-            fontSize = 12.sp,
-            color = Color(theme.colorTextSecondary)
-        )
     }
 }
 
